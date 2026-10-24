@@ -1,0 +1,143 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Mail, MapPin, ArrowUpRight, Instagram, Youtube } from 'lucide-react';
+
+const Footer = () => {
+    return (
+        <footer className="relative z-10 bg-[#0e1015] text-zinc-400 pt-16 pb-10 overflow-hidden border-t border-white/10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+                    {/* Brand */}
+                    <div className="col-span-1 lg:col-span-1">
+                        <Link to="/" className="flex items-center mb-5 group">
+                            <div className="h-10 flex items-center">
+                                <img src="/logo.png?v=8" alt="StaySetu Logo" className="h-9 w-auto object-contain brightness-110" />
+                            </div>
+                        </Link>
+                        <p className="text-zinc-400 mb-6 leading-relaxed text-xs sm:text-sm font-normal">
+                            Your bridge to better living. We connect students with safe, verified, and affordable housing options across India's top college hubs.
+                        </p>
+                        <div className="flex items-center space-x-2 mb-4">
+                            <a
+                                href="https://www.instagram.com/stay.setu/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-zinc-400 hover:text-rose-400 hover:bg-white/10 transition-all border border-white/10"
+                                title="Instagram @stay.setu"
+                            >
+                                <Instagram size={15} />
+                            </a>
+                            <a
+                                href="https://www.youtube.com/@Sudhanshu_vision"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-8 h-8 bg-white/5 rounded-xl flex items-center justify-center text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-all border border-white/10"
+                                title="YouTube @Sudhanshu_vision"
+                            >
+                                <Youtube size={15} />
+                            </a>
+                        </div>
+                        <a
+                            href="https://www.youtube.com/@Sudhanshu_vision"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 text-[11px] font-bold transition-all"
+                        >
+                            <Youtube size={13} className="text-red-500 fill-red-500" />
+                            <span>Subscribe @Sudhanshu_vision</span>
+                        </a>
+                    </div>
+
+                    {/* Explore */}
+                    <div>
+                        <h3 className="text-white font-extrabold text-sm mb-5">Explore Stays</h3>
+                        <ul className="space-y-3">
+                            {[
+                                { id: 'e1', label: 'Boys PG', to: '/listings?type=PG&gender=Boys', desc: 'Secure and safe stays for students.' },
+                                { id: 'e2', label: 'Girls PG', to: '/listings?type=PG&gender=Girls', desc: 'Vetted and verified girls only spaces.' },
+                                { id: 'e3', label: 'Flats & Apartments', to: '/listings?type=Flat', desc: 'Independent student flats.' },
+                                { id: 'e4', label: 'Student Hostels', to: '/listings?type=Hostel', desc: 'Hostels with mess & security.' },
+                                { id: 'e5', label: 'List Your Property', to: '/signup', desc: 'Earn by listing your vacant property.' },
+                            ].map((link) => (
+                                <li key={link.label} className="group">
+                                    <Link to={link.to} className="flex items-center justify-between text-xs font-semibold text-zinc-400 hover:text-rose-400 transition-colors">
+                                        <span>{link.label}</span>
+                                        <ArrowUpRight size={13} className="text-zinc-600 group-hover:text-rose-400 transition-colors" />
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Quick Links */}
+                    <div>
+                        <h3 className="text-white font-extrabold text-sm mb-5">Company</h3>
+                        <ul className="space-y-3">
+                            {[
+                                { label: 'Roommates Finder', to: '/roommates' },
+                                { label: 'Verified Maids & Cooks', to: '/maids' },
+                                { label: 'How StaySetu Works', to: '/listings' },
+                                { label: 'Owner Dashboard', to: '/owner-dashboard' },
+                                { label: 'Student Login', to: '/login' },
+                            ].map((item) => (
+                                <li key={item.label}>
+                                    <Link to={item.to} className="text-xs font-semibold text-zinc-400 hover:text-rose-400 transition-colors">
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Contact */}
+                    <div>
+                        <h3 className="text-white font-extrabold text-sm mb-5">Get in Touch</h3>
+                        <ul className="space-y-3">
+                            <li className="flex items-center space-x-2.5 text-xs text-zinc-400">
+                                <div className="w-7 h-7 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center shrink-0 border border-rose-500/20">
+                                    <Mail size={13} />
+                                </div>
+                                <span className="font-medium">staysetu26@gmail.com</span>
+                            </li>
+                            <li className="flex items-center space-x-2.5 text-xs text-zinc-400">
+                                <div className="w-7 h-7 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center shrink-0 border border-rose-500/20">
+                                    <Instagram size={13} />
+                                </div>
+                                <a href="https://www.instagram.com/stay.setu/" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-rose-400 transition-colors">
+                                    @stay.setu
+                                </a>
+                            </li>
+                            <li className="flex items-center space-x-2.5 text-xs text-zinc-400">
+                                <div className="w-7 h-7 bg-red-500/10 text-red-500 rounded-lg flex items-center justify-center shrink-0 border border-red-500/20">
+                                    <Youtube size={13} />
+                                </div>
+                                <a href="https://www.youtube.com/@Sudhanshu_vision" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-red-400 transition-colors">
+                                    @Sudhanshu_vision (YouTube)
+                                </a>
+                            </li>
+                            <li className="flex items-center space-x-2.5 text-xs text-zinc-400">
+                                <div className="w-7 h-7 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center shrink-0 border border-rose-500/20">
+                                    <MapPin size={13} />
+                                </div>
+                                <span className="font-medium">Knowledge Park, Greater Noida, UP</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Bottom bar */}
+                <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-500">
+                    <p>© {new Date().getFullYear()} StaySetu. Made for Indian students with care.</p>
+                    <div className="flex space-x-5">
+                        <span className="hover:text-white transition-colors cursor-pointer">Privacy Policy</span>
+                        <span className="hover:text-white transition-colors cursor-pointer">Terms of Service</span>
+                        <span className="hover:text-white transition-colors cursor-pointer">Security Standards</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    );
+};
+
+export default Footer;

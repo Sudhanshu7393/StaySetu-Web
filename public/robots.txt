@@ -1,0 +1,12 @@
+# StaySetu robots.txt for https://staysetu.online/
+User-agent: *
+Allow: /
+Allow: /listings
+Allow: /property/*
+Allow: /roommates
+Allow: /maids
+Disallow: /admin
+Disallow: /dashboard
+
+# Sitemaps
+Sitemap: https://staysetu.online/sitemap.xml
