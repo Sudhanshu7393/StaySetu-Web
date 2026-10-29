@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { databases, DATABASE_ID, COLLECTION, Query, ID } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { normalizeWhatsAppNumber } from '../lib/whatsappTracker';
 import {
     Users, Search, MessageCircle, MapPin, IndianRupee, Calendar,
     User, GraduationCap, CheckCircle2, ArrowRight, X, Phone, Plus
@@ -336,7 +337,7 @@ const Roommates = () => {
                                 <div className="space-y-2 pt-3 border-t border-zinc-100 mt-auto">
                                     {req.whatsapp && (
                                         <a
-                                            href={`https://wa.me/${req.whatsapp}?text=${encodeURIComponent(`Hi ${req.name}, I saw your roommate requirement on StaySetu for ${req.college || req.location}. Let's connect!`)}`}
+                                            href={`https://wa.me/${normalizeWhatsAppNumber(req.whatsapp)}?text=${encodeURIComponent(`Hi ${req.name}, I saw your roommate requirement on StaySetu for ${req.college || req.location}. Let's connect!`)}`}
                                             target="_blank"
                                             rel="noreferrer"
                                             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-extrabold text-xs bg-[#25D366] text-white hover:bg-[#20ba59] shadow-sm transition-all"

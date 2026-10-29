@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search, SlidersHorizontal, MapPin, Home, IndianRupee, X, Check, Map, LayoutGrid, Crosshair, Navigation } from 'lucide-react';
-import { databases, DATABASE_ID, COLLECTION, Query } from '../lib/supabase';
+import { databases, DATABASE_ID, COLLECTION, Query, parseJsonField } from '../lib/supabase';
 import PropertyCard from '../components/common/PropertyCard';
 import ListingMapSearch from '../components/common/ListingMapSearch';
 import { formatPropertyPrice } from '../lib/formatters';
@@ -111,7 +111,7 @@ const Listings = () => {
 
             if (amenities.length > 0) {
                 results = results.filter(l => {
-                    const listingAmenities = typeof l.amenities === 'string' ? JSON.parse(l.amenities) : (l.amenities || []);
+                    const listingAmenities = parseJsonField(l.amenities) || [];
                     return amenities.every(a => listingAmenities.includes(a));
                 });
             }

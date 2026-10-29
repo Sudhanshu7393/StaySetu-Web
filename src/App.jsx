@@ -60,7 +60,7 @@ const AdminRoute = ({ children }) => {
 
   if (!user) return <Navigate to="/login" replace />;
 
-  const isAdmin = profile?.role === 'admin' || ADMIN_EMAILS.includes(user?.email);
+  const isAdmin = profile?.role === 'admin' || ADMIN_EMAILS.includes(user?.email?.toLowerCase());
   if (!isAdmin) return <Navigate to="/" replace />;
 
   return children;

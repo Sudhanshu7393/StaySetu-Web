@@ -61,13 +61,35 @@ export async function trackWhatsAppClick({
 }
 
 /**
+ * Normalize Indian phone numbers to international WhatsApp format (with 91 country code).
+ */
+export function normalizeWhatsAppNumber(phoneNumber) {
+    let clean = (phoneNumber || '').toString().replace(/\D/g, '');
+    if (!clean) return '';
+    if (clean.length === 10) {
+        clean = '91' + clean;
+    } else if (clean.length === 11 && clean.startsWith('0')) {
+        clean = '91' + clean.slice(1);
+    }
+    return clean;
+}
+
+/**
  * Open WhatsApp after tracking the click.
  */
 export function openWhatsApp(phoneNumber, message) {
-    const cleanNumber = (phoneNumber || '').replace(/\D/g, '');
+    const cleanNumber = normalizeWhatsAppNumber(phoneNumber);
     if (!cleanNumber) {
         alert('Contact number not available for this listing.');
         return;
     }
-    window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
+    let encodedMessage = message || '';
+    try {
+        if (decodeURIComponent(message) === message) {
+            encodedMessage = encodeURIComponent(message);
+        }
+    } catch {
+        encodedMessage = encodeURIComponent(message);
+    }
+    window.open(`https://wa.me/${cleanNumber}?text=${encodedMessage}`, '_blank');
 }

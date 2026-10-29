@@ -13,7 +13,7 @@ const MobileBottomNav = () => {
     };
 
     const role = profile?.role || 'student';
-    const profilePath = user ? (role === 'owner' ? '/owner-dashboard' : '/dashboard') : '/login';
+    const profilePath = user ? ((role === 'owner' || role === 'broker') ? '/owner-dashboard' : '/dashboard') : '/login';
 
     const navItems = [
         { label: 'Home', path: '/', icon: Home },

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, LayoutDashboard, Search, Users, ChevronDown, Bell, PlusCircle, Youtube } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, Search, Users, ChevronDown, Bell, PlusCircle, Youtube, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+
+const ADMIN_EMAILS = ['sudhansu@gmail.com', 'yutkarsh669@gmail.com', 'staysetu26@gmail.com'];
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -56,6 +58,7 @@ const Navbar = () => {
     ];
 
     const role = profile?.role || 'student';
+    const isAdmin = profile?.role === 'admin' || (user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase()));
     const dashPath = (role === 'owner' || role === 'broker') ? '/owner-dashboard' : '/dashboard';
 
     return (
@@ -158,6 +161,15 @@ const Navbar = () => {
                                                     <p className="text-[10px] text-zinc-500 truncate mt-0.5">{user?.email}</p>
                                                 </div>
                                                 <div className="p-1.5">
+                                                    {isAdmin && (
+                                                        <Link
+                                                            to="/admin"
+                                                            className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-amber-700 hover:bg-amber-50 rounded-xl transition-all"
+                                                            onClick={() => setDropdownOpen(false)}
+                                                        >
+                                                            <ShieldCheck size={14} className="text-amber-600" /> Admin Panel
+                                                        </Link>
+                                                    )}
                                                     <Link
                                                         to={dashPath}
                                                         className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-zinc-700 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
@@ -246,6 +258,15 @@ const Navbar = () => {
 
                                 {user ? (
                                     <>
+                                        {isAdmin && (
+                                            <Link
+                                                to="/admin"
+                                                className="px-4 py-2.5 rounded-xl text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 flex items-center gap-2"
+                                                onClick={() => setIsOpen(false)}
+                                            >
+                                                <ShieldCheck size={15} className="text-amber-600" /> Admin Panel
+                                            </Link>
+                                        )}
                                         <Link
                                             to={dashPath}
                                             className="px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-800 bg-zinc-50"
