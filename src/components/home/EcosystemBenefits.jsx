@@ -22,10 +22,10 @@ const EcosystemBenefits = () => {
                         <span>100% Free Platform • Transparent Pricing • Direct Connect</span>
                     </div>
                     <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight leading-tight">
-                        The 3 Biggest Student Living Needs, <span className="text-rose-600">Solved in One Platform</span>
+                        The 3 Biggest Living & Housing Needs, <span className="text-rose-600">Solved in One Platform</span>
                     </h2>
                     <p className="text-zinc-500 font-normal text-sm sm:text-base mt-2.5 leading-relaxed">
-                        Finding a clean room, a compatible roommate, and reliable local housekeeping shouldn't be stressful. StaySetu brings complete clarity, zero fees, and direct connections to your campus life.
+                        Finding a verified home, a compatible roommate, and reliable local housekeeping shouldn't be stressful. StaySetu brings complete clarity, upfront pricing, and direct connections.
                     </p>
                 </div>
 
@@ -199,10 +199,10 @@ const EcosystemBenefits = () => {
                                 Official Community • @stay.setu
                             </span>
                             <h4 className="text-base sm:text-lg font-black text-zinc-900">
-                                Join Our Student Living Community on Instagram
+                                Join Our Community on Instagram
                             </h4>
                             <p className="text-zinc-600 text-xs sm:text-sm mt-0.5 max-w-2xl">
-                                Watch real room tours, campus guides, hostel reviews, and student hacks directly on our official Instagram page.
+                                Watch property walk-throughs, tower tours, locality reviews, and home tips directly on our official Instagram page.
                             </p>
                         </div>
                     </div>

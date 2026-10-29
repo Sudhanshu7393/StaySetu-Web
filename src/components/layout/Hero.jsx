@@ -365,8 +365,8 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
                                         </>
                                     ) : (
                                         <>
-                                            Find Verified Student Stays, <br className="hidden sm:inline" />
-                                            <span className="text-rose-600">Right Near Campus.</span>
+                                            Find Verified Rooms & Flats, <br className="hidden sm:inline" />
+                                            <span className="text-rose-600">Right Where You Need.</span>
                                         </>
                                     )}
                                 </h1>
@@ -376,7 +376,7 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
                                     <p className="hidden sm:block text-zinc-600 text-sm md:text-base font-normal max-w-lg leading-relaxed">
                                         {activePurpose === 'sell'
                                             ? 'Flats, plots and independent villas in prime locations. Direct owner and verified broker deals with 100% upfront pricing.'
-                                            : 'Explore vetted PGs, hostels & apartments with upfront rent, clear deposits, and honest broker terms. Connect directly on WhatsApp.'}
+                                            : 'Explore vetted flats, apartments, PGs & rental stays with upfront rent, clear deposits, and honest broker terms. Connect directly on WhatsApp.'}
                                     </p>
                                     <div className="flex sm:hidden items-center gap-1.5 text-[11px] font-bold text-zinc-600 flex-wrap">
                                         {activePurpose === 'sell' ? (

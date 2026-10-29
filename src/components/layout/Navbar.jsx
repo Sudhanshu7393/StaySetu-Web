@@ -85,9 +85,6 @@ const Navbar = () => {
                                         <span className="bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 bg-clip-text text-transparent">Setu</span>
                                         <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-500 ml-0.5 animate-pulse" />
                                     </div>
-                                    <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 font-sans mt-0.5">
-                                        Verified Student Living
-                                    </span>
                                 </div>
                             </Link>
 
