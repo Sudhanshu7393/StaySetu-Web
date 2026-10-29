@@ -140,19 +140,19 @@ const Hero = () => {
     };
 
     return (
-        <div className="relative bg-[#FAFAFB] pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="relative bg-[#FAFAFB] pt-20 sm:pt-24 pb-4 sm:pb-8 px-3 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 
                 {/* Curved Hero Banner Card matching reference screenshot */}
-                <div className="relative rounded-[2.5rem] bg-gradient-to-br from-rose-50/90 via-white to-rose-100/50 border border-rose-100 p-6 sm:p-10 lg:p-12 shadow-sm overflow-hidden">
+                <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-gradient-to-br from-rose-50/80 via-white to-rose-100/40 border border-rose-100 p-4 sm:p-10 lg:p-12 shadow-sm overflow-hidden">
                     
                     {/* Decorative Background Blob */}
-                    <div className="absolute -top-24 -right-24 w-96 h-96 bg-rose-200/30 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute -top-24 -right-24 w-96 h-96 bg-rose-200/25 rounded-full blur-3xl pointer-events-none" />
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 items-center relative z-10">
                         
                         {/* Left Column: Heading, Subtitle & Search */}
-                        <div className="lg:col-span-7 space-y-5 text-left">
+                        <div className="lg:col-span-7 space-y-4 sm:space-y-5 text-left">
                             
                             {/* Top row: City Pill + Purpose Toggle */}
                             <div className="flex flex-wrap items-center gap-2.5">
@@ -318,42 +318,53 @@ const Hero = () => {
                             </div>
 
                             {/* Main Display Headline */}
-                            {purpose === 'sell' ? (
-                                <h1 className="text-3xl sm:text-5xl lg:text-5xl font-extrabold text-zinc-900 tracking-tight leading-[1.18]">
-                                    Verified Properties for Sale, <br className="hidden sm:inline" />
-                                    <span className="text-zinc-900">With 100% </span>
-                                    <span className="text-rose-600">Pricing Clarity.</span>
+                            <div>
+                                <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-zinc-950 tracking-tight leading-[1.18]">
+                                    {purpose === 'sell' ? (
+                                        <>
+                                            Verified Properties for Sale, <br className="hidden sm:inline" />
+                                            <span className="text-rose-600">With 100% Clarity.</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            Find Verified Student Stays, <br className="hidden sm:inline" />
+                                            <span className="text-rose-600">Right Near Campus.</span>
+                                        </>
+                                    )}
                                 </h1>
-                            ) : (
-                                <h1 className="text-3xl sm:text-5xl lg:text-5xl font-extrabold text-zinc-900 tracking-tight leading-[1.18]">
-                                    Find Verified Student Stays, <br className="hidden sm:inline" />
-                                    <span className="text-zinc-900">Right Near </span>
-                                    <span className="text-rose-600">Your Campus.</span>
-                                </h1>
-                            )}
 
-                            {/* Subtitle */}
-                            <p className="text-zinc-600 text-xs sm:text-sm md:text-base font-normal max-w-lg leading-relaxed">
-                                {purpose === 'sell'
-                                    ? 'Flats, plots and independent villas in prime locations. Direct owner and verified broker deals with 100% upfront pricing.'
-                                    : 'Explore vetted PGs, hostels & apartments with upfront rent, clear deposits, and honest broker terms. Connect directly on WhatsApp.'}
-                            </p>
+                                {/* Subtitle on mobile: sleek trust badges; on desktop: clean description */}
+                                <div className="mt-1.5 sm:mt-2.5">
+                                    <p className="hidden sm:block text-zinc-600 text-sm md:text-base font-normal max-w-lg leading-relaxed">
+                                        {purpose === 'sell'
+                                            ? 'Flats, plots and independent villas in prime locations. Direct owner and verified broker deals with 100% upfront pricing.'
+                                            : 'Explore vetted PGs, hostels & apartments with upfront rent, clear deposits, and honest broker terms. Connect directly on WhatsApp.'}
+                                    </p>
+                                    <div className="flex sm:hidden items-center gap-1.5 text-[11px] font-bold text-zinc-600 flex-wrap">
+                                        <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                            ✓ ₹0 Brokerage
+                                        </span>
+                                        <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                                            ✓ Verified Stays
+                                        </span>
+                                        <span className="inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                                            ✓ Direct WhatsApp
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
 
-                            {/* Search Bar matching modern pill design */}
+                            {/* Sleek Modern Floating Search Bar */}
                             <form
                                 onSubmit={handleSearch}
                                 ref={searchRef}
-                                className="relative max-w-xl bg-white rounded-2xl sm:rounded-full p-2 sm:p-2 border border-zinc-200/80 shadow-md flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
+                                className="relative max-w-xl bg-white rounded-2xl sm:rounded-full p-1.5 sm:p-2 border border-zinc-200 shadow-md shadow-zinc-200/50 flex items-center gap-1.5"
                             >
-                                <div className="flex-1 flex items-center px-3 py-1 relative">
-                                    <Search size={18} className="text-rose-500 mr-2.5 shrink-0" />
+                                <div className="flex-1 flex items-center pl-2.5 sm:pl-3 relative min-w-0">
+                                    <Search size={18} className="text-rose-500 mr-2 shrink-0" />
                                     <input
                                         type="text"
-                                        placeholder={
-                                            purpose === 'sell'
-                                                ? "Search flats, plots, villas across India (e.g. Crossings Republik, Lucknow)..."
-                                                : "Search any area, college, city across India (e.g. Crossings Republik, ABES, Noida)..."
-                                        }
+                                        placeholder="Search college, PG, flat or area..."
                                         value={searchQuery}
                                         onChange={(e) => {
                                             const val = e.target.value;
@@ -373,7 +384,7 @@ const Hero = () => {
                                                 setShowSuggestions(true);
                                             }
                                         }}
-                                        className="w-full text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none bg-transparent"
+                                        className="w-full text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none bg-transparent truncate"
                                     />
                                     
                                     <button
@@ -408,44 +419,68 @@ const Hero = () => {
 
                                 <button
                                     type="submit"
-                                    className="bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs sm:text-sm py-3 px-6 rounded-full flex items-center justify-center gap-2 transition-all shadow-md shadow-rose-500/25 shrink-0"
+                                    className="bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-extrabold text-xs sm:text-sm py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-full flex items-center justify-center gap-1.5 transition-all shadow-md shadow-rose-500/25 shrink-0"
                                 >
-                                    <Search size={15} />
-                                    <span>Search Rooms</span>
+                                    <Search size={14} className="hidden sm:inline" />
+                                    <span>Search</span>
                                 </button>
                             </form>
 
-                            {/* Property Types & Popular Hubs Quick Click */}
-                            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-zinc-500">
-                                <span className="font-bold text-zinc-400">Filter:</span>
-                                {['All', 'Girls PG', 'Boys PG', 'Flat'].map((t) => (
+                            {/* App-like Quick Categories - 1 Tap Actions */}
+                            <div className="grid grid-cols-5 gap-1.5 sm:gap-2 pt-1">
+                                {[
+                                    { label: 'Girls PG', icon: '🌸', type: 'PG', gender: 'girls' },
+                                    { label: 'Boys PG', icon: '⚡', type: 'PG', gender: 'boys' },
+                                    { label: 'Flats', icon: '🏢', type: 'Flat' },
+                                    { label: 'Roommates', icon: '👥', link: '/roommates' },
+                                    { label: 'Maids', icon: '🧹', link: '/maids' },
+                                ].map((cat) => (
                                     <button
-                                        key={t}
+                                        key={cat.label}
                                         type="button"
                                         onClick={() => {
-                                            setPropertyType(t);
-                                            navigate(`/listings?purpose=${purpose}${t !== 'All' ? `&type=${encodeURIComponent(t)}` : ''}`);
+                                            if (cat.link) {
+                                                navigate(cat.link);
+                                            } else {
+                                                setPropertyType(cat.type);
+                                                navigate(`/listings?purpose=${purpose}&type=${encodeURIComponent(cat.type)}${cat.gender ? `&gender=${cat.gender}` : ''}`);
+                                            }
                                         }}
-                                        className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${
-                                            propertyType === t
-                                                ? 'bg-rose-500 text-white border-rose-500'
-                                                : 'bg-white/80 hover:bg-rose-50 text-zinc-700 border-zinc-200/60'
-                                        }`}
+                                        className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/95 hover:bg-rose-50/70 border border-zinc-200/80 shadow-2xs hover:border-rose-300 transition-all active:scale-95 text-center group cursor-pointer"
                                     >
-                                        {t === 'All' ? 'All Stays' : t}
+                                        <span className="text-xl sm:text-2xl mb-1 group-hover:scale-110 transition-transform">
+                                            {cat.icon}
+                                        </span>
+                                        <span className="text-[10px] sm:text-xs font-extrabold text-zinc-800 group-hover:text-rose-600 truncate max-w-full">
+                                            {cat.label}
+                                        </span>
                                     </button>
                                 ))}
-                                {['Crossings Republik', 'ABES Engg', 'Noida Sec 62', 'Indirapuram', 'Lucknow'].map((tag) => (
+                            </div>
+
+                            {/* Popular Campuses & Areas - Horizontal Scrollable (Never wraps!) */}
+                            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-nowrap pt-1">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 shrink-0">
+                                    Popular:
+                                </span>
+                                {[
+                                    { label: '🎓 ABES Engg', q: 'ABES' },
+                                    { label: '📍 Crossings Republik', q: 'Crossings Republik' },
+                                    { label: '🎓 IMS Ghaziabad', q: 'IMS' },
+                                    { label: '📍 Noida Sec 62', q: 'Noida' },
+                                    { label: '📍 Lucknow', q: 'Lucknow' },
+                                    { label: '🎓 AKGEC', q: 'AKGEC' },
+                                ].map((tag) => (
                                     <button
-                                        key={tag}
+                                        key={tag.label}
                                         type="button"
                                         onClick={() => {
-                                            setSearchQuery(tag);
-                                            navigate(`/listings?q=${encodeURIComponent(tag)}`);
+                                            setSearchQuery(tag.q);
+                                            navigate(`/listings?q=${encodeURIComponent(tag.q)}`);
                                         }}
-                                        className="px-2.5 py-1 rounded-full bg-white/80 hover:bg-rose-50 text-zinc-700 hover:text-rose-600 border border-zinc-200/60 font-medium transition-colors"
+                                        className="px-3 py-1 rounded-full bg-white hover:bg-rose-50 text-zinc-700 hover:text-rose-600 border border-zinc-200 text-xs font-bold transition-colors shrink-0 shadow-2xs whitespace-nowrap"
                                     >
-                                        {tag}
+                                        {tag.label}
                                     </button>
                                 ))}
                             </div>
