@@ -107,8 +107,8 @@ const Footer = () => {
                                 <div className="w-7 h-7 bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center shrink-0 border border-emerald-500/20">
                                     <Phone size={13} />
                                 </div>
-                                <a href="https://wa.me/919289614973?text=Hi%20StaySetu%2C%20I%20have%20an%20inquiry" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-emerald-400 transition-colors">
-                                    +91 9289614973 (WhatsApp / Call)
+                                <a href="https://wa.me/917393011350?text=Hi%20StaySetu%2C%20I%20have%20an%20inquiry" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-emerald-400 transition-colors">
+                                    +91 7393011350 (WhatsApp / Call)
                                 </a>
                             </li>
                             <li className="flex items-center space-x-2.5 text-xs text-zinc-400">

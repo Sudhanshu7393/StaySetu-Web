@@ -6,7 +6,7 @@ import MobileBottomNav from './components/layout/MobileBottomNav';
 import Footer from './components/layout/Footer';
 
 // Superadmin whitelist — works even if DB role update is pending
-const ADMIN_EMAILS = ['sudhansu@gmail.com', 'yutkarsh669@gmail.com', 'staysetu26@gmail.com'];
+const ADMIN_EMAILS = ['staysetu26@gmail.com', 'yutkarsh669@gmail.com'];
 
 // Pages
 import Home from './pages/Home';

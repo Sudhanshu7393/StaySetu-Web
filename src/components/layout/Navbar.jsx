@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut, LayoutDashboard, Search, Users, ChevronDown, Bell, PlusCircle, Youtube, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const ADMIN_EMAILS = ['sudhansu@gmail.com', 'yutkarsh669@gmail.com', 'staysetu26@gmail.com'];
+const ADMIN_EMAILS = ['staysetu26@gmail.com', 'yutkarsh669@gmail.com'];
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);

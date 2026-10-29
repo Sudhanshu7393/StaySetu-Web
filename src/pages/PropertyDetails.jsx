@@ -200,7 +200,7 @@ const PropertyDetails = () => {
         ? (reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length).toFixed(1)
         : null;
 
-    const isAdmin = profile?.role === 'admin' || (user?.email && ['sudhansu@gmail.com', 'yutkarsh669@gmail.com', 'staysetu26@gmail.com'].includes(user.email.toLowerCase()));
+    const isAdmin = profile?.role === 'admin' || (user?.email && ['staysetu26@gmail.com', 'yutkarsh669@gmail.com'].includes(user.email.toLowerCase()));
 
     const handleShare = async () => {
         const shareData = {

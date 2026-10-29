@@ -179,7 +179,7 @@ const Login = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-bold text-slate-800 group-hover:text-purple-700">Super Admin Panel</p>
-                                        <p className="text-xs text-slate-400">sudhansu@gmail.com</p>
+                                        <p className="text-xs text-slate-400">staysetu26@gmail.com</p>
                                     </div>
                                 </div>
                                 <ArrowRight size={16} className="text-slate-400 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />

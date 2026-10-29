@@ -17,7 +17,7 @@ const VIKRANT_PG_DEFAULT = {
         'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80'
     ],
     amenities: ['WiFi', 'Food', 'Parking', 'Laundry', 'Security', 'Attached Bath', 'Power Backup'],
-    whatsappNumber: '9289614973',
+    whatsappNumber: '7393011350',
 };
 
 const Hero = () => {

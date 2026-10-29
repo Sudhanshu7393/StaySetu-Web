@@ -247,7 +247,7 @@ const EcosystemBenefits = () => {
                             List Property Free
                         </Link>
                         <a
-                            href="https://wa.me/919289614973?text=Hi%20StaySetu%20Team%2C%20I%20am%20a%20property%20owner%20and%20want%20to%20list%20my%20PG%2FFlat."
+                            href="https://wa.me/917393011350?text=Hi%20StaySetu%20Team%2C%20I%20am%20a%20property%20owner%20and%20want%20to%20list%20my%20PG%2FFlat."
                             target="_blank"
                             rel="noopener noreferrer"
                             className="w-full md:w-auto bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-extrabold px-5 py-3 rounded-full text-xs text-center border border-zinc-200/80 transition-all flex items-center justify-center gap-1.5"

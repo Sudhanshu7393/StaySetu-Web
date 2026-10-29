@@ -5,7 +5,7 @@ import StudentDashboard from './StudentDashboard';
 import OwnerDashboard from './OwnerDashboard';
 
 // Superadmin whitelist
-const ADMIN_EMAILS = ['sudhansu@gmail.com', 'yutkarsh669@gmail.com', 'staysetu26@gmail.com'];
+const ADMIN_EMAILS = ['staysetu26@gmail.com', 'yutkarsh669@gmail.com'];
 
 const Dashboard = () => {
     const { user, profile, loading } = useAuth();
@@ -22,7 +22,7 @@ const Dashboard = () => {
     }
 
     const role = profile?.role || user?.user_metadata?.role || 'student';
-    const isAdmin = role === 'admin' || ADMIN_EMAILS.includes(user?.email);
+    const isAdmin = role === 'admin' || ADMIN_EMAILS.includes(user?.email?.toLowerCase());
 
     // Admin → go straight to admin panel
     if (isAdmin) {
