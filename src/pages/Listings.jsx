@@ -93,7 +93,16 @@ const Listings = () => {
                 });
             }
 
-            // Client-side filtering for search (All India support)
+            // Price filter: adjust according to purpose to ensure sale vs rent pricing doesn't block listings
+            if (purposeFilter === 'sell') {
+                const effectiveMax = priceRange >= 1000000 ? priceRange : 30000000;
+                results = results.filter(l => (Number(l.price) || 0) <= effectiveMax);
+            } else if (purposeFilter === 'rent') {
+                const effectiveMax = priceRange <= 200000 ? priceRange : 100000;
+                results = results.filter(l => (Number(l.price) || 0) <= effectiveMax);
+            } else {
+                results = results.filter(l => (Number(l.price) || 0) <= priceRange);
+            }
             if (searchQuery) {
                 const q = searchQuery.toLowerCase().trim();
                 results = results.filter(l =>
@@ -121,8 +130,6 @@ const Listings = () => {
                     (l.nearbyCollege || l.nearby_college || '').toLowerCase().includes(c)
                 );
             }
-
-            results = results.filter(l => (l.price || 0) <= priceRange);
 
             if (amenities.length > 0) {
                 results = results.filter(l => {
@@ -195,6 +202,22 @@ const Listings = () => {
         }, 500);
         return () => clearTimeout(timer);
     }, [searchQuery, showSuggestions]);
+
+    // Sync state when URL params change (e.g. clicking "Buy / Sell" in Navbar from /dashboard or any page)
+    useEffect(() => {
+        const urlPurpose = searchParams.get('purpose');
+        if (urlPurpose && urlPurpose !== purposeFilter) {
+            setPurposeFilter(urlPurpose);
+            setPropertyType('all');
+            if (urlPurpose === 'sell') {
+                setPriceRange(30000000);
+            } else if (urlPurpose === 'rent') {
+                setPriceRange(50000);
+            } else {
+                setPriceRange(30000000);
+            }
+        }
+    }, [searchParams]);
 
     // Re-fetch when search params or internal state changes
     useEffect(() => {

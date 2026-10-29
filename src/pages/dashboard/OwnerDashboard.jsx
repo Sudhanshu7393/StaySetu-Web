@@ -30,7 +30,10 @@ const OwnerDashboard = () => {
 
     // Add listing form state
     const [formData, setFormData] = useState({
+        purpose: 'rent', // 'rent' | 'sell'
         title: '', description: '', price: '',
+        area: '', ownership: 'Freehold',
+        possession: 'Ready to Move', bedrooms: '',
         location: '', type: 'PG',
         phone_number: '', whatsapp_number: '',
         amenities: [], images: [''],
@@ -288,9 +291,14 @@ const OwnerDashboard = () => {
             const imageUrls = uploadedImages.map(img => img.url);
 
             await databases.createDocument(DATABASE_ID, COLLECTION.listings, ID.unique(), {
+                purpose: formData.purpose || 'rent',
                 title: formData.title,
                 description: formData.description,
                 price: parseFloat(formData.price),
+                area: formData.area || '',
+                ownership: formData.ownership || 'Freehold',
+                possession: formData.possession || 'Ready to Move',
+                bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
                 location: formData.location,
                 latitude: formData.latitude,
                 longitude: formData.longitude,
@@ -301,8 +309,8 @@ const OwnerDashboard = () => {
                 images: JSON.stringify(imageUrls.length > 0 ? imageUrls : []),
                 ownerId: user.$id,
                 listedBy: formData.listed_by || 'owner',
-                brokerageFee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? '15 Days Rent' : '₹0'),
-                brokerage_fee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? '15 Days Rent' : '₹0'),
+                brokerageFee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent') : '₹0'),
+                brokerage_fee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent') : '₹0'),
                 status: 'pending',
                 genderPreference: formData.gender_preference || 'any',
                 occupancy: JSON.stringify(formData.occupancy),
@@ -316,7 +324,10 @@ const OwnerDashboard = () => {
 
             setFormSuccess(true);
             setFormData({
+                purpose: 'rent',
                 title: '', description: '', price: '',
+                area: '', ownership: 'Freehold',
+                possession: 'Ready to Move', bedrooms: '',
                 location: '', type: 'PG',
                 phone_number: '', whatsapp_number: '',
                 amenities: [], images: [''],
@@ -910,15 +921,42 @@ const OwnerDashboard = () => {
                                         Basic Information
                                     </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Purpose Switcher: Rent vs Sell */}
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Listing Purpose (प्रॉपर्टी का उद्देश्य)</label>
+                                            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData(prev => ({ ...prev, purpose: 'rent', type: 'PG' }))}
+                                                    className={`flex-1 py-3.5 sm:py-4 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm flex items-center justify-center gap-2 ${formData.purpose === 'rent'
+                                                        ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-xs'
+                                                        : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
+                                                        }`}
+                                                >
+                                                    <span>🏠 Rent Out (किराए पर देना है)</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData(prev => ({ ...prev, purpose: 'sell', type: 'Flat' }))}
+                                                    className={`flex-1 py-3.5 sm:py-4 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm flex items-center justify-center gap-2 ${formData.purpose === 'sell'
+                                                        ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-xs'
+                                                        : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
+                                                        }`}
+                                                >
+                                                    <span>🏷️ Sell Property (प्रॉपर्टी बेचनी है)</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Are you an Owner or a Broker?</label>
-                                            <div className="flex gap-4">
+                                            <div className="flex gap-3 sm:gap-4">
                                                 <button
                                                     type="button"
                                                     onClick={() => setFormData(prev => ({ ...prev, listed_by: 'owner' }))}
-                                                    className={`flex-1 py-4 rounded-2xl border-2 transition-all font-bold text-sm ${formData.listed_by === 'owner'
+                                                    className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm ${formData.listed_by === 'owner'
                                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                        : 'border-slate-50 text-slate-500 hover:border-slate-100 bg-white'
+                                                        : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
                                                         }`}
                                                 >
                                                     Owner
@@ -926,9 +964,9 @@ const OwnerDashboard = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => setFormData(prev => ({ ...prev, listed_by: 'broker' }))}
-                                                    className={`flex-1 py-4 rounded-2xl border-2 transition-all font-bold text-sm ${formData.listed_by === 'broker'
+                                                    className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm ${formData.listed_by === 'broker'
                                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                        : 'border-slate-50 text-slate-500 hover:border-slate-100 bg-white'
+                                                        : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
                                                         }`}
                                                 >
                                                     Broker
@@ -975,70 +1013,122 @@ const OwnerDashboard = () => {
                                         </div>
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Property Title *</label>
-                                            <input type="text" name="title" required placeholder="e.g. Modern PG near ABES EC / Crossings Republik"
-                                                className="input-field" value={formData.title} onChange={handleChange} />
+                                            <input 
+                                                type="text" 
+                                                name="title" 
+                                                required 
+                                                placeholder={formData.purpose === 'sell' ? "e.g. 3 BHK Luxury Apartment in Crossings Republik" : "e.g. Modern PG near ABES EC / Crossings Republik"}
+                                                className="input-field" 
+                                                value={formData.title} 
+                                                onChange={handleChange} 
+                                            />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Property Type *</label>
                                             <select name="type" className="input-field cursor-pointer" value={formData.type} onChange={handleChange}>
-                                                <option value="PG">PG (Paying Guest)</option>
-                                                <option value="Flat">Flat / Apartment</option>
-                                                <option value="Hostel">Hostel</option>
+                                                {formData.purpose === 'sell' ? (
+                                                    <>
+                                                        <option value="Flat">Flat / Apartment</option>
+                                                        <option value="House/Villa">Independent Villa / Kothi</option>
+                                                        <option value="Plot">Residential Plot</option>
+                                                        <option value="Studio">Studio Suite</option>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <option value="PG">PG (Paying Guest)</option>
+                                                        <option value="Flat">Flat / Apartment</option>
+                                                        <option value="Hostel">Hostel</option>
+                                                    </>
+                                                )}
                                             </select>
                                         </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Foundation / Association Name</label>
-                                            <div className="relative">
-                                                <Building2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <input type="text" name="association" placeholder="e.g. Crossings Republik / Delhi NCR PG Association"
-                                                    className="input-field pl-10" value={formData.association} onChange={handleChange} />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Nearby College / University</label>
-                                            <div className="relative">
-                                                <Users size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <input type="text" name="nearbyCollege" placeholder="e.g. ABES EC, IMS Ghaziabad, AKGEC"
-                                                    className="input-field pl-10" value={formData.nearbyCollege} onChange={handleChange} />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Monthly Rent (₹) *</label>
+
+                                        {formData.purpose === 'sell' ? (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Super Built-up Area</label>
+                                                    <input type="text" name="area" placeholder="e.g. 1,580 sq.ft" className="input-field" value={formData.area} onChange={handleChange} />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Bedrooms (BHK)</label>
+                                                    <input type="number" name="bedrooms" placeholder="e.g. 3" className="input-field" value={formData.bedrooms} onChange={handleChange} />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Possession Status</label>
+                                                    <select name="possession" className="input-field cursor-pointer" value={formData.possession} onChange={handleChange}>
+                                                        <option value="Ready to Move">Ready to Move</option>
+                                                        <option value="Under Construction">Under Construction</option>
+                                                        <option value="Immediate Registry">Immediate Registry</option>
+                                                    </select>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Foundation / Association Name</label>
+                                                    <div className="relative">
+                                                        <Building2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                        <input type="text" name="association" placeholder="e.g. Crossings Republik / Delhi NCR PG Association"
+                                                            className="input-field pl-10" value={formData.association} onChange={handleChange} />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Nearby College / University</label>
+                                                    <div className="relative">
+                                                        <Users size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                        <input type="text" name="nearbyCollege" placeholder="e.g. ABES EC, IMS Ghaziabad, AKGEC"
+                                                            className="input-field pl-10" value={formData.nearbyCollege} onChange={handleChange} />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Gender Preference</label>
+                                                    <select name="gender_preference" className="input-field cursor-pointer" value={formData.gender_preference} onChange={handleChange}>
+                                                        <option value="any">Any</option>
+                                                        <option value="boys">Boys Only</option>
+                                                        <option value="girls">Girls Only</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Room Occupancy</label>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {[
+                                                            { id: 'single', label: 'Single' },
+                                                            { id: 'double', label: 'Double Sharing' },
+                                                            { id: 'triple', label: 'Triple Sharing' },
+                                                            { id: 'four', label: 'Four Sharing' }
+                                                        ].map((opt) => (
+                                                            <button
+                                                                key={opt.id}
+                                                                type="button"
+                                                                onClick={() => toggleOccupancy(opt.id)}
+                                                                className={`px-4 py-2 rounded-xl border-2 transition-all font-bold text-xs ${formData.occupancy.includes(opt.id)
+                                                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                                    : 'border-slate-50 text-slate-500 hover:border-slate-100 bg-white'
+                                                                    }`}
+                                                            >
+                                                                {opt.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">
+                                                {formData.purpose === 'sell' ? 'Total Selling Price (₹) *' : 'Monthly Rent (₹) *'}
+                                            </label>
                                             <div className="relative">
                                                 <IndianRupee size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <input type="number" name="price" required placeholder="8500"
-                                                    className="input-field pl-10" value={formData.price} onChange={handleChange} />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Gender Preference</label>
-                                            <select name="gender_preference" className="input-field cursor-pointer" value={formData.gender_preference} onChange={handleChange}>
-                                                <option value="any">Any</option>
-                                                <option value="boys">Boys Only</option>
-                                                <option value="girls">Girls Only</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Room Occupancy</label>
-                                            <div className="flex flex-wrap gap-2">
-                                                {[
-                                                    { id: 'single', label: 'Single' },
-                                                    { id: 'double', label: 'Double Sharing' },
-                                                    { id: 'triple', label: 'Triple Sharing' },
-                                                    { id: 'four', label: 'Four Sharing' }
-                                                ].map((opt) => (
-                                                    <button
-                                                        key={opt.id}
-                                                        type="button"
-                                                        onClick={() => toggleOccupancy(opt.id)}
-                                                        className={`px-4 py-2 rounded-xl border-2 transition-all font-bold text-xs ${formData.occupancy.includes(opt.id)
-                                                            ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                            : 'border-slate-50 text-slate-500 hover:border-slate-100 bg-white'
-                                                            }`}
-                                                    >
-                                                        {opt.label}
-                                                    </button>
-                                                ))}
+                                                <input 
+                                                    type="number" 
+                                                    name="price" 
+                                                    required 
+                                                    placeholder={formData.purpose === 'sell' ? "6500000" : "8500"}
+                                                    className="input-field pl-10" 
+                                                    value={formData.price} 
+                                                    onChange={handleChange} 
+                                                />
                                             </div>
                                         </div>
                                         <div className="md:col-span-2">

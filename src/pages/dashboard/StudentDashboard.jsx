@@ -23,6 +23,7 @@ const StudentDashboard = () => {
     const [savedListings, setSavedListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [purposeFilter, setPurposeFilter] = useState('all');
     const [propertyType, setPropertyType] = useState('all');
     const [genderFilter, setGenderFilter] = useState('all');
     const [priceRange, setPriceRange] = useState(100000);
@@ -203,15 +204,20 @@ const StudentDashboard = () => {
         const matchesType = propertyType === 'all' || listing.type === propertyType;
         const matchesPrice = Number(listing.price) <= priceRange;
 
+        const matchesPurpose = purposeFilter === 'all' ||
+            (purposeFilter === 'sell'
+                ? (listing.purpose === 'sell' || Number(listing.price) > 500000)
+                : (listing.purpose !== 'sell' && Number(listing.price) <= 500000));
+
         let matchesGender = true;
-        if (genderFilter !== 'all') {
+        if (genderFilter !== 'all' && purposeFilter !== 'sell') {
             const genderValue = genderFilter === 'male' ? 'boys' : 'girls';
             // Check both camelCase and snake_case for compatibility
             const propertyGender = listing.genderPreference || listing.gender_preference || listing.gender;
             matchesGender = propertyGender === genderValue || propertyGender === 'any';
         }
 
-        return matchesSearch && matchesType && matchesPrice && matchesGender;
+        return matchesPurpose && matchesSearch && matchesType && matchesPrice && matchesGender;
     });
 
     const timeAgo = (dateStr) => {
@@ -506,65 +512,101 @@ const StudentDashboard = () => {
                 {activeTab === 'browse' && (
                     <div className="animate-fade-in">
                         {/* Search & Filter Bar */}
-                        <div className="bg-slate-50 rounded-3xl p-6 border border-slate-200 shadow-sm mb-8">
-                            <div className="flex flex-col md:flex-row gap-4">
+                        <div className="bg-slate-50 rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-sm mb-8">
+                            
+                            {/* Purpose Switcher: Rent vs Buy/Sell */}
+                            <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl w-fit mb-4 border border-slate-200 shadow-2xs max-w-full overflow-x-auto scrollbar-none flex-nowrap">
+                                {[
+                                    { id: 'all', label: 'All Stays' },
+                                    { id: 'rent', label: '🏠 For Rent' },
+                                    { id: 'sell', label: '🏷️ Buy / Sell' }
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        type="button"
+                                        onClick={() => {
+                                            setPurposeFilter(tab.id);
+                                            setPropertyType('all');
+                                            if (tab.id === 'sell') setPriceRange(30000000);
+                                            else setPriceRange(100000);
+                                        }}
+                                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all ${
+                                            purposeFilter === tab.id
+                                                ? 'bg-rose-500 text-white shadow-xs'
+                                                : 'text-slate-600 hover:text-slate-900'
+                                        }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="flex flex-col md:flex-row gap-3 sm:gap-4">
                                 <div className="relative flex-1">
                                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                     <input
                                         type="text"
                                         placeholder="Search by location, property name, or college..."
-                                        className="w-full bg-white border border-slate-200 rounded-xl py-3.5 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all font-medium text-sm text-slate-900"
+                                        className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-400 transition-all font-medium text-xs sm:text-sm text-slate-900"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                 </div>
 
-                                <div className="flex gap-3">
-                                    {['all', 'PG', 'Flat', 'Hostel'].map(type => (
+                                <div className="flex gap-2 overflow-x-auto scrollbar-none flex-nowrap shrink-0">
+                                    {(purposeFilter === 'sell' ? ['all', 'Flat', 'House/Villa', 'Plot'] : ['all', 'PG', 'Flat', 'Hostel']).map(type => (
                                         <button
                                             key={type}
                                             onClick={() => setPropertyType(type)}
-                                            className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${propertyType === type
-                                                ? 'bg-blue-500 text-white shadow-md shadow-blue-200'
-                                                : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'
+                                            className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all ${propertyType === type
+                                                ? 'bg-zinc-900 text-white shadow-xs'
+                                                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                                                 }`}
                                         >
-                                            {type === 'all' ? 'All' : type}
+                                            {type === 'all' ? 'All Types' : type}
                                         </button>
                                     ))}
                                 </div>
 
-                                <div className="flex gap-2">
-                                    {[{ key: 'all', label: 'All' }, { key: 'male', label: 'Boys' }, { key: 'female', label: 'Girls' }].map(({ key, label }) => (
-                                        <button
-                                            key={key}
-                                            onClick={() => setGenderFilter(key)}
-                                            className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${genderFilter === key
-                                                ? 'bg-blue-500 text-white shadow-md shadow-blue-200'
-                                                : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'
-                                                }`}
-                                        >
-                                            {label}
-                                        </button>
-                                    ))}
-                                </div>
+                                {purposeFilter !== 'sell' && (
+                                    <div className="flex gap-1.5 overflow-x-auto scrollbar-none flex-nowrap shrink-0">
+                                        {[{ key: 'all', label: 'All' }, { key: 'male', label: 'Boys' }, { key: 'female', label: 'Girls' }].map(({ key, label }) => (
+                                            <button
+                                                key={key}
+                                                onClick={() => setGenderFilter(key)}
+                                                className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all ${genderFilter === key
+                                                    ? 'bg-rose-500 text-white shadow-xs'
+                                                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                                    }`}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Price Range */}
-                            <div className="mt-4 pt-4 border-t border-slate-50 flex items-center gap-4">
-                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Max Budget</span>
+                            <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-3 sm:gap-4">
+                                <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                                    {purposeFilter === 'sell' ? 'Max Budget' : 'Max Rent'}
+                                </span>
                                 <input
                                     type="range"
-                                    min="2000"
-                                    max="100000"
-                                    step="500"
-                                    className="flex-1 h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                    min={purposeFilter === 'sell' ? 1000000 : 2000}
+                                    max={purposeFilter === 'sell' ? 50000000 : 100000}
+                                    step={purposeFilter === 'sell' ? 500000 : 500}
+                                    className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
                                     value={priceRange}
                                     onChange={(e) => setPriceRange(parseInt(e.target.value))}
                                 />
-                                <span className="text-blue-600 font-black flex items-center text-sm min-w-[80px] justify-end">
-                                    <IndianRupee size={14} />
-                                    {priceRange.toLocaleString()}
+                                <span className="text-rose-600 font-black flex items-center text-xs sm:text-sm min-w-[75px] justify-end whitespace-nowrap">
+                                    <IndianRupee size={13} />
+                                    {purposeFilter === 'sell' && priceRange >= 10000000
+                                        ? `${(priceRange / 10000000).toFixed(1)} Cr`
+                                        : purposeFilter === 'sell' && priceRange >= 100000
+                                            ? `${(priceRange / 100000).toFixed(0)} Lac`
+                                            : priceRange.toLocaleString()}
                                 </span>
                             </div>
                         </div>
