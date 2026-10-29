@@ -265,19 +265,19 @@ const StudentDashboard = () => {
                         </div>
 
                         {/* Quick Stats */}
-                        <div className="flex gap-3">
+                        <div className="grid grid-cols-3 gap-2 sm:gap-3">
                             {[
                                 { label: 'Visits', value: visits.length, icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-50' },
                                 { label: 'Saved', value: stats.saved, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
                                 { label: 'Available', value: listings.length, icon: Home, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                             ].map((stat, i) => (
-                                <div key={i} className="bg-white px-4 py-3 rounded-2xl border border-zinc-200/80 shadow-xs flex items-center gap-3">
-                                    <div className={`${stat.bg} ${stat.color} w-10 h-10 rounded-xl flex items-center justify-center`}>
-                                        <stat.icon size={18} />
+                                <div key={i} className="bg-white px-2.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl border border-zinc-200/80 shadow-xs flex items-center gap-2 sm:gap-3">
+                                    <div className={`${stat.bg} ${stat.color} w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0`}>
+                                        <stat.icon size={16} />
                                     </div>
-                                    <div>
-                                        <p className="text-lg font-black text-zinc-900">{stat.value}</p>
-                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{stat.label}</span>
+                                    <div className="min-w-0">
+                                        <p className="text-base sm:text-lg font-black text-zinc-900 leading-tight">{stat.value}</p>
+                                        <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-widest block truncate">{stat.label}</span>
                                     </div>
                                 </div>
                             ))}

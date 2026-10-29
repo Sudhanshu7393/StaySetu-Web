@@ -294,7 +294,7 @@ const PropertyDetails = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#FAFAFB] pt-20 pb-24 text-zinc-900">
+        <div className="min-h-screen bg-[#FAFAFB] pt-20 pb-32 sm:pb-24 text-zinc-900">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Breadcrumbs matching screenshot 3 */}
@@ -341,8 +341,7 @@ const PropertyDetails = () => {
                     <div className="lg:col-span-2 space-y-6">
                         {/* Image Gallery */}
                         <div
-                            className="relative rounded-3xl overflow-hidden bg-zinc-100 group shadow-sm border border-zinc-200/80"
-                            style={{ height: '460px' }}
+                            className="relative rounded-3xl overflow-hidden bg-zinc-100 group shadow-sm border border-zinc-200/80 h-[280px] sm:h-[380px] md:h-[460px]"
                             onTouchStart={onTouchStart}
                             onTouchMove={onTouchMove}
                             onTouchEnd={onTouchEnd}

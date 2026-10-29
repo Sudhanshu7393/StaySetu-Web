@@ -75,6 +75,8 @@ const AppContent = () => {
   const location = useLocation();
   const hideOn = ['/login', '/signup', '/verify-email'];
   const shouldHide = hideOn.includes(location.pathname);
+  const isPropertyDetails = location.pathname.startsWith('/property/');
+  const shouldHideBottomNav = shouldHide || isPropertyDetails;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -113,7 +115,7 @@ const AppContent = () => {
           <Route path="/security" element={<SecurityStandards />} />
         </Routes>
       </main>
-      {!shouldHide && <MobileBottomNav />}
+      {!shouldHideBottomNav && <MobileBottomNav />}
       {!shouldHide && <Footer />}
     </div>
   );

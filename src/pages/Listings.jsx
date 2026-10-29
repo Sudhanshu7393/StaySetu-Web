@@ -709,18 +709,21 @@ const Listings = () => {
 
             {/* Mobile Filters Modal */}
             {showFilters && (
-                <div className="fixed inset-0 z-[100] bg-[#121418] text-white animate-fade-in md:hidden">
-                    <div className="flex flex-col h-full">
-                        <div className="flex items-center justify-between p-6 border-b border-white/10">
-                            <h3 className="text-xl font-bold text-white">Filters</h3>
+                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm animate-fade-in md:hidden flex flex-col justify-end">
+                    <div className="bg-white rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl animate-slide-up">
+                        <div className="flex items-center justify-between p-5 border-b border-zinc-100">
+                            <div>
+                                <h3 className="text-lg font-extrabold text-zinc-900">Filter Properties</h3>
+                                <p className="text-xs text-zinc-500 font-medium">Select rent, type & amenities</p>
+                            </div>
                             <button
                                 onClick={() => setShowFilters(false)}
-                                className="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-white"
+                                className="w-8 h-8 bg-zinc-100 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-900"
                             >
                                 <X size={18} />
                             </button>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-6 bg-[#16181f]">
+                        <div className="flex-1 overflow-y-auto p-5">
                             {renderFilterPanel()}
                         </div>
                     </div>
