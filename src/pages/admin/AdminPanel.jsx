@@ -312,11 +312,11 @@ const AdminPanel = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white pt-24 pb-16">
+        <div className="min-h-screen bg-white pt-20 sm:pt-24 pb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
                             <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white"
@@ -364,10 +364,10 @@ const AdminPanel = () => {
                 {/* Main Content */}
                 <div className="card-elevated overflow-hidden">
                     {/* Tab Switcher */}
-                    <div className="flex border-b border-slate-100/80">
+                    <div className="flex border-b border-slate-100/80 overflow-x-auto scrollbar-none">
                         <button
                             onClick={() => { setActiveTab('listings'); setFilter('pending'); }}
-                            className={`flex-1 py-4 text-sm font-semibold transition-all ${activeTab === 'listings'
+                            className={`px-4 py-3.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${activeTab === 'listings'
                                 ? 'text-blue-600 border-b-2 border-blue-500 bg-blue-50/30'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}
@@ -376,7 +376,7 @@ const AdminPanel = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab('roommates'); setFilter('pending'); }}
-                            className={`flex-1 py-4 text-sm font-semibold transition-all ${activeTab === 'roommates'
+                            className={`px-4 py-3.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${activeTab === 'roommates'
                                 ? 'text-blue-600 border-b-2 border-blue-500 bg-blue-50/30'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}
@@ -385,7 +385,7 @@ const AdminPanel = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab('sold_listings'); }}
-                            className={`flex-1 py-4 text-sm font-semibold transition-all ${activeTab === 'sold_listings'
+                            className={`px-4 py-3.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${activeTab === 'sold_listings'
                                 ? 'text-red-600 border-b-2 border-red-500 bg-red-50/30'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}
@@ -394,7 +394,7 @@ const AdminPanel = () => {
                         </button>
                         <button
                             onClick={() => setActiveTab('add')}
-                            className={`flex-1 py-4 text-sm font-semibold transition-all ${activeTab === 'add'
+                            className={`px-4 py-3.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${activeTab === 'add'
                                 ? 'text-blue-600 border-b-2 border-blue-500 bg-blue-50/30'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}
@@ -403,7 +403,7 @@ const AdminPanel = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab('whatsapp_leads'); }}
-                            className={`flex-1 py-4 text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'whatsapp_leads'
+                            className={`px-4 py-3.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 ${activeTab === 'whatsapp_leads'
                                 ? 'text-green-600 border-b-2 border-green-500 bg-green-50/30'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}
@@ -412,7 +412,7 @@ const AdminPanel = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab('maids'); setFilter('pending'); }}
-                            className={`flex-1 py-4 text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'maids'
+                            className={`px-4 py-3.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 ${activeTab === 'maids'
                                 ? 'text-amber-600 border-b-2 border-amber-500 bg-amber-50/30'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}
@@ -421,7 +421,7 @@ const AdminPanel = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab('users'); }}
-                            className={`flex-1 py-4 text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'users'
+                            className={`px-4 py-3.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 ${activeTab === 'users'
                                 ? 'text-purple-600 border-b-2 border-purple-500 bg-purple-50/30'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}
@@ -430,7 +430,7 @@ const AdminPanel = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab('add_maid'); }}
-                            className={`flex-1 py-4 text-sm font-semibold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'add_maid'
+                            className={`px-4 py-3.5 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 flex items-center justify-center gap-1.5 ${activeTab === 'add_maid'
                                 ? 'text-amber-600 border-b-2 border-amber-500 bg-amber-50/30'
                                 : 'text-slate-400 hover:text-slate-600'
                                 }`}

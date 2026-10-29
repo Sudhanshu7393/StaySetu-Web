@@ -421,14 +421,14 @@ const Listings = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-24 pb-12">
+        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-20 sm:pt-24 pb-28 sm:pb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Top Search & Filter Bar matching screenshot 2 */}
                 <div className="bg-white rounded-3xl p-3 sm:p-5 border border-zinc-200/90 shadow-sm mb-6">
                     
                     {/* Top Segment: Purpose Tabs (All | For Rent | For Sale) */}
-                    <div className="flex items-center gap-1.5 p-1 bg-zinc-100/90 rounded-full w-fit mb-3.5 border border-zinc-200/80">
+                    <div className="flex items-center gap-1.5 p-1 bg-zinc-100/90 rounded-full max-w-full overflow-x-auto scrollbar-none flex-nowrap mb-3.5 border border-zinc-200/80">
                         {[
                             { id: 'all', label: 'All Properties' },
                             { id: 'rent', label: '🏠 For Rent (किराया)' },
@@ -438,7 +438,7 @@ const Listings = () => {
                                 key={tab.id}
                                 type="button"
                                 onClick={() => handlePurposeChange(tab.id)}
-                                className={`px-4 py-1.5 rounded-full text-xs font-extrabold transition-all ${
+                                className={`px-4 py-1.5 rounded-full text-xs font-extrabold whitespace-nowrap shrink-0 transition-all ${
                                     purposeFilter === tab.id
                                         ? 'bg-rose-500 text-white shadow-xs'
                                         : 'text-zinc-600 hover:text-zinc-950'

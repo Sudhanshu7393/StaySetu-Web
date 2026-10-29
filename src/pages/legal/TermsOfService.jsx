@@ -9,7 +9,7 @@ const TermsOfService = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-28 pb-20">
+        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-20 sm:pt-28 pb-28 sm:pb-20">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Back button */}
@@ -22,12 +22,12 @@ const TermsOfService = () => {
                 </Link>
 
                 {/* Header */}
-                <div className="bg-white rounded-3xl p-8 sm:p-10 border border-zinc-200/80 shadow-xs mb-8">
+                <div className="bg-white rounded-3xl p-5 sm:p-10 border border-zinc-200/80 shadow-xs mb-8">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-black uppercase tracking-wider border border-rose-200/70 mb-4">
                         <FileText size={14} />
                         Terms of Use
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-3">
+                    <h1 className="text-2xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-3">
                         Terms of Service
                     </h1>
                     <p className="text-zinc-500 text-xs sm:text-sm">
@@ -36,7 +36,7 @@ const TermsOfService = () => {
                     <div className="mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-950 text-xs sm:text-sm flex items-start gap-3">
                         <CheckCircle2 size={18} className="text-rose-600 shrink-0 mt-0.5" />
                         <div>
-                            <strong className="font-bold">100% Free Community Platform:</strong> StaySetu connects college students and property owners across India directly with ₹0 brokerage, ₹0 listing fees, and zero hidden platform charges.
+                            <strong className="font-bold">100% Free Community Platform:</strong> StaySetu connects college students and property owners across India directly with transparent pricing, ₹0 listing fees, and zero hidden platform charges.
                         </div>
                     </div>
                 </div>

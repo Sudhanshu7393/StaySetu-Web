@@ -244,7 +244,7 @@ const StudentDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#FAFAFB] pt-20 pb-16 text-zinc-900">
+        <div className="min-h-screen bg-[#FAFAFB] pt-20 pb-28 sm:pb-16 text-zinc-900">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Welcome Header */}
@@ -286,7 +286,7 @@ const StudentDashboard = () => {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="bg-zinc-100 rounded-2xl p-1.5 border border-zinc-200/80 shadow-xs mb-8 flex gap-1 overflow-x-auto">
+                <div className="bg-zinc-100 rounded-2xl p-1.5 border border-zinc-200/80 shadow-xs mb-8 flex gap-1 overflow-x-auto scrollbar-none flex-nowrap">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}

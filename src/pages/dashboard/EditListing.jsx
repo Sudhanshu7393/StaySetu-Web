@@ -304,13 +304,13 @@ const EditListing = () => {
                     <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
                 </button>
 
-                <div className="bg-white rounded-[2.5rem] shadow-premium overflow-hidden border border-slate-100">
-                    <div className="p-8 md:p-12 border-b border-slate-50">
-                        <h1 className="text-3xl font-black text-slate-900 mb-2">Edit Property</h1>
-                        <p className="text-slate-500 font-medium tracking-tight">Update your property details to keep information accurate.</p>
+                <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-premium overflow-hidden border border-slate-100">
+                    <div className="p-5 sm:p-8 md:p-12 border-b border-slate-50">
+                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Edit Property</h1>
+                        <p className="text-slate-500 font-medium tracking-tight text-xs sm:text-sm">Update your property details to keep information accurate.</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
+                    <form onSubmit={handleSubmit} className="p-5 sm:p-8 md:p-12 space-y-8 sm:space-y-10">
                         {error && (
                             <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start space-x-3">
                                 <AlertCircle className="text-red-500 shrink-0" size={20} />
@@ -333,11 +333,11 @@ const EditListing = () => {
                                 {/* Purpose Switcher: Rent vs Sell */}
                                 <div className="md:col-span-2">
                                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Listing Purpose</label>
-                                    <div className="flex gap-4">
+                                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                                         <button
                                             type="button"
                                             onClick={() => setFormData(prev => ({ ...prev, purpose: 'rent', type: 'PG' }))}
-                                            className={`flex-1 py-3.5 rounded-2xl border-2 transition-all font-bold text-sm flex items-center justify-center gap-2 ${formData.purpose === 'rent'
+                                            className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm flex items-center justify-center gap-2 ${formData.purpose === 'rent'
                                                 ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-xs'
                                                 : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
                                                 }`}
@@ -347,7 +347,7 @@ const EditListing = () => {
                                         <button
                                             type="button"
                                             onClick={() => setFormData(prev => ({ ...prev, purpose: 'sell', type: 'Flat' }))}
-                                            className={`flex-1 py-3.5 rounded-2xl border-2 transition-all font-bold text-sm flex items-center justify-center gap-2 ${formData.purpose === 'sell'
+                                            className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm flex items-center justify-center gap-2 ${formData.purpose === 'sell'
                                                 ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-xs'
                                                 : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
                                                 }`}
@@ -359,11 +359,11 @@ const EditListing = () => {
 
                                 <div className="md:col-span-2">
                                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Are you an Owner or a Broker?</label>
-                                    <div className="flex gap-4">
+                                    <div className="flex gap-3 sm:gap-4">
                                         <button
                                             type="button"
                                             onClick={() => setFormData(prev => ({ ...prev, listed_by: 'owner' }))}
-                                            className={`flex-1 py-3.5 rounded-2xl border-2 transition-all font-bold text-sm ${formData.listed_by === 'owner'
+                                            className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm ${formData.listed_by === 'owner'
                                                 ? 'border-rose-500 bg-rose-50 text-rose-700'
                                                 : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
                                                 }`}
@@ -373,7 +373,7 @@ const EditListing = () => {
                                         <button
                                             type="button"
                                             onClick={() => setFormData(prev => ({ ...prev, listed_by: 'broker' }))}
-                                            className={`flex-1 py-3.5 rounded-2xl border-2 transition-all font-bold text-sm ${formData.listed_by === 'broker'
+                                            className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm ${formData.listed_by === 'broker'
                                                 ? 'border-rose-500 bg-rose-50 text-rose-700'
                                                 : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
                                                 }`}

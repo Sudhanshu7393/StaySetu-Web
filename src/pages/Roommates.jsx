@@ -153,27 +153,27 @@ const Roommates = () => {
     });
 
     return (
-        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-24 pb-12">
+        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-20 sm:pt-24 pb-28 sm:pb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-12">
                     <div>
                         <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-800 text-xs font-extrabold uppercase tracking-wider border border-amber-200/80 mb-3 shadow-xs">
                             <Users size={12} className="text-amber-600" />
                             Student Community
                         </span>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-zinc-900 tracking-tight">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-zinc-900 tracking-tight">
                             Find Roommates
                         </h1>
-                        <p className="text-zinc-500 font-normal mt-2 max-w-md text-sm">
+                        <p className="text-zinc-500 font-normal mt-2 max-w-md text-xs sm:text-sm">
                             Connect with verified students looking for compatible roommates near your college.
                         </p>
                     </div>
                     {user && (
                         <button
                             onClick={() => setShowForm(!showForm)}
-                            className="bg-rose-500 hover:bg-rose-600 text-white font-extrabold py-3 px-6 rounded-full flex items-center gap-2 text-xs uppercase tracking-wider shadow-sm transition-all hover:scale-[1.02]"
+                            className="bg-rose-500 hover:bg-rose-600 text-white font-extrabold py-3 px-6 rounded-full flex items-center justify-center gap-2 text-xs uppercase tracking-wider shadow-sm transition-all hover:scale-[1.02] w-full sm:w-auto"
                         >
                             <Plus size={16} />
                             Post Requirement
@@ -183,7 +183,7 @@ const Roommates = () => {
 
                 {/* Form */}
                 {showForm && (
-                    <div className="bg-white border border-zinc-200 rounded-3xl p-8 mb-10 shadow-xl animate-slide-up text-zinc-900">
+                    <div className="bg-white border border-zinc-200 rounded-3xl p-4 sm:p-8 mb-8 sm:mb-10 shadow-xl animate-slide-up text-zinc-900">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-extrabold text-zinc-900">Post Your Requirement</h2>
                             <button onClick={() => setShowForm(false)} className="w-8 h-8 bg-zinc-100 hover:bg-zinc-200 rounded-xl flex items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors">
@@ -252,12 +252,12 @@ const Roommates = () => {
                             onChange={e => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none flex-nowrap shrink-0">
                         {['all', 'male', 'female'].map(g => (
                             <button
                                 key={g}
                                 onClick={() => setFilterGender(g)}
-                                className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all border ${filterGender === g
+                                className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all border whitespace-nowrap shrink-0 ${filterGender === g
                                     ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
                                     : 'bg-white text-zinc-600 border-zinc-200/80 hover:text-zinc-900 hover:bg-zinc-50'
                                     }`}

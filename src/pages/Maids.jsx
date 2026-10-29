@@ -73,25 +73,25 @@ const Maids = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-24 pb-16">
+        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-20 sm:pt-24 pb-28 sm:pb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}
-                <div className="text-center mb-10 max-w-2xl mx-auto">
+                <div className="text-center mb-8 sm:mb-10 max-w-2xl mx-auto">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-800 text-xs font-extrabold uppercase tracking-wider border border-amber-200/80 mb-3 shadow-xs">
                         <Sparkles size={12} className="text-amber-600" />
                         Verified Domestic Help
                     </span>
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 tracking-tight mb-3">
+                    <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-900 tracking-tight mb-3">
                         Find Verified Maids & Cooks
                     </h1>
-                    <p className="text-zinc-500 text-sm sm:text-base font-normal leading-relaxed">
+                    <p className="text-zinc-500 text-xs sm:text-base font-normal leading-relaxed">
                         Trusted, verified cooks, daily cleaning staff, and laundry helpers across societies in Crossings Republik, Ghaziabad, Noida & Delhi NCR.
                     </p>
                 </div>
 
                 {/* Search & Filters */}
-                <div className="flex flex-col sm:flex-row gap-3 mb-10 max-w-4xl mx-auto">
+                <div className="flex flex-col sm:flex-row gap-3 mb-8 sm:mb-10 max-w-4xl mx-auto">
                     <div className="relative flex-1">
                         <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                         <input
@@ -102,7 +102,7 @@ const Maids = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <div className="flex gap-1.5 overflow-x-auto pb-1">
+                    <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-nowrap">
                         {[
                             { key: 'all', label: 'All Services' },
                             { key: 'cooking', label: '🍳 Cooks' },

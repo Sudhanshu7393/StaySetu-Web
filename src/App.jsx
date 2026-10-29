@@ -76,13 +76,14 @@ const AppContent = () => {
   const hideOn = ['/login', '/signup', '/verify-email'];
   const shouldHide = hideOn.includes(location.pathname);
   const isPropertyDetails = location.pathname.startsWith('/property/');
+  const isMessages = location.pathname === '/messages';
   const shouldHideBottomNav = shouldHide || isPropertyDetails;
 
   return (
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
       {!shouldHide && <Navbar />}
-      <main className={`flex-grow ${!shouldHide ? 'pb-24 md:pb-0' : ''}`}>
+      <main className={`flex-grow ${!shouldHide && !isMessages ? 'pb-24 md:pb-0' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

@@ -9,7 +9,7 @@ const SecurityStandards = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-28 pb-20">
+        <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-20 sm:pt-28 pb-28 sm:pb-20">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Back button */}
@@ -22,12 +22,12 @@ const SecurityStandards = () => {
                 </Link>
 
                 {/* Header */}
-                <div className="bg-white rounded-3xl p-8 sm:p-10 border border-zinc-200/80 shadow-xs mb-8">
+                <div className="bg-white rounded-3xl p-5 sm:p-10 border border-zinc-200/80 shadow-xs mb-8">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black uppercase tracking-wider border border-emerald-200/70 mb-4">
                         <ShieldCheck size={14} />
                         Student Safety First
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-3">
+                    <h1 className="text-2xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight mb-3">
                         Security & Trust Standards
                     </h1>
                     <p className="text-zinc-500 text-xs sm:text-sm">

@@ -221,9 +221,9 @@ const Messages = () => {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-20 flex flex-col" style={{ height: '100vh' }}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex flex-col overflow-hidden py-4" style={{ height: 'calc(100vh - 80px)' }}>
-                <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 flex-1 flex overflow-hidden border border-slate-200">
+        <div className={`h-[calc(100dvh-4rem)] md:h-[calc(100dvh-5rem)] bg-slate-50 pt-16 md:pt-20 flex flex-col ${!activeChat ? 'pb-16 md:pb-0' : 'pb-0'}`}>
+            <div className="max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 flex-1 flex flex-col overflow-hidden py-2 sm:py-4">
+                <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl shadow-slate-200/50 flex-1 flex overflow-hidden border border-slate-200">
 
                     {/* ── Sidebar ─────────────────────────────────────────── */}
                     <div className={`w-full md:w-80 lg:w-96 border-r border-slate-100 flex flex-col ${activeChat ? 'hidden md:flex' : 'flex'}`}>

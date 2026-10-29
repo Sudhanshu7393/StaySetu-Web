@@ -432,7 +432,7 @@ const OwnerDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-surface pt-20 pb-12">
+        <div className="min-h-screen bg-surface pt-20 pb-28 sm:pb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}
@@ -457,7 +457,7 @@ const OwnerDashboard = () => {
 
                         <button
                             onClick={() => setActiveTab('add')}
-                            className="btn-primary flex items-center justify-center gap-2 py-3 px-6 text-sm"
+                            className="btn-primary flex items-center justify-center gap-2 py-3 px-6 text-sm w-full md:w-auto"
                         >
                             <Plus size={16} />
                             <span>Add New Property</span>
@@ -466,26 +466,26 @@ const OwnerDashboard = () => {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
                     {[
                         { label: 'Total', value: stats.total, icon: Home, gradient: 'from-blue-950 to-blue-600' },
                         { label: 'Live', value: stats.approved, icon: CheckCircle, gradient: 'from-emerald-500 to-teal-600' },
                         { label: 'Rented', value: stats.rented, icon: Building2, gradient: 'from-indigo-500 to-blue-600' },
                         { label: 'Views', value: stats.views, icon: Eye, gradient: 'from-blue-500 to-purple-600' },
                     ].map((stat, i) => (
-                        <div key={i} className="bg-white rounded-3xl p-5 flex flex-col gap-2 border border-slate-200 shadow-sm">
+                        <div key={i} className="bg-white rounded-3xl p-4 sm:p-5 flex flex-col gap-2 border border-slate-200 shadow-sm">
                             <div className={`bg-gradient-to-br ${stat.gradient} w-10 h-10 rounded-xl flex items-center justify-center text-white`}
                                 style={{ boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)' }}>
                                 <stat.icon size={18} />
                             </div>
-                            <p className="text-2xl font-black text-slate-900">{stat.value}</p>
+                            <p className="text-xl sm:text-2xl font-black text-slate-900">{stat.value}</p>
                             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</span>
                         </div>
                     ))}
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="bg-slate-50 rounded-2xl p-1.5 border border-slate-200 shadow-sm mb-8 flex gap-1 overflow-x-auto">
+                <div className="bg-slate-50 rounded-2xl p-1.5 border border-slate-200 shadow-sm mb-8 flex gap-1 overflow-x-auto scrollbar-none flex-nowrap">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
