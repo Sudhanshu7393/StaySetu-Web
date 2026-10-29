@@ -678,11 +678,141 @@ const PropertyDetails = () => {
                         </div>
                     </div>
 
-                    {/* ===== REVIEWS SECTION (full width below) ===== */}
-                    <div className="lg:col-span-3 mt-2">
-                        <div className="card-elevated p-6 md:p-8">
-                            {/* Header */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    {/* Sidebar (Top Right next to Image Gallery & Details) */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white rounded-3xl border border-zinc-200/80 p-6 shadow-sm sticky top-24">
+                            {/* Price */}
+                            <div className="mb-6">
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Starting from</span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-3xl font-black text-slate-900 flex items-center">
+                                        <IndianRupee size={22} className="mr-1" />
+                                        {property.price?.toLocaleString() || 'N/A'}
+                                    </span>
+                                    <span className="text-slate-500 font-normal text-sm">/ month</span>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="space-y-3 mb-6">
+                                <button
+                                    onClick={() => setIsWhatsAppModalOpen(true)}
+                                    disabled={isUnavailable}
+                                    className="w-full py-3.5 justify-center text-xs font-black uppercase tracking-widest rounded-full flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white transition-all shadow-md shadow-rose-500/25 hover:scale-[1.01]"
+                                >
+                                    <Calendar size={16} />
+                                    Schedule a Free Visit
+                                </button>
+
+                                <button
+                                    onClick={initiateWhatsApp}
+                                    disabled={isUnavailable}
+                                    className={`w-full py-3.5 justify-center text-xs font-black uppercase tracking-widest rounded-full flex items-center gap-2 transition-all ${
+                                        isUnavailable 
+                                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none' 
+                                            : 'bg-[#25D366] text-white hover:bg-[#128C7E] shadow-md shadow-emerald-200/50'
+                                    }`}
+                                >
+                                    {isUnavailable ? <Home size={16} /> : <Phone size={16} />}
+                                    {isSold ? 'Sold Out' : isRented ? 'Already Rented Out' : 'Connect via WhatsApp'}
+                                </button>
+                            </div>
+                            <p className="text-center text-[11px] text-zinc-500 font-medium mb-3">⚡ {String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'} typically replies within 5 mins</p>
+                            
+                            <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 py-1.5 px-3 rounded-full border border-emerald-200/80 mb-6">
+                                <ShieldCheck size={13} className="text-emerald-600 shrink-0" />
+                                <span>100% Free • ₹0 Brokerage • Direct Connect</span>
+                            </div>
+
+                            {/* Transparent Pricing Breakdown with Broker Fee Disclosed */}
+                            <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/80 mb-6">
+                                <div className="flex items-center gap-2 mb-3 text-zinc-900 font-extrabold text-xs uppercase tracking-wider">
+                                    <Calculator size={14} className="text-rose-500" /> Transparent Pricing Breakdown
+                                </div>
+                                <div className="space-y-2.5 text-xs">
+                                    <div className="flex justify-between text-zinc-600">
+                                        <span>{isSale ? 'Total Sale Price:' : '1st Month Rent:'}</span>
+                                        <span className="font-extrabold text-zinc-900">
+                                            {isSale ? formatPropertyPrice(property.price, 'sell') : `₹${property.price?.toLocaleString()}`}
+                                        </span>
+                                    </div>
+                                    {!isSale && (
+                                        <div className="flex justify-between text-zinc-600">
+                                            <span>Security Deposit (Refundable):</span>
+                                            <span className="font-extrabold text-zinc-900">
+                                                ₹{(property.deposit ? parseInt(property.deposit) : property.price)?.toLocaleString()}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-center text-zinc-600">
+                                        <span>Brokerage / Commission:</span>
+                                        <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
+                                            String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
+                                                ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                                                : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                        }`}>
+                                            {String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
+                                                ? (property.brokerageFee || property.brokerage_fee || (isSale ? '1% - 2%' : '15 Days Rent'))
+                                                : '₹0 (Direct Owner)'}
+                                        </span>
+                                    </div>
+                                    {!isSale && (
+                                        <div className="pt-2.5 border-t border-zinc-200 flex justify-between font-black text-zinc-900 text-sm">
+                                            <span>Estimated Move-in:</span>
+                                            <span className="text-rose-600">
+                                                ₹{((property.price || 0) + (property.deposit ? parseInt(property.deposit) : (property.price || 0)))?.toLocaleString()}
+                                                {String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker' ? ' + Brokerage' : ''}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <p className="text-[10px] text-zinc-400 mt-1 italic leading-tight">
+                                        * All pricing & brokerage fees are explicitly stated upfront. No hidden surprises.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-zinc-100 mb-6" />
+
+                            <div className="flex items-center gap-3 mb-5">
+                                <div className="w-11 h-11 bg-rose-500 rounded-2xl flex items-center justify-center text-white font-extrabold text-sm shadow-sm shadow-rose-500/20">
+                                    {(property.owner?.name || 'O').charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-zinc-900 text-sm">
+                                        {property.owner?.name || (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Property Owner' : 'Verified Broker')}
+                                    </h4>
+                                    <p className="text-emerald-700 text-xs font-bold flex items-center gap-1">
+                                        <CheckCircle2 size={11} /> Verified {String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/60 mb-6">
+                                <p className="text-sm text-slate-600 leading-relaxed italic font-normal">
+                                    "Hi, I'm {property.owner?.name || (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'the owner' : 'the broker')}. Feel free to reach out — I'll help you find the perfect stay!"
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2.5">
+                                {[
+                                    String(property.listedBy || 'owner').toLowerCase() !== 'owner' ? 'Broker Managed' : 'Direct from Owner',
+                                    'Safe & Verified',
+                                    'Direct Contact',
+                                    'Easy Move-in'
+                                ].map((t) => (
+                                    <div key={t} className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                                        <CheckCircle2 size={10} className="text-emerald-500 shrink-0" />{t}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ===== REVIEWS SECTION (full width below) ===== */}
+                <div className="mt-10 bg-white rounded-3xl border border-zinc-200/80 p-6 md:p-8 shadow-sm">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                                 <div>
                                     <h3 className="text-xl font-bold text-slate-900">
                                         Property Feedback
@@ -823,138 +953,6 @@ const PropertyDetails = () => {
                             )}
                         </div>
                     </div>
-
-                    {/* Sidebar */}
-                    <div className="lg:col-span-1">
-                        <div className="card-elevated p-6 sticky top-24">
-                            {/* Price */}
-                            <div className="mb-6">
-                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Starting from</span>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-black text-slate-900 flex items-center">
-                                        <IndianRupee size={22} className="mr-1" />
-                                        {property.price?.toLocaleString() || 'N/A'}
-                                    </span>
-                                    <span className="text-slate-500 font-normal text-sm">/ month</span>
-                                </div>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="space-y-3 mb-6">
-                                <button
-                                    onClick={() => setIsWhatsAppModalOpen(true)}
-                                    disabled={isUnavailable}
-                                    className="w-full py-3.5 justify-center text-xs font-black uppercase tracking-widest rounded-full flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white transition-all shadow-md shadow-rose-500/25 hover:scale-[1.01]"
-                                >
-                                    <Calendar size={16} />
-                                    Schedule a Free Visit
-                                </button>
-
-                                <button
-                                    onClick={initiateWhatsApp}
-                                    disabled={isUnavailable}
-                                    className={`w-full py-3.5 justify-center text-xs font-black uppercase tracking-widest rounded-full flex items-center gap-2 transition-all ${
-                                        isUnavailable 
-                                            ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none' 
-                                            : 'bg-[#25D366] text-white hover:bg-[#128C7E] shadow-md shadow-emerald-200/50'
-                                    }`}
-                                >
-                                    {isUnavailable ? <Home size={16} /> : <Phone size={16} />}
-                                    {isSold ? 'Sold Out' : isRented ? 'Already Rented Out' : 'Connect via WhatsApp'}
-                                </button>
-                            </div>
-                            <p className="text-center text-[11px] text-zinc-500 font-medium mb-3">⚡ {String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'} typically replies within 5 mins</p>
-                            
-                            <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 py-1.5 px-3 rounded-full border border-emerald-200/80 mb-6">
-                                <ShieldCheck size={13} className="text-emerald-600 shrink-0" />
-                                <span>100% Free • ₹0 Brokerage • Direct Connect</span>
-                            </div>
-
-                            {/* Transparent Pricing Breakdown with Broker Fee Disclosed */}
-                            <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/80 mb-6">
-                                <div className="flex items-center gap-2 mb-3 text-zinc-900 font-extrabold text-xs uppercase tracking-wider">
-                                    <Calculator size={14} className="text-rose-500" /> Transparent Pricing Breakdown
-                                </div>
-                                <div className="space-y-2.5 text-xs">
-                                    <div className="flex justify-between text-zinc-600">
-                                        <span>{isSale ? 'Total Sale Price:' : '1st Month Rent:'}</span>
-                                        <span className="font-extrabold text-zinc-900">
-                                            {isSale ? formatPropertyPrice(property.price, 'sell') : `₹${property.price?.toLocaleString()}`}
-                                        </span>
-                                    </div>
-                                    {!isSale && (
-                                        <div className="flex justify-between text-zinc-600">
-                                            <span>Security Deposit (Refundable):</span>
-                                            <span className="font-extrabold text-zinc-900">
-                                                ₹{(property.deposit ? parseInt(property.deposit) : property.price)?.toLocaleString()}
-                                            </span>
-                                        </div>
-                                    )}
-                                    <div className="flex justify-between items-center text-zinc-600">
-                                        <span>Brokerage / Commission:</span>
-                                        <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
-                                            String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
-                                                ? 'bg-amber-50 text-amber-900 border border-amber-200'
-                                                : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                        }`}>
-                                            {String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
-                                                ? (property.brokerageFee || property.brokerage_fee || (isSale ? '1% - 2%' : '15 Days Rent'))
-                                                : '₹0 (Direct Owner)'}
-                                        </span>
-                                    </div>
-                                    {!isSale && (
-                                        <div className="pt-2.5 border-t border-zinc-200 flex justify-between font-black text-zinc-900 text-sm">
-                                            <span>Estimated Move-in:</span>
-                                            <span className="text-rose-600">
-                                                ₹{((property.price || 0) + (property.deposit ? parseInt(property.deposit) : (property.price || 0)))?.toLocaleString()}
-                                                {String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker' ? ' + Brokerage' : ''}
-                                            </span>
-                                        </div>
-                                    )}
-                                    <p className="text-[10px] text-zinc-400 mt-1 italic leading-tight">
-                                        * All pricing & brokerage fees are explicitly stated upfront. No hidden surprises.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="h-px bg-zinc-100 mb-6" />
-
-                            <div className="flex items-center gap-3 mb-5">
-                                <div className="w-11 h-11 bg-rose-500 rounded-2xl flex items-center justify-center text-white font-extrabold text-sm shadow-sm shadow-rose-500/20">
-                                    {(property.owner?.name || 'O').charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-zinc-900 text-sm">
-                                        {property.owner?.name || (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Property Owner' : 'Verified Broker')}
-                                    </h4>
-                                    <p className="text-emerald-700 text-xs font-bold flex items-center gap-1">
-                                        <CheckCircle2 size={11} /> Verified {String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/60 mb-6">
-                                <p className="text-sm text-slate-600 leading-relaxed italic font-normal">
-                                    "Hi, I'm {property.owner?.name || (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'the owner' : 'the broker')}. Feel free to reach out — I'll help you find the perfect stay!"
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2.5">
-                                {[
-                                    String(property.listedBy || 'owner').toLowerCase() !== 'owner' ? 'Broker Managed' : 'Direct from Owner',
-                                    'Safe & Verified',
-                                    'Direct Contact',
-                                    'Easy Move-in'
-                                ].map((t) => (
-                                    <div key={t} className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
-                                        <CheckCircle2 size={10} className="text-emerald-500 shrink-0" />{t}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* Schedule a Visit Modal */}
             {showVisitModal && (
