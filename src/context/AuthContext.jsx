@@ -64,11 +64,11 @@ export const AuthProvider = ({ children }) => {
         try {
             const authUser = await account.get();
             setUser(authUser);
-            await fetchProfile(authUser);
+            setLoading(false);
+            fetchProfile(authUser);
         } catch {
             setUser(null);
             setProfile(null);
-        } finally {
             setLoading(false);
         }
     }, [fetchProfile]);
@@ -76,6 +76,11 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         // Initial check
         checkUser();
+
+        // Safety fallback timer to prevent infinite loading screen
+        const safetyTimer = setTimeout(() => {
+            setLoading(false);
+        }, 1200);
 
         // Realtime Supabase Auth state listener
         if (isSupabaseConfigured) {
@@ -90,18 +95,23 @@ export const AuthProvider = ({ children }) => {
                         role: u.user_metadata?.role || 'student',
                     };
                     setUser(authUser);
-                    await fetchProfile(authUser);
                     setLoading(false);
-                } else if (event === 'SIGNED_OUT') {
-                    setUser(null);
-                    setProfile(null);
+                    fetchProfile(authUser);
+                } else {
+                    if (event === 'SIGNED_OUT') {
+                        setUser(null);
+                        setProfile(null);
+                    }
                     setLoading(false);
                 }
             });
 
             return () => {
+                clearTimeout(safetyTimer);
                 subscription?.unsubscribe();
             };
+        } else {
+            return () => clearTimeout(safetyTimer);
         }
     }, [checkUser, fetchProfile]);
 
