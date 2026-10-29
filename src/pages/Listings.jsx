@@ -299,7 +299,7 @@ const Listings = () => {
                     {[
                         { id: 'all', label: 'All' },
                         { id: 'rent', label: 'Rent' },
-                        { id: 'sell', label: 'Buy/Sale' }
+                        { id: 'sell', label: 'Buy/Sell' }
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -453,9 +453,9 @@ const Listings = () => {
                     {/* Top Segment: Purpose Tabs (All | For Rent | For Sale) */}
                     <div className="flex items-center gap-1.5 p-1 bg-zinc-100/90 rounded-full max-w-full overflow-x-auto scrollbar-none flex-nowrap mb-3.5 border border-zinc-200/80">
                         {[
-                            { id: 'all', label: 'All Properties' },
-                            { id: 'rent', label: '🏠 For Rent (किराया)' },
-                            { id: 'sell', label: '🏷️ Buy / For Sale (खरीदें / बेचें)' }
+                            { id: 'all', label: 'All Stays' },
+                            { id: 'rent', label: '🏠 For Rent' },
+                            { id: 'sell', label: '🏷️ Buy / Sell' }
                         ].map(tab => (
                             <button
                                 key={tab.id}
@@ -596,7 +596,7 @@ const Listings = () => {
                                 : purposeFilter === 'rent'
                                     ? (listings.length === 1 ? 'rental stay' : 'rental stays')
                                     : (listings.length === 1 ? 'property' : 'properties')
-                        } in {collegeFilter !== 'all' ? collegeFilter : 'Lucknow'}
+                        } {collegeFilter !== 'all' ? `near ${collegeFilter}` : 'across India'}
                     </h2>
                     <span className="text-xs font-bold text-zinc-500 flex items-center gap-1">
                         Sorted by relevance
@@ -655,7 +655,9 @@ const Listings = () => {
 
                         {/* College Quick Filters */}
                         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-5 scrollbar-none">
-                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider shrink-0 mr-1">Colleges:</span>
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider shrink-0 mr-1">
+                                {purposeFilter === 'sell' ? 'Hubs:' : 'Colleges:'}
+                            </span>
                             {colleges.map((col) => {
                                 const isActive = collegeFilter === col.id;
                                 return (
