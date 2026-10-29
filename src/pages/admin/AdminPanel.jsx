@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
     CheckCircle, Users, Home, MapPin, IndianRupee,
     Clock, Trash2, ShieldCheck, LogOut, Loader2, Plus,
-    Upload, X, Image as ImageIcon, Save, Phone, Download, MessageCircle, Brush, Star
+    Upload, X, Image as ImageIcon, Save, Phone, Download, MessageCircle, Brush, Star,
+    Share2, PhoneCall, CheckCircle2, Send
 } from 'lucide-react';
 import { useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { databases, storage, DATABASE_ID, COLLECTION, BUCKET_ID, Query, ID, parseJsonField, getImageUrl } from '../../lib/supabase';
+import { forwardLeadToOwner, contactStudentForReview } from '../../lib/whatsappTracker';
 
 const AdminPanel = () => {
     const { user, profile, signOut } = useAuth();
@@ -467,19 +469,34 @@ const AdminPanel = () => {
 
                     {activeTab === 'whatsapp_leads' ? (
                         <div className="p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-bold text-slate-900">WhatsApp Contact Leads</h3>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                        <MessageCircle className="text-emerald-500" size={20} />
+                                        Concierge Lead Desk (StaySetu WhatsApp Leads)
+                                    </h3>
+                                    <p className="text-xs text-slate-500 mt-0.5">
+                                        All student inquiries captured at +91 7393011350. Forward leads to owners and follow-up with students for reviews.
+                                    </p>
+                                </div>
                                 <button
                                     onClick={() => {
-                                        const csv = ['Phone Number,Listing,Owner,Clicker Name,Clicker Email,Source,Time'];
-                                        whatsappLeads.forEach(l => csv.push(`${l.phoneNumber},"${l.listingTitle}","${l.ownerName}","${l.clickerName}",${l.clickerEmail},${l.source},${l.clickedAt || l.$createdAt}`));
+                                        const csv = ['Student Name,Student Phone,Student Email,Listing,Owner Name,Owner Phone,Source,Time'];
+                                        whatsappLeads.forEach(l => {
+                                            const sPhone = l.studentPhone || 'Not provided';
+                                            const sName = l.studentName || l.clickerName || 'Student';
+                                            const sEmail = l.studentEmail || l.clickerEmail || '';
+                                            const oName = l.ownerName || 'Owner';
+                                            const oPhone = l.ownerPhone || l.phoneNumber || '';
+                                            csv.push(`"${sName}","${sPhone}","${sEmail}","${l.listingTitle || ''}","${oName}","${oPhone}","${l.source}","${l.clickedAt || l.$createdAt}"`);
+                                        });
                                         const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
                                         const url = URL.createObjectURL(blob);
-                                        const a = document.createElement('a'); a.href = url; a.download = `whatsapp-leads-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+                                        const a = document.createElement('a'); a.href = url; a.download = `staysetu-leads-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
                                     }}
-                                    className="btn-secondary flex items-center gap-2 text-xs py-2 px-4"
+                                    className="btn-secondary flex items-center gap-2 text-xs py-2 px-4 shrink-0"
                                 >
-                                    <Download size={14} /> Export CSV
+                                    <Download size={14} /> Export Leads CSV
                                 </button>
                             </div>
                             {loading ? (
@@ -488,54 +505,111 @@ const AdminPanel = () => {
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
                                         <thead>
-                                            <tr className="bg-green-50/50">
-                                                <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">#</th>
-                                                <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Phone Number</th>
-                                                <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Property</th>
-                                                <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Clicker</th>
-                                                <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Source</th>
-                                                <th className="px-4 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Time</th>
+                                            <tr className="bg-emerald-50/60 border-b border-emerald-100">
+                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider">#</th>
+                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider">Student Contact</th>
+                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider">Property & Landlord</th>
+                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider">Source / Time</th>
+                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider text-right">Concierge Actions</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-50">
-                                            {whatsappLeads.map((lead, i) => (
-                                                <tr key={lead.$id} className="hover:bg-green-50/30 transition-colors text-sm">
-                                                    <td className="px-4 py-3 text-xs text-slate-400 font-mono">{i + 1}</td>
-                                                    <td className="px-4 py-3">
-                                                        <span className="text-xs font-bold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-200 flex items-center gap-1.5 w-fit">
-                                                            <Phone size={11} /> {lead.phoneNumber || '-'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-4 py-3">
-                                                        <div className="max-w-[200px]">
-                                                            <p className="text-xs font-semibold text-slate-900 truncate">{lead.listingTitle || '-'}</p>
-                                                            <p className="text-[10px] text-slate-400">Owner: {lead.ownerName || '-'}</p>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-3">
-                                                        <div>
-                                                            <p className="text-xs font-semibold text-slate-700">{lead.clickerName || 'Guest'}</p>
-                                                            <p className="text-[10px] text-slate-400">{lead.clickerEmail || 'Not logged in'}</p>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-3">
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-500">{lead.source}</span>
-                                                    </td>
-                                                    <td className="px-4 py-3 text-[11px] text-slate-400 whitespace-nowrap">
-                                                        {new Date(lead.clickedAt || lead.$createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                        <tbody className="divide-y divide-slate-100">
+                                            {whatsappLeads.map((lead, i) => {
+                                                const sPhone = lead.studentPhone || lead.phoneNumber || '';
+                                                const sName = lead.studentName || lead.clickerName || 'Student';
+                                                const sEmail = lead.studentEmail || lead.clickerEmail || '';
+                                                const oName = lead.ownerName || 'Owner';
+                                                const oPhone = lead.ownerPhone || (lead.studentPhone ? lead.phoneNumber : '');
+
+                                                return (
+                                                    <tr key={lead.$id || i} className="hover:bg-emerald-50/20 transition-colors text-sm">
+                                                        <td className="px-4 py-3.5 text-xs text-slate-400 font-mono">{i + 1}</td>
+                                                        <td className="px-4 py-3.5">
+                                                            <div>
+                                                                <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                                                    <span>{sName}</span>
+                                                                </p>
+                                                                {sPhone && (
+                                                                    <a 
+                                                                        href={`tel:${sPhone}`}
+                                                                        className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full mt-1 hover:bg-emerald-100 transition-colors"
+                                                                    >
+                                                                        <Phone size={10} /> {sPhone}
+                                                                    </a>
+                                                                )}
+                                                                {sEmail && (
+                                                                    <p className="text-[10px] text-slate-400 mt-0.5">{sEmail}</p>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3.5">
+                                                            <div className="max-w-[220px]">
+                                                                <p className="text-xs font-bold text-slate-900 truncate">{lead.listingTitle || 'StaySetu Property'}</p>
+                                                                <div className="flex items-center gap-1 text-[11px] text-slate-600 mt-1">
+                                                                    <span className="font-medium">Landlord:</span>
+                                                                    <span className="font-semibold text-slate-800">{oName}</span>
+                                                                </div>
+                                                                {oPhone && (
+                                                                    <p className="text-[10px] text-slate-400 font-mono">📱 {oPhone}</p>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3.5">
+                                                            <div className="space-y-1">
+                                                                <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                                                                    {lead.source || 'inquiry'}
+                                                                </span>
+                                                                <p className="text-[11px] text-slate-400 whitespace-nowrap">
+                                                                    {new Date(lead.clickedAt || lead.$createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3.5 text-right">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                {/* Forward to Owner */}
+                                                                <button
+                                                                    onClick={() => forwardLeadToOwner({
+                                                                        ownerPhone: oPhone,
+                                                                        ownerName: oName,
+                                                                        studentName: sName,
+                                                                        studentPhone: sPhone,
+                                                                        listingTitle: lead.listingTitle,
+                                                                    })}
+                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
+                                                                    title="Forward student contact & visit request to Landlord on WhatsApp"
+                                                                >
+                                                                    <Share2 size={12} />
+                                                                    <span>Forward to Owner</span>
+                                                                </button>
+
+                                                                {/* Review / Follow-up Student */}
+                                                                <button
+                                                                    onClick={() => contactStudentForReview({
+                                                                        studentPhone: sPhone,
+                                                                        studentName: sName,
+                                                                        listingTitle: lead.listingTitle,
+                                                                    })}
+                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-colors"
+                                                                    title="Call or WhatsApp student to check on visit and ask for review"
+                                                                >
+                                                                    <PhoneCall size={12} />
+                                                                    <span>Follow-up & Review</span>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                         </tbody>
                                     </table>
                                 </div>
                             ) : (
                                 <div className="py-20 text-center">
-                                    <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-green-300">
+                                    <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-400">
                                         <MessageCircle size={24} />
                                     </div>
-                                    <p className="text-slate-400 font-medium">No WhatsApp leads yet.</p>
-                                    <p className="text-slate-300 text-xs mt-1">Leads will appear here when users click "Contact via WhatsApp"</p>
+                                    <p className="text-slate-500 font-bold">No WhatsApp leads yet.</p>
+                                    <p className="text-slate-400 text-xs mt-1">When students request a visit or click WhatsApp, they appear here for 1-click forwarding and review follow-ups.</p>
                                 </div>
                             )}
                         </div>

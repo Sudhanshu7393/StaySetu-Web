@@ -23,6 +23,7 @@ const PropertyDetails = () => {
     const [activeImage, setActiveImage] = useState(0);
     const [liked, setLiked] = useState(false);
     const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState('visit');
     const [error, setError] = useState(null);
     const [touchStart, setTouchStart] = useState(null);
     const [touchEnd, setTouchEnd] = useState(null);
@@ -224,30 +225,8 @@ const PropertyDetails = () => {
 
     const initiateWhatsApp = () => {
         if (isUnavailable) return;
-        if (!user) {
-            navigate('/login', { state: { from: `/property/${id}` } });
-            return;
-        }
-
-        if (!property) return;
-
-        const phoneNumber = property.whatsappNumber || property.phoneNumber || property.whatsapp_number || property.phone_number;
-        const messageText = `Hi, I found your listing "${property.title}" on StaySetu. Is it available?`;
-        const message = encodeURIComponent(messageText);
-
-        trackWhatsAppClick({
-            phoneNumber,
-            listingId: property.$id || id,
-            listingTitle: property.title || 'Property',
-            ownerName: property.owner?.name || '',
-            clickerUserId: user?.$id || '',
-            clickerName: profile?.fullName || user?.name || '',
-            clickerEmail: user?.email || '',
-            source: 'property_details',
-            message: messageText,
-        });
-
-        openWhatsApp(phoneNumber, message);
+        setModalMode('chat');
+        setIsWhatsAppModalOpen(true);
     };
 
     const handleScheduleVisit = async (e) => {
@@ -696,7 +675,10 @@ const PropertyDetails = () => {
                             {/* Actions */}
                             <div className="space-y-3 mb-6">
                                 <button
-                                    onClick={() => setIsWhatsAppModalOpen(true)}
+                                    onClick={() => {
+                                        setModalMode('visit');
+                                        setIsWhatsAppModalOpen(true);
+                                    }}
                                     disabled={isUnavailable}
                                     className="w-full py-3.5 justify-center text-xs font-black uppercase tracking-widest rounded-full flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white transition-all shadow-md shadow-rose-500/25 hover:scale-[1.01]"
                                 >
@@ -1104,7 +1086,10 @@ const PropertyDetails = () => {
                     <span>Contact</span>
                 </button>
                 <button
-                    onClick={() => setIsWhatsAppModalOpen(true)}
+                    onClick={() => {
+                        setModalMode('visit');
+                        setIsWhatsAppModalOpen(true);
+                    }}
                     disabled={isUnavailable}
                     className="flex-1 py-3 px-4 rounded-full font-extrabold text-xs bg-rose-500 hover:bg-rose-600 text-white shadow-md shadow-rose-500/25 flex items-center justify-center gap-2 transition-all"
                 >
@@ -1118,6 +1103,7 @@ const PropertyDetails = () => {
                 isOpen={isWhatsAppModalOpen}
                 onClose={() => setIsWhatsAppModalOpen(false)}
                 property={property}
+                initialMode={modalMode}
             />
         </div>
     );
