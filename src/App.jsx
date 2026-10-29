@@ -23,6 +23,9 @@ import OwnerDashboard from './pages/dashboard/OwnerDashboard';
 import AddListing from './pages/dashboard/AddListing';
 import EditListing from './pages/dashboard/EditListing';
 import AdminPanel from './pages/admin/AdminPanel';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import TermsOfService from './pages/legal/TermsOfService';
+import SecurityStandards from './pages/legal/SecurityStandards';
 import ScrollToTop from './components/common/ScrollToTop';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
@@ -115,6 +118,9 @@ const AppContent = () => {
           <Route path="/admin" element={
             <AdminRoute><AdminPanel /></AdminRoute>
           } />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/security" element={<SecurityStandards />} />
         </Routes>
       </main>
       {!shouldHide && <MobileBottomNav />}

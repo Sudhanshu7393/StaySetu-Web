@@ -34,7 +34,7 @@ const AddListing = () => {
         amenities: [],
         images: [''], // Array of image URLs
         listed_by: 'owner', // owner or broker
-        brokerage_fee: '15 Days Rent',
+        brokerage_fee: '₹0 (Zero Brokerage - Free)',
         occupancy: ['single'],
         occupancy_pricing: { single: '' },
         association: '',
@@ -262,6 +262,14 @@ const AddListing = () => {
                                 <p>Listing submitted successfully! Waiting for admin approval.</p>
                             </div>
                         )}
+
+                        {/* 100% Free Guarantee Banner */}
+                        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs sm:text-sm flex items-center gap-3">
+                            <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+                            <div>
+                                <strong className="font-bold">100% Free Listing:</strong> StaySetu charges ₹0 listing fees and takes 0% commission. Verified students connect directly with your WhatsApp!
+                            </div>
+                        </div>
 
                         {/* Basic Info */}
                         <div>

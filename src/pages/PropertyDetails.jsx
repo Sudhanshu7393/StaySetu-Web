@@ -862,7 +862,12 @@ const PropertyDetails = () => {
                                     {isSold ? 'Sold Out' : isRented ? 'Already Rented Out' : 'Connect via WhatsApp'}
                                 </button>
                             </div>
-                            <p className="text-center text-[11px] text-zinc-500 font-medium mb-6">⚡ {String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'} typically replies within 5 mins</p>
+                            <p className="text-center text-[11px] text-zinc-500 font-medium mb-3">⚡ {String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'} typically replies within 5 mins</p>
+                            
+                            <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 py-1.5 px-3 rounded-full border border-emerald-200/80 mb-6">
+                                <ShieldCheck size={13} className="text-emerald-600 shrink-0" />
+                                <span>100% Free • ₹0 Brokerage • Direct Connect</span>
+                            </div>
 
                             {/* Transparent Pricing Breakdown with Broker Fee Disclosed */}
                             <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/80 mb-6">

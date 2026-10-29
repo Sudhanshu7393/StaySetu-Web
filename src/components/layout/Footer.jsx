@@ -145,11 +145,17 @@ const Footer = () => {
 
                 {/* Bottom bar */}
                 <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-500">
-                    <p>© {new Date().getFullYear()} StaySetu. Made for Indian students with care.</p>
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
+                        <p>© {new Date().getFullYear()} StaySetu. Made for Indian students with care.</p>
+                        <span className="hidden sm:inline text-zinc-600">•</span>
+                        <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 text-[11px]">
+                            100% Free Platform • ₹0 Brokerage
+                        </span>
+                    </div>
                     <div className="flex space-x-5">
-                        <span className="hover:text-white transition-colors cursor-pointer">Privacy Policy</span>
-                        <span className="hover:text-white transition-colors cursor-pointer">Terms of Service</span>
-                        <span className="hover:text-white transition-colors cursor-pointer">Security Standards</span>
+                        <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
+                        <Link to="/security" className="hover:text-white transition-colors">Security Standards</Link>
                     </div>
                 </div>
             </div>

@@ -17,15 +17,15 @@ const EcosystemBenefits = () => {
                 
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-14">
-                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 text-rose-700 text-xs font-black uppercase tracking-wider border border-rose-200/80 mb-3 shadow-2xs">
-                        <Sparkles size={13} className="text-rose-500" />
-                        Everything in One Place
-                    </span>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-black uppercase tracking-wider border border-emerald-200 mb-3 shadow-2xs">
+                        <CheckCircle2 size={14} className="text-emerald-600" />
+                        <span>100% Free Forever • ₹0 Brokerage • Direct Connect</span>
+                    </div>
                     <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight leading-tight">
                         The 3 Biggest Student Living Needs, <span className="text-rose-600">Solved in One Platform</span>
                     </h2>
                     <p className="text-zinc-500 font-normal text-sm sm:text-base mt-2.5 leading-relaxed">
-                        Finding a clean room, a compatible roommate, and reliable local housekeeping shouldn't be stressful. StaySetu brings complete clarity and direct connections to your campus life.
+                        Finding a clean room, a compatible roommate, and reliable local housekeeping shouldn't be stressful. StaySetu brings complete clarity, zero fees, and direct connections to your campus life.
                     </p>
                 </div>
 

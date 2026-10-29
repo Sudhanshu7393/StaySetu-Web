@@ -40,7 +40,7 @@ const OwnerDashboard = () => {
         latitude: '',
         longitude: '',
         listed_by: 'owner',
-        brokerage_fee: '15 Days Rent',
+        brokerage_fee: '₹0 (Zero Brokerage - Free)',
         association: '',
         nearbyCollege: ''
     });
@@ -323,7 +323,7 @@ const OwnerDashboard = () => {
                 deposit: '', available_from: '',
                 latitude: '', longitude: '',
                 listed_by: 'owner',
-                brokerage_fee: '15 Days Rent',
+                brokerage_fee: '₹0 (Zero Brokerage - Free)',
                 association: '',
                 nearbyCollege: ''
             });

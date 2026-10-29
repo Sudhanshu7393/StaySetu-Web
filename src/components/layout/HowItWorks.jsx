@@ -9,12 +9,12 @@ const steps = [
     },
     {
         title: 'Review Transparent Pricing',
-        description: 'Monthly rent, refundable security deposit, and exact broker fee — all 100% disclosed upfront.',
+        description: 'Monthly rent, refundable security deposit, and ₹0 brokerage fee — all 100% disclosed upfront.',
         icon: Home,
     },
     {
         title: 'Connect Directly on WhatsApp',
-        description: 'Chat instantly with property owners or verified brokers to ask questions and schedule a visit.',
+        description: 'Chat instantly with property owners with zero middlemen, zero commission, and schedule a free visit.',
         icon: MessageSquare,
     },
     {
