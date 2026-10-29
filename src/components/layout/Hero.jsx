@@ -3,6 +3,7 @@ import { Search, Building, MapPin, ChevronDown, ArrowRight, Star, Crosshair, Spa
 import { useNavigate, Link } from 'react-router-dom';
 import { databases, DATABASE_ID, COLLECTION, Query } from '../../lib/supabase';
 import { REGIONS_LIST, ALL_INDIAN_CITIES } from '../../lib/indianCities';
+import { formatPropertyPrice } from '../../lib/formatters';
 
 const VIKRANT_PG_DEFAULT = {
     $id: '69cbc4bc0023a8c61505',
@@ -13,6 +14,7 @@ const VIKRANT_PG_DEFAULT = {
     type: 'PG',
     genderPreference: 'girls',
     listedBy: 'owner',
+    purpose: 'rent',
     images: [
         'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&q=80',
         'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80'
@@ -21,8 +23,35 @@ const VIKRANT_PG_DEFAULT = {
     whatsappNumber: '7393011350',
 };
 
-const Hero = () => {
-    const [purpose, setPurpose] = useState('rent');
+const SALE_SPOTLIGHT_DEFAULT = {
+    $id: 'sale-crossings-3bhk',
+    id: 'sale-crossings-3bhk',
+    title: '3 BHK Luxury Apartment in Crossings Republik',
+    price: 6500000,
+    location: 'Crossings Republik, Ghaziabad',
+    type: 'Flat',
+    purpose: 'sell',
+    listedBy: 'owner',
+    images: [
+        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80',
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80'
+    ],
+    amenities: ['Power Backup', 'Gym', 'Swimming Pool', 'Security', 'Covered Parking', 'Club House'],
+    whatsappNumber: '7393011350',
+};
+
+const Hero = ({ purpose = 'rent', onPurposeChange }) => {
+    const [localPurpose, setLocalPurpose] = useState('rent');
+    const activePurpose = onPurposeChange ? purpose : localPurpose;
+
+    const handleSetPurpose = (newPurpose) => {
+        if (onPurposeChange) {
+            onPurposeChange(newPurpose);
+        } else {
+            setLocalPurpose(newPurpose);
+        }
+    };
+
     const [propertyType, setPropertyType] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
     const [city, setCity] = useState('');
@@ -32,7 +61,8 @@ const Hero = () => {
     const [suggestions, setSuggestions] = useState([]);
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [featuredProperty, setFeaturedProperty] = useState(VIKRANT_PG_DEFAULT);
+    const [featuredRentProperty, setFeaturedRentProperty] = useState(VIKRANT_PG_DEFAULT);
+    const [featuredSaleProperty, setFeaturedSaleProperty] = useState(SALE_SPOTLIGHT_DEFAULT);
     const searchRef = useRef(null);
     const cityRef = useRef(null);
     const navigate = useNavigate();
@@ -78,20 +108,26 @@ const Hero = () => {
                     });
                     setSuggestions(Array.from(vals));
 
-                    // Pick spotlight property (admin chosen or Vikrant PG by default)
+                    // Pick rent spotlight property (admin chosen or Vikrant PG by default)
                     const customId = localStorage.getItem('staysetu_hero_featured_id');
-                    let chosen = null;
+                    let chosenRent = null;
                     if (customId) {
-                        chosen = res.documents.find(d => (d.$id === customId || d.id === customId));
+                        chosenRent = res.documents.find(d => (d.$id === customId || d.id === customId));
                     }
-                    if (!chosen) {
-                        chosen = res.documents.find(d => d.title && d.title.toLowerCase().includes('vikrant'));
+                    if (!chosenRent) {
+                        chosenRent = res.documents.find(d => d.title && d.title.toLowerCase().includes('vikrant'));
                     }
-                    if (!chosen) {
-                        chosen = res.documents.find(d => d.featured) || res.documents[0];
+                    if (!chosenRent) {
+                        chosenRent = res.documents.find(d => d.purpose !== 'sell' && d.purpose !== 'sale') || res.documents[0];
                     }
-                    if (chosen) {
-                        setFeaturedProperty(chosen);
+                    if (chosenRent) {
+                        setFeaturedRentProperty(chosenRent);
+                    }
+
+                    // Pick sale spotlight property
+                    const chosenSale = res.documents.find(d => d.purpose === 'sell' || d.purpose === 'sale' || Number(d.price) >= 500000);
+                    if (chosenSale) {
+                        setFeaturedSaleProperty(chosenSale);
                     }
                 }
             } catch (err) {
@@ -113,10 +149,12 @@ const Hero = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const currentSpotlight = activePurpose === 'sell' ? (featuredSaleProperty || SALE_SPOTLIGHT_DEFAULT) : (featuredRentProperty || VIKRANT_PG_DEFAULT);
+
     const handleSearch = (e) => {
         if (e) e.preventDefault();
         const params = new URLSearchParams();
-        if (purpose) params.append('purpose', purpose);
+        if (activePurpose) params.append('purpose', activePurpose);
         if (searchQuery.trim()) params.append('q', searchQuery.trim());
         if (propertyType !== 'All') params.append('type', propertyType);
         if (city && city !== 'All India') params.append('city', city);
@@ -125,15 +163,15 @@ const Hero = () => {
 
     const handleNearMe = () => {
         if (!navigator.geolocation) {
-            navigate('/listings?view=map');
+            navigate(`/listings?purpose=${activePurpose}&view=map`);
             return;
         }
         navigator.geolocation.getCurrentPosition(
             (pos) => {
-                navigate(`/listings?purpose=${purpose}&lat=${pos.coords.latitude}&lng=${pos.coords.longitude}&view=map`);
+                navigate(`/listings?purpose=${activePurpose}&lat=${pos.coords.latitude}&lng=${pos.coords.longitude}&view=map`);
             },
             () => {
-                navigate(`/listings?purpose=${purpose}&view=map`);
+                navigate(`/listings?purpose=${activePurpose}&view=map`);
             },
             { enableHighAccuracy: true, timeout: 8000 }
         );
@@ -294,22 +332,22 @@ const Hero = () => {
                                 <div className="inline-flex items-center gap-1 p-1 bg-white/90 backdrop-blur-md rounded-full border border-rose-200/90 shadow-2xs">
                                     <button
                                         type="button"
-                                        onClick={() => setPurpose('rent')}
-                                        className={`px-3 py-1 rounded-full text-xs font-extrabold transition-all ${
-                                            purpose === 'rent'
-                                                ? 'bg-rose-500 text-white shadow-xs'
-                                                : 'text-zinc-600 hover:text-zinc-950'
+                                        onClick={() => handleSetPurpose('rent')}
+                                        className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
+                                            activePurpose === 'rent'
+                                                ? 'bg-rose-500 text-white shadow-xs scale-[1.02]'
+                                                : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/70'
                                         }`}
                                     >
                                         🏠 Rent
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setPurpose('sell')}
-                                        className={`px-3 py-1 rounded-full text-xs font-extrabold transition-all ${
-                                            purpose === 'sell'
-                                                ? 'bg-rose-500 text-white shadow-xs'
-                                                : 'text-zinc-600 hover:text-zinc-950'
+                                        onClick={() => handleSetPurpose('sell')}
+                                        className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
+                                            activePurpose === 'sell'
+                                                ? 'bg-rose-500 text-white shadow-xs scale-[1.02]'
+                                                : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/70'
                                         }`}
                                     >
                                         🏷️ Buy / Sell
@@ -320,7 +358,7 @@ const Hero = () => {
                             {/* Main Display Headline */}
                             <div>
                                 <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-zinc-950 tracking-tight leading-[1.18]">
-                                    {purpose === 'sell' ? (
+                                    {activePurpose === 'sell' ? (
                                         <>
                                             Verified Properties for Sale, <br className="hidden sm:inline" />
                                             <span className="text-rose-600">With 100% Clarity.</span>
@@ -336,20 +374,36 @@ const Hero = () => {
                                 {/* Subtitle on mobile: sleek trust badges; on desktop: clean description */}
                                 <div className="mt-1.5 sm:mt-2.5">
                                     <p className="hidden sm:block text-zinc-600 text-sm md:text-base font-normal max-w-lg leading-relaxed">
-                                        {purpose === 'sell'
+                                        {activePurpose === 'sell'
                                             ? 'Flats, plots and independent villas in prime locations. Direct owner and verified broker deals with 100% upfront pricing.'
                                             : 'Explore vetted PGs, hostels & apartments with upfront rent, clear deposits, and honest broker terms. Connect directly on WhatsApp.'}
                                     </p>
                                     <div className="flex sm:hidden items-center gap-1.5 text-[11px] font-bold text-zinc-600 flex-wrap">
-                                        <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                                            ✓ Transparent Fees
-                                        </span>
-                                        <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
-                                            ✓ Verified Stays
-                                        </span>
-                                        <span className="inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-                                            ✓ Direct WhatsApp
-                                        </span>
+                                        {activePurpose === 'sell' ? (
+                                            <>
+                                                <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                                    ✓ Clear Titles
+                                                </span>
+                                                <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                                                    ✓ Verified Listings
+                                                </span>
+                                                <span className="inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                                                    ✓ Direct WhatsApp
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                                    ✓ Transparent Fees
+                                                </span>
+                                                <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                                                    ✓ Verified Stays
+                                                </span>
+                                                <span className="inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                                                    ✓ Direct WhatsApp
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -364,7 +418,11 @@ const Hero = () => {
                                     <Search size={18} className="text-rose-500 mr-2 shrink-0" />
                                     <input
                                         type="text"
-                                        placeholder="Search college, PG, flat or area..."
+                                        placeholder={
+                                            activePurpose === 'sell'
+                                                ? 'Search 2/3 BHK flats, plots, villas or area...'
+                                                : 'Search college, PG, flat or area...'
+                                        }
                                         value={searchQuery}
                                         onChange={(e) => {
                                             const val = e.target.value;
@@ -422,28 +480,36 @@ const Hero = () => {
                                     className="bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-extrabold text-xs sm:text-sm py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl sm:rounded-full flex items-center justify-center gap-1.5 transition-all shadow-md shadow-rose-500/25 shrink-0"
                                 >
                                     <Search size={14} className="hidden sm:inline" />
-                                    <span>Search</span>
+                                    <span>{activePurpose === 'sell' ? 'Search Properties' : 'Search Stays'}</span>
                                 </button>
                             </form>
 
                             {/* App-like Quick Categories - 1 Tap Actions */}
                             <div className="grid grid-cols-5 gap-1.5 sm:gap-2 pt-1">
-                                {[
+                                {(activePurpose === 'sell' ? [
+                                    { label: 'Flats / Apts', icon: '🏢', type: 'Flat' },
+                                    { label: 'Villas / Kothis', icon: '🏡', type: 'House/Villa' },
+                                    { label: 'Plots / Land', icon: '📐', type: 'Plot' },
+                                    { label: 'Commercial', icon: '💼', type: 'Studio' },
+                                    { label: 'Resale Deals', icon: '💰', query: 'Resale' },
+                                ] : [
                                     { label: 'Girls PG', icon: '🌸', type: 'PG', gender: 'girls' },
                                     { label: 'Boys PG', icon: '⚡', type: 'PG', gender: 'boys' },
                                     { label: 'Flats', icon: '🏢', type: 'Flat' },
                                     { label: 'Roommates', icon: '👥', link: '/roommates' },
                                     { label: 'Maids', icon: '🧹', link: '/maids' },
-                                ].map((cat) => (
+                                ]).map((cat) => (
                                     <button
                                         key={cat.label}
                                         type="button"
                                         onClick={() => {
                                             if (cat.link) {
                                                 navigate(cat.link);
+                                            } else if (cat.query) {
+                                                navigate(`/listings?purpose=${activePurpose}&q=${encodeURIComponent(cat.query)}`);
                                             } else {
                                                 setPropertyType(cat.type);
-                                                navigate(`/listings?purpose=${purpose}&type=${encodeURIComponent(cat.type)}${cat.gender ? `&gender=${cat.gender}` : ''}`);
+                                                navigate(`/listings?purpose=${activePurpose}&type=${encodeURIComponent(cat.type)}${cat.gender ? `&gender=${cat.gender}` : ''}`);
                                             }
                                         }}
                                         className="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/95 hover:bg-rose-50/70 border border-zinc-200/80 shadow-2xs hover:border-rose-300 transition-all active:scale-95 text-center group cursor-pointer"
@@ -463,20 +529,27 @@ const Hero = () => {
                                 <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 shrink-0">
                                     Popular:
                                 </span>
-                                {[
+                                {(activePurpose === 'sell' ? [
+                                    { label: '📍 Crossings Republik', q: 'Crossings Republik' },
+                                    { label: '📍 Gomti Nagar Lucknow', q: 'Gomti Nagar' },
+                                    { label: '📍 Noida Expressway', q: 'Noida Expressway' },
+                                    { label: '📍 Indirapuram', q: 'Indirapuram' },
+                                    { label: '📍 Shaheed Path', q: 'Shaheed Path' },
+                                    { label: '📍 Greater Noida', q: 'Greater Noida' },
+                                ] : [
                                     { label: '🎓 ABES Engg', q: 'ABES' },
                                     { label: '📍 Crossings Republik', q: 'Crossings Republik' },
                                     { label: '🎓 IMS Ghaziabad', q: 'IMS' },
                                     { label: '📍 Noida Sec 62', q: 'Noida' },
                                     { label: '📍 Lucknow', q: 'Lucknow' },
                                     { label: '🎓 AKGEC', q: 'AKGEC' },
-                                ].map((tag) => (
+                                ]).map((tag) => (
                                     <button
                                         key={tag.label}
                                         type="button"
                                         onClick={() => {
                                             setSearchQuery(tag.q);
-                                            navigate(`/listings?q=${encodeURIComponent(tag.q)}`);
+                                            navigate(`/listings?purpose=${activePurpose}&q=${encodeURIComponent(tag.q)}`);
                                         }}
                                         className="px-3 py-1 rounded-full bg-white hover:bg-rose-50 text-zinc-700 hover:text-rose-600 border border-zinc-200 text-xs font-bold transition-colors shrink-0 shadow-2xs whitespace-nowrap"
                                     >
@@ -490,18 +563,18 @@ const Hero = () => {
                         {/* Right Column: Featured Spotlight Property Card */}
                         <div className="lg:col-span-5 relative group">
                             <Link
-                                to={`/property/${featuredProperty?.$id || featuredProperty?.id || '69cbc4bc0023a8c61505'}`}
+                                to={`/property/${currentSpotlight?.$id || currentSpotlight?.id || '69cbc4bc0023a8c61505'}`}
                                 className="block relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border-4 border-white transition-all duration-300 hover:shadow-2xl hover:scale-[1.01]"
                             >
                                 <img
                                     src={
-                                        (Array.isArray(featuredProperty?.images) && featuredProperty.images.length > 0)
-                                            ? featuredProperty.images[0]
-                                            : (typeof featuredProperty?.images === 'string' && featuredProperty.images.startsWith('[')
-                                                ? JSON.parse(featuredProperty.images)[0]
-                                                : (featuredProperty?.images || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&q=80'))
+                                        (Array.isArray(currentSpotlight?.images) && currentSpotlight.images.length > 0)
+                                            ? currentSpotlight.images[0]
+                                            : (typeof currentSpotlight?.images === 'string' && currentSpotlight.images.startsWith('[')
+                                                ? JSON.parse(currentSpotlight.images)[0]
+                                                : (currentSpotlight?.images || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&q=80'))
                                     }
-                                    alt={featuredProperty?.title || 'VIKRANT GIRLS PG'}
+                                    alt={currentSpotlight?.title || 'Property'}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                     onError={(e) => {
                                         e.target.onerror = null;
@@ -514,10 +587,12 @@ const Hero = () => {
                                 <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 pointer-events-none">
                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 text-xs font-black shadow-md border border-white/50">
                                         <Sparkles size={13} className="text-rose-500 fill-rose-500" />
-                                        Featured Spotlight
+                                        {activePurpose === 'sell' ? 'Verified Sale Deal' : 'Featured Spotlight'}
                                     </span>
                                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-rose-500 text-white text-xs font-black shadow-md">
-                                        {featuredProperty?.genderPreference === 'girls' ? '🌸 Girls PG' : (featuredProperty?.type || 'PG')}
+                                        {activePurpose === 'sell'
+                                            ? '🏷️ For Sale'
+                                            : (currentSpotlight?.genderPreference === 'girls' ? '🌸 Girls PG' : (currentSpotlight?.type || 'PG'))}
                                     </span>
                                 </div>
 
@@ -525,25 +600,31 @@ const Hero = () => {
                                 <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-xl border border-zinc-100 flex items-center justify-between gap-3">
                                     <div className="min-w-0">
                                         <h3 className="text-sm sm:text-base font-black text-zinc-900 truncate">
-                                            {featuredProperty?.title || 'VIKRANT GIRLS PG'}
+                                            {currentSpotlight?.title || 'VIKRANT GIRLS PG'}
                                         </h3>
                                         <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium mt-0.5">
                                             <span className="flex items-center gap-1 truncate text-zinc-600">
                                                 <MapPin size={12} className="text-rose-500 shrink-0" />
-                                                {featuredProperty?.location || 'Arihant Ambience'}
+                                                {currentSpotlight?.location || 'Arihant Ambience'}
                                             </span>
                                             <span>•</span>
                                             <span className="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] border border-emerald-100 shrink-0">
-                                                {String(featuredProperty?.listedBy || 'owner').toLowerCase() === 'owner' ? '🏠 ₹0 Brokerage' : '🤝 Broker Fee Disclosed'}
+                                                {String(currentSpotlight?.listedBy || 'owner').toLowerCase() === 'owner' ? '🏠 ₹0 Brokerage' : '🤝 Broker Fee Disclosed'}
                                             </span>
                                         </div>
                                     </div>
 
                                     <div className="text-right shrink-0">
-                                        <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Starts at</div>
+                                        <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                                            {activePurpose === 'sell' ? 'Total Price' : 'Starts at'}
+                                        </div>
                                         <div className="text-base sm:text-lg font-black text-zinc-950">
-                                            ₹{Number(featuredProperty?.price || 10000).toLocaleString()}
-                                            <span className="text-[10px] text-zinc-400 font-medium">/mo</span>
+                                            {activePurpose === 'sell'
+                                                ? formatPropertyPrice(currentSpotlight?.price, 'sell')
+                                                : `₹${Number(currentSpotlight?.price || 10000).toLocaleString()}`}
+                                            {activePurpose !== 'sell' && (
+                                                <span className="text-[10px] text-zinc-400 font-medium">/mo</span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

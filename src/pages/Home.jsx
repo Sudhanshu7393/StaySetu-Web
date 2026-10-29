@@ -12,13 +12,19 @@ import {
 import { Link } from 'react-router-dom';
 
 const Home = () => {
+    const [purpose, setPurpose] = useState('rent');
     const [allListings, setAllListings] = useState([]);
     const [filteredListings, setFilteredListings] = useState([]);
     const [selectedCity, setSelectedCity] = useState('All');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        document.title = 'StaySetu — Verified Student PGs, Hostels & Roommates';
+        document.title = purpose === 'sell' 
+            ? 'StaySetu — Verified Properties for Sale, Flats & Plots'
+            : 'StaySetu — Verified Student PGs, Hostels & Roommates';
+    }, [purpose]);
+
+    useEffect(() => {
         const fetchAllHomeData = async () => {
             setLoading(true);
             try {
@@ -28,7 +34,7 @@ const Home = () => {
                     [
                         Query.equal('status', ['approved', 'active']),
                         Query.orderDesc('$createdAt'),
-                        Query.limit(10),
+                        Query.limit(50),
                     ]
                 );
 
@@ -38,7 +44,6 @@ const Home = () => {
                     amenities: parseJsonField(item.amenities)
                 }));
                 setAllListings(parsed);
-                setFilteredListings(parsed);
             } catch (err) {
                 console.error('Home Page Fetch Error:', err);
             } finally {
@@ -49,29 +54,38 @@ const Home = () => {
         fetchAllHomeData();
     }, []);
 
+    useEffect(() => {
+        let list = allListings;
+        if (purpose === 'sell') {
+            list = list.filter(item => item.purpose === 'sell' || item.purpose === 'sale' || Number(item.price) >= 500000);
+        } else {
+            list = list.filter(item => !(item.purpose === 'sell' || item.purpose === 'sale' || Number(item.price) >= 500000));
+        }
+
+        if (selectedCity !== 'All') {
+            const q = selectedCity.toLowerCase();
+            list = list.filter(item => 
+                (item.location || '').toLowerCase().includes(q) ||
+                (item.title || '').toLowerCase().includes(q)
+            );
+        }
+        setFilteredListings(list);
+    }, [purpose, selectedCity, allListings]);
+
     const handleCityFilter = (city) => {
         setSelectedCity(city);
-        if (city === 'All') {
-            setFilteredListings(allListings);
-        } else {
-            const filtered = allListings.filter(item => 
-                (item.location || '').toLowerCase().includes(city.toLowerCase()) ||
-                (item.title || '').toLowerCase().includes(city.toLowerCase())
-            );
-            setFilteredListings(filtered);
-        }
     };
 
     return (
         <div className="relative min-h-screen overflow-x-hidden bg-[#FAFAFB] text-zinc-900 pb-16">
             
             {/* 1. Curved Hero Banner */}
-            <Hero />
+            <Hero purpose={purpose} onPurposeChange={setPurpose} />
 
-            {/* 2. Explore by room type (Categories matching screenshot 1) */}
-            <Categories />
+            {/* 2. Explore by room / property type */}
+            <Categories purpose={purpose} />
 
-            {/* 3. Available Rooms Section (Matching screenshot 1 & 2) */}
+            {/* 3. Available Rooms / Properties Section */}
             <section className="py-8 sm:py-12 bg-[#FAFAFB]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     
@@ -79,15 +93,17 @@ const Home = () => {
                     <div className="flex items-center justify-between mb-4">
                         <div>
                             <h2 className="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">
-                                Available Rooms
+                                {purpose === 'sell' ? 'Properties for Sale' : 'Available Rooms & Stays'}
                             </h2>
                             <p className="text-zinc-500 text-xs sm:text-sm font-normal mt-0.5">
-                                Explore rooms currently available on StaySetu.
+                                {purpose === 'sell'
+                                    ? 'Explore verified flats, luxury villas & plots available for purchase.'
+                                    : 'Explore verified student rooms and PGs currently available on StaySetu.'}
                             </p>
                         </div>
 
                         <Link
-                            to="/listings"
+                            to={`/listings?purpose=${purpose}`}
                             className="text-xs sm:text-sm font-extrabold text-rose-600 hover:text-rose-700 flex items-center gap-1 transition-colors"
                         >
                             <span>View all</span>
@@ -96,15 +112,15 @@ const Home = () => {
                     </div>
 
                     {/* Filter Pills Row */}
-                    <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1">
+                    <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
                         <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 shrink-0">
-                            ✓ Stays in Crossings Republik, Ghaziabad & Pan-India
+                            {purpose === 'sell' ? '✓ Verified Real Estate with Direct Contacts' : '✓ Stays in Crossings Republik, Ghaziabad & Pan-India'}
                         </span>
                         {['All', 'Crossings Republik', 'Ghaziabad', 'Noida', 'Delhi NCR', 'Lucknow'].map((loc) => (
                             <button
                                 key={loc}
                                 onClick={() => handleCityFilter(loc)}
-                                className={`px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 ${
+                                className={`px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
                                     selectedCity === loc
                                         ? 'bg-rose-500 text-white shadow-xs'
                                         : 'bg-white text-zinc-600 border border-zinc-200/80 hover:bg-zinc-50'
@@ -133,16 +149,20 @@ const Home = () => {
                             <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                 <HomeIcon size={26} />
                             </div>
-                            <h3 className="text-base font-extrabold text-zinc-900 mb-1.5">No properties listed yet</h3>
+                            <h3 className="text-base font-extrabold text-zinc-900 mb-1.5">
+                                {purpose === 'sell' ? 'No sale properties found in this location' : 'No properties listed yet'}
+                            </h3>
                             <p className="text-zinc-500 text-xs sm:text-sm font-normal mb-6 leading-relaxed">
-                                Are you an owner or broker? List your flat, PG, or property on StaySetu with 100% direct connects.
+                                {purpose === 'sell'
+                                    ? 'Are you an owner or broker with a flat, villa, or plot to sell? List on StaySetu with direct buyer connects.'
+                                    : 'Are you an owner or broker? List your flat, PG, or property on StaySetu with 100% direct connects.'}
                             </p>
                             <div className="flex flex-wrap items-center justify-center gap-3">
-                                <Link to="/dashboard/add-listing" className="bg-rose-500 hover:bg-rose-600 text-white font-extrabold py-2.5 px-5 rounded-full text-xs shadow-xs transition-colors">
-                                    + List Your Property
+                                <Link to={`/dashboard/add-listing?purpose=${purpose}`} className="bg-rose-500 hover:bg-rose-600 text-white font-extrabold py-2.5 px-5 rounded-full text-xs shadow-xs transition-colors">
+                                    {purpose === 'sell' ? '+ List Property for Sale' : '+ List Your Property'}
                                 </Link>
-                                <Link to="/listings" className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-extrabold py-2.5 px-5 rounded-full text-xs transition-colors">
-                                    View Listings
+                                <Link to={`/listings?purpose=${purpose}`} className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-extrabold py-2.5 px-5 rounded-full text-xs transition-colors">
+                                    View All {purpose === 'sell' ? 'Sale Listings' : 'Listings'}
                                 </Link>
                             </div>
                         </div>
