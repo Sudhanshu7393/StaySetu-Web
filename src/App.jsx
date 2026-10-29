@@ -91,6 +91,7 @@ const AppContent = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/listings" element={<Listings />} />
+          <Route path="/explore" element={<Navigate to="/listings" replace />} />
           <Route path="/property/:id" element={<PropertyDetails />} />
           <Route path="/roommates" element={<Roommates />} />
           <Route path="/maids" element={<Maids />} />

@@ -17,11 +17,12 @@ const Listings = () => {
     const [viewMode, setViewMode] = useState(searchParams.get('view') || 'grid');
     const [selectedListingId, setSelectedListingId] = useState(null);
 
+    const cityParam = searchParams.get('city');
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     const [propertyType, setPropertyType] = useState(searchParams.get('type') || 'all');
     const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || 'all');
     const [priceRange, setPriceRange] = useState(
-        parseInt(searchParams.get('price')) || (initialPurpose === 'sell' ? 30000000 : 100000)
+        parseInt(searchParams.get('price')) || (initialPurpose === 'sell' ? 50000000 : 100000)
     );
     const [amenities, setAmenities] = useState(searchParams.get('amenities')?.split(',') || []);
     const [userCoords, setUserCoords] = useState(
@@ -33,7 +34,7 @@ const Listings = () => {
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    const colleges = [
+    const RENT_HUBS = [
         { id: 'all', label: 'All Cities & Hubs' },
         { id: 'Crossings', label: '📍 Crossings Republik' },
         { id: 'ABES', label: '🎓 ABES Engg College' },
@@ -42,6 +43,17 @@ const Listings = () => {
         { id: 'Noida', label: '📍 Noida / Gr. Noida' },
         { id: 'Lucknow', label: '📍 Lucknow' },
     ];
+
+    const SELL_HUBS = [
+        { id: 'all', label: 'All Locations' },
+        { id: 'Crossings', label: '📍 Crossings Republik' },
+        { id: 'Ghaziabad', label: '📍 Ghaziabad' },
+        { id: 'Noida', label: '📍 Noida' },
+        { id: 'Indirapuram', label: '📍 Indirapuram' },
+        { id: 'Greater Noida', label: '📍 Greater Noida' },
+    ];
+
+    const colleges = purposeFilter === 'sell' ? SELL_HUBS : RENT_HUBS;
 
     const amenityOptions = ['WiFi', 'AC', 'Food', 'Parking', 'Laundry'];
 
@@ -95,7 +107,7 @@ const Listings = () => {
 
             // Price filter: adjust according to purpose to ensure sale vs rent pricing doesn't block listings
             if (purposeFilter === 'sell') {
-                const effectiveMax = priceRange >= 1000000 ? priceRange : 30000000;
+                const effectiveMax = priceRange >= 1000000 ? priceRange : 50000000;
                 results = results.filter(l => (Number(l.price) || 0) <= effectiveMax);
             } else if (purposeFilter === 'rent') {
                 const effectiveMax = priceRange <= 200000 ? priceRange : 100000;
@@ -168,13 +180,18 @@ const Listings = () => {
     const handlePurposeChange = (newPurpose) => {
         setPurposeFilter(newPurpose);
         setPropertyType('all');
+        setCollegeFilter('all');
         if (newPurpose === 'sell') {
-            setPriceRange(30000000);
+            setPriceRange(50000000);
         } else if (newPurpose === 'rent') {
             setPriceRange(50000);
         } else {
-            setPriceRange(30000000);
+            setPriceRange(50000000);
         }
+        // Clear any stale city param when switching mode
+        const newParams = new URLSearchParams();
+        if (newPurpose !== 'all') newParams.set('purpose', newPurpose);
+        setSearchParams(newParams);
     };
 
     const fetchSuggestions = async (query) => {
@@ -209,12 +226,13 @@ const Listings = () => {
         if (urlPurpose && urlPurpose !== purposeFilter) {
             setPurposeFilter(urlPurpose);
             setPropertyType('all');
+            setCollegeFilter('all');
             if (urlPurpose === 'sell') {
-                setPriceRange(30000000);
+                setPriceRange(50000000);
             } else if (urlPurpose === 'rent') {
                 setPriceRange(50000);
             } else {
-                setPriceRange(30000000);
+                setPriceRange(50000000);
             }
         }
     }, [searchParams]);
@@ -281,12 +299,13 @@ const Listings = () => {
                         setSearchQuery('');
                         setPropertyType('all');
                         setGenderFilter('all');
-                        setPriceRange(purposeFilter === 'sell' ? 30000000 : 100000);
+                        setCollegeFilter('all');
+                        setPriceRange(purposeFilter === 'sell' ? 50000000 : 100000);
                         setAmenities([]);
                         setUserCoords(null);
-                        setSearchParams({});
+                        setSearchParams(purposeFilter !== 'all' ? { purpose: purposeFilter } : {});
                     }}
-                    className="text-rose-600 text-xs font-semibold hover:text-rose-700 transition-colors"
+                    className="text-rose-600 text-xs font-semibold hover:text-rose-700 transition-colors cursor-pointer"
                 >
                     Reset
                 </button>
@@ -399,7 +418,7 @@ const Listings = () => {
                 <input
                     type="range"
                     min={purposeFilter === 'sell' ? 1000000 : 2000}
-                    max={purposeFilter === 'sell' ? 30000000 : 50000}
+                    max={purposeFilter === 'sell' ? 50000000 : 50000}
                     step={purposeFilter === 'sell' ? 500000 : 500}
                     className="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
                     value={priceRange}
@@ -407,7 +426,7 @@ const Listings = () => {
                 />
                 <div className="flex justify-between mt-2 text-[10px] font-medium text-zinc-400">
                     <span>{purposeFilter === 'sell' ? '₹10 Lac' : '₹2,000'}</span>
-                    <span>{purposeFilter === 'sell' ? '₹3 Cr+' : '₹50,000+'}</span>
+                    <span>{purposeFilter === 'sell' ? '₹5 Cr+' : '₹50,000+'}</span>
                 </div>
             </div>
 
@@ -625,7 +644,15 @@ const Listings = () => {
                                 : purposeFilter === 'rent'
                                     ? (listings.length === 1 ? 'rental stay' : 'rental stays')
                                     : (listings.length === 1 ? 'property' : 'properties')
-                        } {collegeFilter !== 'all' ? `near ${collegeFilter}` : 'across India'}
+                        } {
+                            collegeFilter !== 'all'
+                                ? `in ${colleges.find(c => c.id === collegeFilter)?.label?.replace(/^[^\w\s]+/, '').trim() || collegeFilter}`
+                                : cityParam && cityParam !== 'all' && cityParam !== 'All India'
+                                    ? `in ${cityParam}`
+                                    : purposeFilter === 'sell'
+                                        ? 'in NCR / Ghaziabad'
+                                        : 'across India'
+                        }
                     </h2>
                     <span className="text-xs font-bold text-zinc-500 flex items-center gap-1">
                         Sorted by relevance
@@ -724,11 +751,13 @@ const Listings = () => {
                                             setSearchQuery('');
                                             setPropertyType('all');
                                             setGenderFilter('all');
-                                            setPriceRange(purposeFilter === 'sell' ? 30000000 : 100000);
+                                            setCollegeFilter('all');
+                                            setUserCoords(null);
+                                            setPriceRange(purposeFilter === 'sell' ? 50000000 : 100000);
                                             setAmenities([]);
-                                            setSearchParams({});
+                                            setSearchParams(purposeFilter !== 'all' ? { purpose: purposeFilter } : {});
                                         }}
-                                        className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-extrabold px-5 py-2.5 rounded-full text-xs transition-all"
+                                        className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-extrabold px-5 py-2.5 rounded-full text-xs transition-all cursor-pointer"
                                     >
                                         Clear Filters
                                     </button>
