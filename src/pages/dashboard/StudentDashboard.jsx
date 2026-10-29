@@ -8,7 +8,8 @@ import {
     Star, BookmarkCheck, Bell, TrendingUp, Eye, Clock,
     ChevronRight, Filter, IndianRupee, Sparkles, Shield,
     LogOut, Settings, X, Users, Phone, Plus, Loader2,
-    CheckCircle, Calendar, UserCheck, Trash2
+    CheckCircle, Calendar, UserCheck, Trash2,
+    MessageCircle, Mail
 } from 'lucide-react';
 
 const StudentDashboard = () => {

@@ -9,7 +9,8 @@ import {
     BarChart3, ArrowUpRight, ArrowLeft, Upload,
     Save, X, User, LogOut, Shield, Briefcase,
     Phone, Send, Bell, Settings, Building2,
-    ChevronLeft, MoreVertical, Filter, Locate, Brush, Loader2
+    ChevronLeft, MoreVertical, Filter, Locate, Brush, Loader2,
+    MessageCircle, Mail
 } from 'lucide-react';
 import PropertyMap from '../../components/common/PropertyMap';
 import { formatPropertyPrice, getPropertyTypeLabel } from '../../lib/formatters';

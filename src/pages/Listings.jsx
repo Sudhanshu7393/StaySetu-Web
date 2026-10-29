@@ -652,13 +652,13 @@ const Listings = () => {
                         </div>
 
                         {loading ? (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5">
                                 {[1, 2, 3, 4, 5, 6].map((i) => (
                                     <div key={i} className="bg-white rounded-3xl animate-pulse h-48 border border-zinc-200"></div>
                                 ))}
                             </div>
                         ) : listings.length > 0 ? (
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5">
                                 {listings.map((listing) => {
                                     const isHighlighted = selectedListingId === (listing.$id || listing.id);
                                     return (

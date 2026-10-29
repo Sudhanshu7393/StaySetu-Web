@@ -4,7 +4,8 @@ import {
     MapPin, IndianRupee, Wifi, Wind, Coffee, Car, Home,
     ChevronLeft, ChevronRight, Phone,
     CheckCircle2, AlertCircle, Share2, Heart, MessageCircle, MessageSquare, Users as UsersIcon, Pencil,
-    Trash2, Send, GraduationCap, Calendar, Clock, Video, Calculator, Sparkles, X
+    Trash2, Send, GraduationCap, Calendar, Clock, Video, Calculator, Sparkles, X,
+    ShieldCheck, Star
 } from 'lucide-react';
 import { databases, DATABASE_ID, COLLECTION, Query, ID, parseJsonField } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';

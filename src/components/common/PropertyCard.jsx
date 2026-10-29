@@ -48,10 +48,10 @@ const PropertyCard = ({ property }) => {
 
     return (
         <>
-            <div className="group relative flex flex-col sm:flex-row bg-white rounded-3xl border border-zinc-200/80 hover:border-rose-300 hover:shadow-xl transition-all duration-300 p-3 sm:p-3.5 gap-4 text-zinc-900 shadow-sm">
+            <div className="group relative flex flex-col sm:flex-row bg-white rounded-3xl border border-zinc-200/80 hover:border-rose-300 hover:shadow-xl transition-all duration-300 p-3 sm:p-3.5 gap-3.5 sm:gap-4 text-zinc-900 shadow-sm overflow-hidden">
                 
                 {/* Left: Image Container with Heart overlay */}
-                <div className="relative w-full sm:w-52 md:w-60 aspect-[16/10] sm:aspect-square shrink-0 rounded-2xl overflow-hidden bg-zinc-100">
+                <div className="relative w-full sm:w-44 md:w-48 lg:w-52 aspect-[16/10] sm:aspect-square shrink-0 rounded-2xl overflow-hidden bg-zinc-100">
                     <img
                         src={getImgSrc(activeImage)}
                         alt={property?.title || 'Property'}
@@ -211,24 +211,24 @@ const PropertyCard = ({ property }) => {
                     </div>
 
                     {/* Bottom Pricing & CTA Row */}
-                    <div className="flex items-center justify-between pt-3 border-t border-zinc-100 gap-3">
-                        <div>
+                    <div className="flex flex-wrap sm:flex-nowrap items-end sm:items-center justify-between pt-3 border-t border-zinc-100 gap-2 mt-auto">
+                        <div className="min-w-0 pr-1">
                             {isSale ? (
                                 <div>
                                     <div className="flex items-baseline gap-1.5">
-                                        <span className="text-base sm:text-xl font-black text-zinc-950">
+                                        <span className="text-base sm:text-lg font-black text-zinc-950">
                                             {formatPropertyPrice(property?.price, 'sell')}
                                         </span>
                                         <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100">
-                                            Total Price
+                                            Total
                                         </span>
                                     </div>
-                                    <div className="text-[11px] text-zinc-500 font-medium flex items-center gap-1.5 flex-wrap mt-0.5">
-                                        <span>{property?.area ? `${property.area} • ` : ''}{property?.possession || 'Ready to Move'}</span>
+                                    <div className="text-[10px] text-zinc-500 font-medium flex items-center gap-1.5 flex-wrap mt-0.5">
+                                        <span>{property?.area ? `${property.area} • ` : ''}{property?.possession || 'Ready'}</span>
                                         <span className="text-zinc-300">•</span>
                                         {String(property?.listedBy || property?.listed_by || '').toLowerCase() === 'broker' ? (
                                             <span className="text-zinc-700 font-semibold bg-zinc-100 px-1.5 py-0.5 rounded text-[10px]">
-                                                🤝 Broker Fee: {property?.brokerageFee || property?.brokerage_fee || '1% - 2%'}
+                                                🤝 Broker
                                             </span>
                                         ) : (
                                             <span className="text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] border border-emerald-100">
@@ -243,14 +243,14 @@ const PropertyCard = ({ property }) => {
                                         <span className="text-base sm:text-lg font-extrabold text-zinc-950">
                                             ₹{property?.price ? Number(property.price).toLocaleString() : '8,500'}
                                         </span>
-                                        <span className="text-xs text-zinc-400 font-medium">/month</span>
+                                        <span className="text-[11px] text-zinc-400 font-medium">/mo</span>
                                     </div>
-                                    <div className="text-[11px] text-zinc-500 font-medium flex items-center gap-1.5 flex-wrap mt-0.5">
-                                        <span>Deposit: ₹{depositAmount.toLocaleString()}</span>
+                                    <div className="text-[10px] text-zinc-500 font-medium flex items-center gap-1.5 flex-wrap mt-0.5">
+                                        <span>Dep: ₹{depositAmount.toLocaleString()}</span>
                                         <span className="text-zinc-300">•</span>
                                         {String(property?.listedBy || property?.listed_by || '').toLowerCase() === 'broker' ? (
                                             <span className="text-zinc-700 font-semibold bg-zinc-100 px-1.5 py-0.5 rounded text-[10px]">
-                                                🤝 Broker Fee: {property?.brokerageFee || property?.brokerage_fee || '15 Days Rent'}
+                                                🤝 Broker
                                             </span>
                                         ) : (
                                             <span className="text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] border border-emerald-100">
@@ -262,20 +262,20 @@ const PropertyCard = ({ property }) => {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 shrink-0">
                             <button
                                 onClick={() => setIsVisitModalOpen(true)}
                                 disabled={isUnavailable}
-                                className="hidden md:inline-flex items-center gap-1 text-xs font-extrabold px-3 py-2 rounded-full border border-rose-200 text-rose-600 bg-rose-50/60 hover:bg-rose-100 transition-all"
+                                className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-full border border-rose-200 text-rose-600 bg-rose-50/70 hover:bg-rose-100 transition-all shrink-0"
                             >
-                                <Clock size={12} /> Visit
+                                <Clock size={11} /> Visit
                             </button>
                             <Link
                                 to={`/property/${property?.$id || property?.id || '123'}`}
-                                className="inline-flex items-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs px-4 py-2.5 rounded-full shadow-sm shadow-rose-500/25 hover:shadow-md transition-all group-hover:gap-2"
+                                className="inline-flex items-center gap-1 bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs px-3.5 py-1.5 rounded-full shadow-sm shadow-rose-500/25 hover:shadow-md transition-all shrink-0 whitespace-nowrap"
                             >
-                                <span>View Details</span>
-                                <ArrowRight size={13} />
+                                <span>Details</span>
+                                <ArrowRight size={12} />
                             </Link>
                         </div>
                     </div>
