@@ -33,8 +33,8 @@ const SALE_SPOTLIGHT_DEFAULT = {
     purpose: 'sell',
     listedBy: 'owner',
     images: [
-        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&q=80',
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80'
+        '/properties/crossings/crossings_republik_towers.jpg',
+        '/properties/crossings/indian_tower_balconies.jpg'
     ],
     amenities: ['Power Backup', 'Gym', 'Swimming Pool', 'Security', 'Covered Parking', 'Club House'],
     whatsappNumber: '7393011350',

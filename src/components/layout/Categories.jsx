@@ -37,7 +37,7 @@ const SALE_CATEGORIES = [
     {
         title: 'Multistorey Flats',
         subtitle: '2, 3 & 4 BHK Apts',
-        image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80',
+        image: '/properties/crossings/crossings_republik_towers.jpg',
         icon: Building2,
         link: '/listings?purpose=sell&type=Flat',
     },
@@ -58,7 +58,7 @@ const SALE_CATEGORIES = [
     {
         title: 'Commercial Spaces',
         subtitle: 'Shops & Office Spaces',
-        image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80',
+        image: '/properties/crossings/indirapuram_towers.jpg',
         icon: Landmark,
         link: '/listings?purpose=sell&type=Studio',
     },
