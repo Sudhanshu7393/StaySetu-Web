@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { account, databases, DATABASE_ID, COLLECTION, ID, Query } from '../lib/supabase';
+import { supabase, isSupabaseConfigured, account, databases, DATABASE_ID, COLLECTION, ID, Query } from '../lib/supabase';
 import { DEMO_USERS } from '../lib/mockData';
 
 const AuthContext = createContext({});
@@ -74,13 +74,41 @@ export const AuthProvider = ({ children }) => {
     }, [fetchProfile]);
 
     useEffect(() => {
+        // Initial check
         checkUser();
-    }, [checkUser]);
+
+        // Realtime Supabase Auth state listener
+        if (isSupabaseConfigured) {
+            const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+                if (session?.user) {
+                    const u = session.user;
+                    const authUser = {
+                        $id: u.id,
+                        id: u.id,
+                        email: u.email,
+                        name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0],
+                        role: u.user_metadata?.role || 'student',
+                    };
+                    setUser(authUser);
+                    await fetchProfile(authUser);
+                    setLoading(false);
+                } else if (event === 'SIGNED_OUT') {
+                    setUser(null);
+                    setProfile(null);
+                    setLoading(false);
+                }
+            });
+
+            return () => {
+                subscription?.unsubscribe();
+            };
+        }
+    }, [checkUser, fetchProfile]);
 
     const signInWithDemo = async (role = 'student') => {
         setLoading(true);
         const demoUser = DEMO_USERS[role] || DEMO_USERS.student;
-        localStorage.setItem('staysetu_current_user_v2', JSON.stringify(demoUser));
+        localStorage.setItem('staysetu_current_user_v3', JSON.stringify(demoUser));
         setUser(demoUser);
         setProfile(demoUser);
         setLoading(false);
@@ -103,8 +131,8 @@ export const AuthProvider = ({ children }) => {
     const signUpWithEmail = async (email, password, fullName, role = 'student') => {
         setLoading(true);
         try {
-            const uid = 'usr_' + Math.random().toString(36).substr(2, 9);
-            await account.create(uid, email, password, fullName);
+            const res = await account.create(null, email, password, fullName, role);
+            const uid = res.$id || res.id;
             const userObj = {
                 $id: uid,
                 id: uid,
@@ -113,10 +141,10 @@ export const AuthProvider = ({ children }) => {
                 fullName,
                 role
             };
-            localStorage.setItem('staysetu_current_user_v2', JSON.stringify(userObj));
+            localStorage.setItem('staysetu_current_user_v3', JSON.stringify(userObj));
             setUser(userObj);
 
-            // Create profile
+            // Create profile in DB
             const newProfile = await databases.createDocument(
                 DATABASE_ID,
                 COLLECTION.profiles,
@@ -138,16 +166,24 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signInWithGoogle = async (role = 'student') => {
-        // Direct instant login simulation for preview/demo
+        if (isSupabaseConfigured) {
+            try {
+                await account.createOAuth2Session('google', window.location.origin + '/dashboard');
+                return;
+            } catch (err) {
+                console.warn('Google OAuth redirected or failed:', err);
+            }
+        }
         return signInWithDemo(role);
     };
 
     const signOut = async () => {
         try {
-            await account.deleteSession('current');
+            await account.deleteSession();
         } catch (err) {
             console.error('Sign out error:', err);
         }
+        localStorage.removeItem('staysetu_current_user_v3');
         localStorage.removeItem('staysetu_current_user_v2');
         setUser(null);
         setProfile(null);

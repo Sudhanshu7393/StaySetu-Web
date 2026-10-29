@@ -388,7 +388,7 @@ export const account = {
         throw new Error('User not logged in');
     },
 
-    async create(userId, email, password, name) {
+    async create(userId, email, password, name, role = 'student') {
         if (isSupabaseConfigured) {
             const { data, error } = await supabase.auth.signUp({
                 email,
@@ -397,6 +397,7 @@ export const account = {
                     data: {
                         full_name: name,
                         name,
+                        role,
                     }
                 }
             });
@@ -405,8 +406,9 @@ export const account = {
             return {
                 $id: u?.id || userId,
                 id: u?.id || userId,
-                email,
+                email: u?.email || email,
                 name,
+                role,
             };
         }
 
@@ -415,6 +417,7 @@ export const account = {
             id: userId || ID.unique(),
             email,
             name: name || email.split('@')[0],
+            role,
         };
         localStorage.setItem('staysetu_current_user_v3', JSON.stringify(newUser));
         return newUser;

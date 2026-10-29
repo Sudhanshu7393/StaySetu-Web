@@ -11,7 +11,7 @@ const Login = () => {
     const [error, setError] = useState(null);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [authMode, setAuthMode] = useState('demo'); // 'demo' | 'email'
+    const [authMode, setAuthMode] = useState('email'); // Real authentication default
 
     // If already logged in, redirect
     useEffect(() => {
@@ -41,8 +41,8 @@ const Login = () => {
             setLoading(true);
             setError(null);
             await signInWithDemo(role);
-        } catch {
-            setError('Demo sign-in failed. Please try again.');
+        } catch (err) {
+            setError(err?.message || 'Demo sign-in failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -58,8 +58,8 @@ const Login = () => {
             setLoading(true);
             setError(null);
             await signInWithEmail(email, password);
-        } catch {
-            setError('Login failed. Please check your credentials.');
+        } catch (err) {
+            setError(err?.message || 'Login failed. Please check your credentials.');
         } finally {
             setLoading(false);
         }
@@ -70,8 +70,8 @@ const Login = () => {
             setLoading(true);
             setError(null);
             await signInWithGoogle();
-        } catch {
-            setError('Google sign-in failed. Please try again.');
+        } catch (err) {
+            setError(err?.message || 'Google sign-in failed. Please try again.');
         } finally {
             setLoading(false);
         }

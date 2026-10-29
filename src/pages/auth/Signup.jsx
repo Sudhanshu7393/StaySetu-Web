@@ -37,12 +37,16 @@ const Signup = () => {
             setError('Please fill in all fields.');
             return;
         }
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return;
+        }
         try {
             setLoading(true);
             setError(null);
             await signUpWithEmail(email, password, fullName, role);
-        } catch {
-            setError('Account creation failed. Please try again.');
+        } catch (err) {
+            setError(err?.message || 'Account creation failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -53,8 +57,8 @@ const Signup = () => {
             setLoading(true);
             setError(null);
             await signInWithGoogle(role);
-        } catch {
-            setError('Google sign-in failed. Please try again.');
+        } catch (err) {
+            setError(err?.message || 'Google sign-in failed. Please try again.');
         } finally {
             setLoading(false);
         }
