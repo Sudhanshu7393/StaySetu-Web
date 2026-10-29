@@ -447,66 +447,75 @@ const Listings = () => {
         <div className="min-h-screen bg-[#FAFAFB] text-zinc-900 pt-20 sm:pt-24 pb-28 sm:pb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/* Top Search & Filter Bar matching screenshot 2 */}
-                <div className="bg-white rounded-3xl p-3 sm:p-5 border border-zinc-200/90 shadow-sm mb-6">
+                {/* Top Search & Filter Bar */}
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-zinc-200/90 shadow-sm mb-6">
                     
-                    {/* Top Segment: Purpose Tabs (All | For Rent | For Sale) */}
-                    <div className="flex items-center gap-1.5 p-1 bg-zinc-100/90 rounded-full max-w-full overflow-x-auto scrollbar-none flex-nowrap mb-3.5 border border-zinc-200/80">
-                        {[
-                            { id: 'all', label: 'All Stays' },
-                            { id: 'rent', label: '🏠 For Rent' },
-                            { id: 'sell', label: '🏷️ Buy / Sell' }
-                        ].map(tab => (
-                            <button
-                                key={tab.id}
-                                type="button"
-                                onClick={() => handlePurposeChange(tab.id)}
-                                className={`px-4 py-1.5 rounded-full text-xs font-extrabold whitespace-nowrap shrink-0 transition-all ${
-                                    purposeFilter === tab.id
-                                        ? 'bg-rose-500 text-white shadow-xs'
-                                        : 'text-zinc-600 hover:text-zinc-950'
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-                        
-                        {/* City / Location Dropdown Pill */}
-                        <div className="relative shrink-0">
-                            <select
-                                value={collegeFilter}
-                                onChange={(e) => {
-                                    setCollegeFilter(e.target.value);
-                                }}
-                                className="appearance-none bg-zinc-50 border border-zinc-200 rounded-full pl-8 pr-8 py-2.5 text-xs font-bold text-zinc-800 focus:outline-none focus:border-rose-400 cursor-pointer w-full sm:w-auto"
-                            >
-                                <option value="all">🇮🇳 All India (All Cities)</option>
-                                <option value="Crossings">📍 Crossings Republik</option>
-                                <option value="ABES">🎓 ABES Engg College (NH-24)</option>
-                                <option value="Ghaziabad">📍 Ghaziabad (Indirapuram / NH-24)</option>
-                                <option value="Noida">📍 Noida / Greater Noida</option>
-                                <option value="IMS">🎓 IMS Ghaziabad</option>
-                                <option value="AKGEC">🎓 AKGEC Ghaziabad</option>
-                                <option value="Lucknow">📍 Lucknow</option>
-                            </select>
-                            <MapPin size={13} className="text-rose-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    {/* Top Segment: Purpose Tabs & Map/Grid Toggle */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-1.5 p-1 bg-zinc-100/90 rounded-full max-w-full overflow-x-auto scrollbar-none flex-nowrap border border-zinc-200/80">
+                            {[
+                                { id: 'all', label: 'All Stays' },
+                                { id: 'rent', label: '🏠 For Rent' },
+                                { id: 'sell', label: '🏷️ Buy / Sell' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    type="button"
+                                    onClick={() => handlePurposeChange(tab.id)}
+                                    className={`px-3 sm:px-4 py-1.5 rounded-full text-xs font-extrabold whitespace-nowrap shrink-0 transition-all ${
+                                        purposeFilter === tab.id
+                                            ? 'bg-rose-500 text-white shadow-xs'
+                                            : 'text-zinc-600 hover:text-zinc-950'
+                                    }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
                         </div>
 
+                        {/* View Mode Switcher: Cards vs Map (visible on desktop) */}
+                        <div className="hidden sm:inline-flex items-center bg-zinc-100 p-1 rounded-full border border-zinc-200 shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('grid')}
+                                className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition-all ${
+                                    viewMode === 'grid'
+                                        ? 'bg-white text-zinc-900 shadow-xs'
+                                        : 'text-zinc-600 hover:text-zinc-900'
+                                }`}
+                            >
+                                <LayoutGrid size={13} />
+                                <span>Cards</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('map')}
+                                className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition-all ${
+                                    viewMode === 'map'
+                                        ? 'bg-rose-500 text-white shadow-xs'
+                                        : 'text-zinc-600 hover:text-zinc-900'
+                                }`}
+                            >
+                                <Map size={13} />
+                                <span>Map</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Integrated Search Row */}
+                    <div className="flex items-center gap-2">
                         {/* Search Input with Location Button */}
-                        <form onSubmit={handleSearch} className="flex-1 group relative">
+                        <form onSubmit={handleSearch} className="flex-1 group relative min-w-0">
                             <div className="relative">
-                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-rose-500 transition-colors" size={16} />
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-rose-500 transition-colors" size={15} />
                                 <input
                                     type="text"
                                     placeholder={
                                         purposeFilter === 'sell'
-                                            ? "Search flats for sale, plots across India..."
-                                            : "Search any area, city, college across India (e.g. Crossings Republik, ABES, Noida)..."
+                                            ? "Search flats, plots, city across India..."
+                                            : "Search area, city, college across India..."
                                     }
-                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-full pl-10 pr-9 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 transition-all"
+                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-full pl-9 pr-8 py-2 text-xs sm:text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-rose-400 focus:bg-white focus:ring-2 focus:ring-rose-400/20 transition-all truncate"
                                     value={searchQuery}
                                     onChange={(e) => {
                                         setSearchQuery(e.target.value);
@@ -514,14 +523,24 @@ const Listings = () => {
                                     }}
                                     onFocus={() => setShowSuggestions(suggestions.length > 0)}
                                 />
-                                <button
-                                    type="button"
-                                    onClick={detectLocation}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-rose-500 transition-colors"
-                                    title="Locate around me"
-                                >
-                                    <Crosshair size={15} />
-                                </button>
+                                {searchQuery ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => setSearchQuery('')}
+                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-600 transition-colors"
+                                    >
+                                        <X size={13} />
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={detectLocation}
+                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-rose-500 transition-colors"
+                                        title="Locate around me"
+                                    >
+                                        <Crosshair size={14} />
+                                    </button>
+                                )}
                             </div>
 
                             {/* Recommendation Dropdown */}
@@ -537,10 +556,10 @@ const Listings = () => {
                                                 setShowSuggestions(false);
                                                 fetchListings();
                                             }}
-                                            className="w-full text-left px-5 py-3.5 hover:bg-rose-50 transition-colors border-b border-zinc-100 last:border-0 flex items-start gap-3"
+                                            className="w-full text-left px-4 py-3 hover:bg-rose-50 transition-colors border-b border-zinc-100 last:border-0 flex items-start gap-2.5 text-xs font-medium text-zinc-800"
                                         >
-                                            <MapPin size={14} className="text-rose-500 mt-1 shrink-0" />
-                                            <span className="text-xs font-medium text-zinc-800 line-clamp-2">{s.display_name}</span>
+                                            <MapPin size={13} className="text-rose-500 mt-0.5 shrink-0" />
+                                            <span className="line-clamp-2">{s.display_name}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -550,40 +569,50 @@ const Listings = () => {
                         {/* Filters Trigger Pill */}
                         <button
                             onClick={() => setShowFilters(true)}
-                            className="bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-full flex items-center justify-center space-x-2 py-2.5 px-4 transition-all shrink-0"
+                            className="bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-zinc-900 rounded-full flex items-center justify-center gap-1.5 py-2 px-3 sm:px-4 transition-all shrink-0 cursor-pointer shadow-2xs"
                         >
-                            <SlidersHorizontal size={14} className="text-rose-500" />
+                            <SlidersHorizontal size={13} className="text-rose-500" />
                             <span className="text-xs font-bold">Filters</span>
+                            {(propertyType !== 'all' || genderFilter !== 'all' || amenities.length > 0) && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                            )}
                         </button>
 
-                        {/* View Mode Switcher: Cards vs Map */}
-                        <div className="inline-flex items-center bg-zinc-100 p-1 rounded-full border border-zinc-200 shrink-0">
-                            <button
-                                type="button"
-                                onClick={() => setViewMode('grid')}
-                                className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition-all ${
-                                    viewMode === 'grid'
-                                        ? 'bg-white text-zinc-900 shadow-xs'
-                                        : 'text-zinc-600 hover:text-zinc-900'
-                                }`}
-                            >
-                                <LayoutGrid size={13} />
-                                <span>Cards</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setViewMode('map')}
-                                className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5 transition-all ${
-                                    viewMode === 'map'
-                                        ? 'bg-rose-500 text-white shadow-xs'
-                                        : 'text-zinc-600 hover:text-zinc-900'
-                                }`}
-                            >
-                                <Map size={13} />
-                                <span>Map</span>
-                            </button>
-                        </div>
+                        {/* Mobile Map / Cards Toggle Pill */}
+                        <button
+                            onClick={() => setViewMode(viewMode === 'map' ? 'grid' : 'map')}
+                            className={`sm:hidden p-2 rounded-full border flex items-center justify-center shrink-0 transition-all ${
+                                viewMode === 'map'
+                                    ? 'bg-rose-500 text-white border-rose-500 shadow-xs'
+                                    : 'bg-zinc-50 text-zinc-700 border-zinc-200'
+                            }`}
+                            title={viewMode === 'map' ? 'Show Cards' : 'Show Map'}
+                        >
+                            {viewMode === 'map' ? <LayoutGrid size={15} /> : <Map size={15} />}
+                        </button>
+                    </div>
 
+                    {/* Quick City / Hub Chips (Single Horizontal Scrollable Line) */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 mt-2.5 scrollbar-none flex-nowrap">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 shrink-0 mr-1">
+                            {purposeFilter === 'sell' ? '📍 Hubs:' : '🎓 Campus:'}
+                        </span>
+                        {colleges.map((col) => {
+                            const isActive = collegeFilter === col.id;
+                            return (
+                                <button
+                                    key={col.id}
+                                    onClick={() => setCollegeFilter(col.id)}
+                                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 whitespace-nowrap ${
+                                        isActive
+                                            ? 'bg-zinc-900 text-white shadow-xs'
+                                            : 'bg-zinc-100/80 hover:bg-zinc-200 text-zinc-600 border border-zinc-200/50'
+                                    }`}
+                                >
+                                    {col.label}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -653,29 +682,7 @@ const Listings = () => {
                             </div>
                         )}
 
-                        {/* College Quick Filters */}
-                        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-5 scrollbar-none">
-                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider shrink-0 mr-1">
-                                {purposeFilter === 'sell' ? 'Hubs:' : 'Colleges:'}
-                            </span>
-                            {colleges.map((col) => {
-                                const isActive = collegeFilter === col.id;
-                                return (
-                                    <button
-                                        key={col.id}
-                                        onClick={() => setCollegeFilter(col.id)}
-                                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${
-                                            isActive
-                                                ? 'bg-zinc-900 text-white shadow-sm scale-105'
-                                                : 'bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50'
-                                        }`}
-                                    >
-                                        {col.label}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
+                        {/* Listings loading & results */}
                         {loading ? (
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5">
                                 {[1, 2, 3, 4, 5, 6].map((i) => (

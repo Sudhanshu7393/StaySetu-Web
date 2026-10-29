@@ -78,6 +78,7 @@ const AppContent = () => {
   const isPropertyDetails = location.pathname.startsWith('/property/');
   const isMessages = location.pathname === '/messages';
   const shouldHideBottomNav = shouldHide || isPropertyDetails;
+  const hideFooterOnMobile = location.pathname === '/listings' || location.pathname === '/messages';
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -117,7 +118,9 @@ const AppContent = () => {
         </Routes>
       </main>
       {!shouldHideBottomNav && <MobileBottomNav />}
-      {!shouldHide && <Footer />}
+      <div className={hideFooterOnMobile ? 'hidden md:block' : ''}>
+        {!shouldHide && <Footer />}
+      </div>
     </div>
   );
 };
