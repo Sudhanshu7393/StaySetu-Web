@@ -702,7 +702,7 @@ const PropertyDetails = () => {
                             
                             <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 py-1.5 px-3 rounded-full border border-emerald-200/80 mb-6">
                                 <ShieldCheck size={13} className="text-emerald-600 shrink-0" />
-                                <span>100% Free • ₹0 Brokerage • Direct Connect</span>
+                                <span>100% Free Platform • Transparent Pricing • Direct Connect</span>
                             </div>
 
                             {/* Transparent Pricing Breakdown with Broker Fee Disclosed */}
@@ -728,13 +728,11 @@ const PropertyDetails = () => {
                                     <div className="flex justify-between items-center text-zinc-600">
                                         <span>Brokerage / Commission:</span>
                                         <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
-                                            String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
+                                            (property.brokerageFee && !property.brokerageFee.includes('Zero') && property.brokerageFee !== '0' && property.brokerageFee !== '₹0 (Direct Owner)' && property.brokerageFee !== '₹0 (No Brokerage)') || String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
                                                 ? 'bg-amber-50 text-amber-900 border border-amber-200'
                                                 : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                                         }`}>
-                                            {String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
-                                                ? (property.brokerageFee || property.brokerage_fee || (isSale ? '1% - 2%' : '15 Days Rent'))
-                                                : '₹0 (Direct Owner)'}
+                                            {property.brokerageFee || property.brokerage_fee || (String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker' ? (isSale ? '1% - 2%' : '15 Days Rent') : '₹0 (No Brokerage)')}
                                         </span>
                                     </div>
                                     {!isSale && (

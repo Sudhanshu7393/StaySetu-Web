@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, LayoutDashboard, Search, Users, ChevronDown, Bell, PlusCircle, Youtube, ShieldCheck } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, Search, Users, ChevronDown, Bell, PlusCircle, Instagram, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const ADMIN_EMAILS = ['staysetu26@gmail.com', 'yutkarsh669@gmail.com'];
@@ -118,14 +118,14 @@ const Navbar = () => {
                         {/* Desktop Auth on Right */}
                         <div className="hidden md:flex items-center gap-2.5">
                             <a 
-                                href="https://www.youtube.com/@Sudhanshu_vision" 
+                                href="https://www.instagram.com/stay.setu/" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="hidden lg:flex items-center gap-1.5 text-xs font-extrabold text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-200/90 hover:border-red-600 px-3 py-1.5 rounded-full transition-all duration-200 shadow-2xs group"
-                                title="Watch Campus & PG Video Tours on YouTube (@Sudhanshu_vision)"
+                                className="hidden lg:flex items-center gap-1.5 text-xs font-extrabold text-rose-600 hover:text-white bg-rose-50 hover:bg-gradient-to-r hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 border border-rose-200/90 px-3 py-1.5 rounded-full transition-all duration-200 shadow-2xs group"
+                                title="Follow StaySetu on Instagram (@stay.setu)"
                             >
-                                <Youtube size={13} className="text-red-600 group-hover:text-white fill-current transition-colors" />
-                                <span>YouTube</span>
+                                <Instagram size={13} className="text-rose-600 group-hover:text-white transition-colors" />
+                                <span>Instagram</span>
                             </a>
 
                             <Link 
@@ -235,17 +235,17 @@ const Navbar = () => {
 
                             <div className="pt-3 border-t border-zinc-100 flex flex-col gap-2">
                                 <a
-                                    href="https://www.youtube.com/@Sudhanshu_vision"
+                                    href="https://www.instagram.com/stay.setu/"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-red-600 bg-red-50/80 border border-red-200 flex items-center justify-between"
+                                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-rose-700 bg-rose-50/80 border border-rose-200 flex items-center justify-between"
                                     onClick={() => setIsOpen(false)}
                                 >
                                     <span className="flex items-center gap-2">
-                                        <Youtube size={15} className="fill-current text-red-600" />
-                                        <span>Watch on YouTube (@Sudhanshu_vision)</span>
+                                        <Instagram size={15} className="text-rose-600" />
+                                        <span>Follow on Instagram (@stay.setu)</span>
                                     </span>
-                                    <span className="text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Videos</span>
+                                    <span className="text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full">Community</span>
                                 </a>
 
                                 <Link

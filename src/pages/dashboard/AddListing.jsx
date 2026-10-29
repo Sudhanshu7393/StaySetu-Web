@@ -214,8 +214,8 @@ const AddListing = () => {
                 status: 'pending',
                 genderPreference: formData.gender_preference || 'any',
                 listedBy: formData.listed_by || 'owner',
-                brokerageFee: formData.listed_by === 'broker' ? (formData.brokerage_fee || (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent')) : '₹0 (Direct Owner)',
-                brokerage_fee: formData.listed_by === 'broker' ? (formData.brokerage_fee || (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent')) : '₹0 (Direct Owner)',
+                brokerageFee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent') : '₹0'),
+                brokerage_fee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent') : '₹0'),
                 occupancy: JSON.stringify(occupancyData),
                 association: formData.association || '',
                 nearbyCollege: formData.nearbyCollege || '',
@@ -332,49 +332,48 @@ const AddListing = () => {
                                     </div>
                                 </div>
 
-                                {formData.listed_by === 'broker' && (
-                                    <div className="md:col-span-2 p-5 bg-amber-50/70 border border-amber-200/80 rounded-2xl animate-fade-in">
-                                        <div className="flex items-center justify-between gap-2 mb-2">
-                                            <label className="block text-sm font-black text-amber-950 uppercase tracking-wider">
-                                                Disclosed Broker Fee / Commission *
-                                            </label>
-                                            <span className="text-[11px] font-extrabold text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-full">
-                                                Transparent Pricing
-                                            </span>
-                                        </div>
-                                        <p className="text-xs text-amber-800/80 mb-3 font-medium">
-                                            Students aur clients ko hidden surprise na mile, isliye aapka broker fee upfront transparently show hoga.
-                                        </p>
-                                        <div className="flex flex-wrap gap-2 mb-3">
-                                            {(formData.purpose === 'sell' 
-                                                ? ['1% Deal Value', '2% Deal Value', '1.5% Deal Value', '₹25,000 Flat']
-                                                : ['15 Days Rent', '1 Month Rent', '₹5,000 Flat', '₹2,500 Flat']
-                                            ).map((opt) => (
-                                                <button
-                                                    key={opt}
-                                                    type="button"
-                                                    onClick={() => setFormData(prev => ({ ...prev, brokerage_fee: opt }))}
-                                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
-                                                        formData.brokerage_fee === opt
-                                                            ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
-                                                            : 'bg-white text-amber-900 border-amber-200 hover:border-amber-400'
-                                                    }`}
-                                                >
-                                                    {opt}
-                                                </button>
-                                            ))}
-                                        </div>
-                                        <input
-                                            type="text"
-                                            name="brokerage_fee"
-                                            value={formData.brokerage_fee}
-                                            onChange={handleChange}
-                                            placeholder="Custom brokerage e.g. 15 Days Rent or 1% Deal Value"
-                                            className="w-full bg-white border border-amber-300 rounded-xl px-4 py-2.5 text-sm font-semibold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                                            required={formData.listed_by === 'broker'}
-                                        />
+                                <div className="md:col-span-2 p-4 bg-zinc-50 border border-zinc-200/80 rounded-2xl animate-fade-in">
+                                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                                        <label className="block text-xs font-black text-zinc-900 uppercase tracking-wider">
+                                            {formData.listed_by === 'broker' ? 'Disclosed Broker Fee / Commission' : 'Brokerage Fee (Optional - Defaults to ₹0)'}
+                                        </label>
+                                        <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${formData.listed_by === 'broker' ? 'text-amber-800 bg-amber-100' : 'text-emerald-800 bg-emerald-100'}`}>
+                                            {formData.listed_by === 'broker' ? 'Transparent Brokerage' : '₹0 Brokerage Default'}
+                                        </span>
                                     </div>
-                                )}
+                                    <p className="text-[11px] text-zinc-500 mb-3 font-medium">
+                                        Agar aap koi brokerage fee lete hain toh yahan bharein. Agar nahi lete toh khali chhod dein (clients ko ₹0 show hoga).
+                                    </p>
+                                    <div className="flex flex-wrap gap-2 mb-3">
+                                        {[
+                                            '₹0 (Zero Brokerage)',
+                                            ...(formData.purpose === 'sell' 
+                                                ? ['1% Deal Value', '2% Deal Value', '₹25,000 Flat']
+                                                : ['15 Days Rent', '1 Month Rent', '₹5,000 Flat'])
+                                        ].map((opt) => (
+                                            <button
+                                                key={opt}
+                                                type="button"
+                                                onClick={() => setFormData(prev => ({ ...prev, brokerage_fee: opt }))}
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
+                                                    formData.brokerage_fee === opt
+                                                        ? 'bg-rose-500 text-white border-rose-500 shadow-xs'
+                                                        : 'bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400'
+                                                }`}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        name="brokerage_fee"
+                                        value={formData.brokerage_fee}
+                                        onChange={handleChange}
+                                        placeholder="Brokerage fee e.g. ₹0 or 15 Days Rent"
+                                        className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-400"
+                                    />
+                                </div>
 
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Property Title</label>

@@ -48,13 +48,13 @@ const Footer = () => {
                             </a>
                         </div>
                         <a
-                            href="https://www.youtube.com/@Sudhanshu_vision"
+                            href="https://www.instagram.com/stay.setu/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 text-[11px] font-bold transition-all"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/20 text-[11px] font-bold transition-all"
                         >
-                            <Youtube size={13} className="text-red-500 fill-red-500" />
-                            <span>Subscribe @Sudhanshu_vision</span>
+                            <Instagram size={13} className="text-rose-500" />
+                            <span>Follow @stay.setu</span>
                         </a>
                     </div>
 
@@ -149,7 +149,7 @@ const Footer = () => {
                         <p>© {new Date().getFullYear()} StaySetu. Made for Indian students with care.</p>
                         <span className="hidden sm:inline text-zinc-600">•</span>
                         <span className="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 text-[11px]">
-                            100% Free Platform • ₹0 Brokerage
+                            100% Free Platform • Transparent Pricing
                         </span>
                     </div>
                     <div className="flex space-x-5">

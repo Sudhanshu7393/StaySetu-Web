@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { 
     Home, Users, Sparkles, MapPin, Phone, MessageCircle, 
     ArrowRight, CheckCircle2, ShieldCheck, Clock, Building2,
-    Calendar, HeartHandshake, Eye, Youtube
+    Calendar, HeartHandshake, Eye, Instagram
 } from 'lucide-react';
 
 const EcosystemBenefits = () => {
@@ -19,7 +19,7 @@ const EcosystemBenefits = () => {
                 <div className="text-center max-w-3xl mx-auto mb-14">
                     <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-black uppercase tracking-wider border border-emerald-200 mb-3 shadow-2xs">
                         <CheckCircle2 size={14} className="text-emerald-600" />
-                        <span>100% Free Forever • ₹0 Brokerage • Direct Connect</span>
+                        <span>100% Free Platform • Transparent Pricing • Direct Connect</span>
                     </div>
                     <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight leading-tight">
                         The 3 Biggest Student Living Needs, <span className="text-rose-600">Solved in One Platform</span>
@@ -188,34 +188,34 @@ const EcosystemBenefits = () => {
 
                 </div>
 
-                {/* YouTube Video Tours Showcase Card */}
-                <div className="rounded-3xl bg-gradient-to-r from-red-50/90 via-white to-red-100/50 p-6 sm:p-8 border border-red-200/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+                {/* Instagram Community Card */}
+                <div className="rounded-3xl bg-gradient-to-r from-rose-50/90 via-white to-pink-100/50 p-6 sm:p-8 border border-rose-200/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
                     <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-red-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-red-500/25">
-                            <Youtube size={24} className="fill-current" />
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-rose-500/25">
+                            <Instagram size={24} />
                         </div>
                         <div>
-                            <span className="text-[10px] font-black uppercase tracking-wider text-red-700 bg-red-100 px-2.5 py-0.5 rounded-full border border-red-200/80 inline-block mb-1">
-                                Official YouTube Channel • @Sudhanshu_vision
+                            <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-200/80 inline-block mb-1">
+                                Official Community • @stay.setu
                             </span>
                             <h4 className="text-base sm:text-lg font-black text-zinc-900">
-                                Watch Honest PG & Campus Walkthrough Videos
+                                Join Our Student Living Community on Instagram
                             </h4>
                             <p className="text-zinc-600 text-xs sm:text-sm mt-0.5 max-w-2xl">
-                                Watch real room tours, mess food reviews, hostel amenities, and college neighborhood guides before you visit or book.
+                                Watch real room tours, campus guides, hostel reviews, and student hacks directly on our official Instagram page.
                             </p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
                         <a
-                            href="https://www.youtube.com/@Sudhanshu_vision"
+                            href="https://www.instagram.com/stay.setu/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white font-extrabold px-6 py-3 rounded-full text-xs text-center transition-all shadow-md shadow-red-600/25 flex items-center justify-center gap-2"
+                            className="w-full md:w-auto bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:opacity-95 text-white font-extrabold px-6 py-3 rounded-full text-xs text-center transition-all shadow-md shadow-rose-600/25 flex items-center justify-center gap-2"
                         >
-                            <Youtube size={15} className="fill-current" />
-                            <span>Subscribe @Sudhanshu_vision</span>
+                            <Instagram size={15} />
+                            <span>Follow @stay.setu</span>
                         </a>
                     </div>
                 </div>

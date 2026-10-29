@@ -342,7 +342,7 @@ const Hero = () => {
                                     </p>
                                     <div className="flex sm:hidden items-center gap-1.5 text-[11px] font-bold text-zinc-600 flex-wrap">
                                         <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                                            ✓ ₹0 Brokerage
+                                            ✓ Transparent Fees
                                         </span>
                                         <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
                                             ✓ Verified Stays

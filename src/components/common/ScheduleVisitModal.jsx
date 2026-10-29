@@ -113,7 +113,7 @@ Please coordinate my visit and connect me!`;
                         {initialMode === 'chat' ? 'Connect with StaySetu Desk' : 'Schedule a Free Visit'}
                     </h3>
                     <p className="text-zinc-500 text-xs sm:text-sm font-normal mt-1">
-                        Inquiring about <span className="text-zinc-900 font-semibold">{property.title}</span>. Our desk directly arranges your physical visit with the owner with ₹0 brokerage.
+                        Inquiring about <span className="text-zinc-900 font-semibold">{property.title}</span>. Our desk directly arranges your physical visit with the landlord with 100% transparent terms.
                     </p>
                 </div>
 
@@ -250,7 +250,7 @@ Please coordinate my visit and connect me!`;
                         </button>
                         <div className="text-[10px] text-zinc-400 text-center mt-2 flex items-center justify-center gap-1.5">
                             <ShieldCheck size={12} className="text-emerald-600 shrink-0" />
-                            <span>StaySetu Desk (+91 7393011350) coordinates your visit with ₹0 brokerage.</span>
+                            <span>StaySetu Desk (+91 7393011350) coordinates your visit directly with 100% verified terms.</span>
                         </div>
                     </div>
 
