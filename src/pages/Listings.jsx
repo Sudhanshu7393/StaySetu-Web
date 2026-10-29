@@ -107,6 +107,21 @@ const Listings = () => {
                 );
             }
 
+            // City filter if passed from Hero or URL (Pan-India support)
+            const cityParam = searchParams.get('city');
+            if (cityParam && cityParam !== 'all' && cityParam !== 'All India') {
+                const c = cityParam.toLowerCase().trim();
+                results = results.filter(l =>
+                    (l.title || '').toLowerCase().includes(c) ||
+                    (l.location || '').toLowerCase().includes(c) ||
+                    (l.city || '').toLowerCase().includes(c) ||
+                    (l.locality || '').toLowerCase().includes(c) ||
+                    (l.address || '').toLowerCase().includes(c) ||
+                    (l.description || '').toLowerCase().includes(c) ||
+                    (l.nearbyCollege || l.nearby_college || '').toLowerCase().includes(c)
+                );
+            }
+
             results = results.filter(l => (l.price || 0) <= priceRange);
 
             if (amenities.length > 0) {
