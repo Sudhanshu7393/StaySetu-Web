@@ -24,6 +24,7 @@ import AddListing from './pages/dashboard/AddListing';
 import EditListing from './pages/dashboard/EditListing';
 import AdminPanel from './pages/admin/AdminPanel';
 import ScrollToTop from './components/common/ScrollToTop';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
@@ -124,11 +125,13 @@ const AppContent = () => {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 
