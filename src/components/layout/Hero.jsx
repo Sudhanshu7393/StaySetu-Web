@@ -24,11 +24,11 @@ const VIKRANT_PG_DEFAULT = {
 };
 
 const SALE_SPOTLIGHT_DEFAULT = {
-    $id: 'sale-crossings-3bhk',
-    id: 'sale-crossings-3bhk',
-    title: '3 BHK Luxury Apartment in Crossings Republik',
-    price: 6500000,
-    location: 'Crossings Republik, Ghaziabad',
+    $id: 'c5fa45a1-6fed-4782-89bc-6f35cb73d93c',
+    id: 'c5fa45a1-6fed-4782-89bc-6f35cb73d93c',
+    title: '3 BHK Flat in GH 07, Crossings Republik',
+    price: 11000000,
+    location: 'GH 07, Crossings Republik, Ghaziabad',
     type: 'Flat',
     purpose: 'sell',
     listedBy: 'owner',
