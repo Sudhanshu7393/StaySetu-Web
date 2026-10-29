@@ -1,38 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, Building, MapPin, ChevronDown, ArrowRight, Star, Crosshair, Sparkles, X, Check } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { databases, DATABASE_ID, COLLECTION, Query } from '../../lib/supabase';
-
-const POPULAR_INDIAN_HUBS = [
-    { name: 'Crossings Republik (Ghaziabad HQ)', badge: 'Core Hub' },
-    { name: 'ABES Engg College (NH-24)', badge: 'Campus' },
-    { name: 'IMS Ghaziabad', badge: 'Campus' },
-    { name: 'AKGEC Ghaziabad', badge: 'Campus' },
-    { name: 'Noida', badge: 'NCR' },
-    { name: 'Greater Noida', badge: 'NCR' },
-    { name: 'Delhi', badge: 'Metro' },
-    { name: 'Gurgaon (Gurugram)', badge: 'NCR' },
-    { name: 'Faridabad', badge: 'NCR' },
-    { name: 'Lucknow', badge: 'UP' },
-    { name: 'Kanpur', badge: 'UP' },
-    { name: 'Prayagraj (Allahabad)', badge: 'UP' },
-    { name: 'Varanasi', badge: 'UP' },
-    { name: 'Kota', badge: 'Student Hub' },
-    { name: 'Pune', badge: 'Student Hub' },
-    { name: 'Bengaluru', badge: 'Tech Hub' },
-    { name: 'Hyderabad', badge: 'Tech Hub' },
-    { name: 'Mumbai', badge: 'Metro' },
-    { name: 'Jaipur', badge: 'Major City' },
-    { name: 'Dehradun', badge: 'Student Hub' },
-    { name: 'Chandigarh', badge: 'Major City' },
-    { name: 'Indore', badge: 'Student Hub' },
-    { name: 'Bhopal', badge: 'Major City' },
-    { name: 'Patna', badge: 'Major City' },
-    { name: 'Kolkata', badge: 'Metro' },
-    { name: 'Chennai', badge: 'Metro' },
-    { name: 'Ahmedabad', badge: 'Major City' },
-    { name: 'Bhubaneswar', badge: 'Student Hub' },
-];
+import { REGIONS_LIST, ALL_INDIAN_CITIES } from '../../lib/indianCities';
 
 const VIKRANT_PG_DEFAULT = {
     $id: '69cbc4bc0023a8c61505',
@@ -58,6 +28,7 @@ const Hero = () => {
     const [city, setCity] = useState('');
     const [isCityOpen, setIsCityOpen] = useState(false);
     const [citySearchText, setCitySearchText] = useState('');
+    const [selectedRegion, setSelectedRegion] = useState('All India');
     const [suggestions, setSuggestions] = useState([]);
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -66,10 +37,22 @@ const Hero = () => {
     const cityRef = useRef(null);
     const navigate = useNavigate();
 
-    const filteredHubs = POPULAR_INDIAN_HUBS.filter(hub =>
-        hub.name.toLowerCase().includes(citySearchText.toLowerCase()) ||
-        hub.badge.toLowerCase().includes(citySearchText.toLowerCase())
-    );
+    const filteredHubs = useMemo(() => {
+        let list = ALL_INDIAN_CITIES;
+        if (selectedRegion !== 'All India') {
+            list = list.filter(c => c.region === selectedRegion);
+        }
+        if (citySearchText.trim()) {
+            const q = citySearchText.toLowerCase().trim();
+            list = ALL_INDIAN_CITIES.filter(c =>
+                c.name.toLowerCase().includes(q) ||
+                c.state.toLowerCase().includes(q) ||
+                c.region.toLowerCase().includes(q) ||
+                c.badge.toLowerCase().includes(q)
+            );
+        }
+        return list;
+    }, [selectedRegion, citySearchText]);
 
     useEffect(() => {
         const fetchSuggestions = async () => {
@@ -189,28 +172,48 @@ const Hero = () => {
                                     </button>
 
                                     {isCityOpen && (
-                                        <div className="absolute top-full left-0 mt-2 w-72 sm:w-84 bg-white rounded-2xl shadow-2xl border border-zinc-200/90 z-50 overflow-hidden text-left animate-fade-in p-2.5">
+                                        <div className="absolute top-full left-0 mt-2 w-80 sm:w-96 md:w-[420px] bg-white rounded-3xl shadow-2xl border border-zinc-200/90 z-50 overflow-hidden text-left animate-fade-in p-3">
                                             {/* Search Input for ANY city/town/location in India */}
                                             <div className="relative mb-2">
-                                                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-rose-500" />
+                                                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-rose-500" />
                                                 <input
                                                     type="text"
                                                     value={citySearchText}
                                                     onChange={(e) => setCitySearchText(e.target.value)}
-                                                    placeholder="Search any city or campus across India..."
+                                                    placeholder="Search any of 200+ cities & campuses in India..."
                                                     autoFocus
-                                                    className="w-full pl-8 pr-7 py-2 text-xs font-bold text-zinc-900 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:border-rose-400 focus:bg-white placeholder:text-zinc-400"
+                                                    className="w-full pl-9 pr-8 py-2.5 text-xs font-bold text-zinc-900 bg-zinc-50 border border-zinc-200 rounded-2xl focus:outline-none focus:border-rose-400 focus:bg-white placeholder:text-zinc-400 shadow-2xs"
                                                 />
                                                 {citySearchText && (
                                                     <button
                                                         type="button"
                                                         onClick={() => setCitySearchText('')}
-                                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
                                                     >
-                                                        <X size={12} />
+                                                        <X size={13} />
                                                     </button>
                                                 )}
                                             </div>
+
+                                            {/* State / Region Filter Pills */}
+                                            {!citySearchText.trim() && (
+                                                <div className="flex items-center gap-1.5 overflow-x-auto pb-2 pt-0.5 mb-1.5 border-b border-zinc-100 text-[10px]">
+                                                    {REGIONS_LIST.map((reg) => (
+                                                        <button
+                                                            key={reg}
+                                                            type="button"
+                                                            onClick={() => setSelectedRegion(reg)}
+                                                            className={`px-2.5 py-1 rounded-full font-bold whitespace-nowrap transition-colors shrink-0 ${
+                                                                selectedRegion === reg
+                                                                    ? 'bg-rose-500 text-white shadow-xs'
+                                                                    : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-600'
+                                                            }`}
+                                                        >
+                                                            {reg}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
 
                                             {/* Custom Location button if typed custom city name */}
                                             {citySearchText.trim() && (
@@ -220,13 +223,13 @@ const Hero = () => {
                                                         setCity(citySearchText.trim());
                                                         setIsCityOpen(false);
                                                     }}
-                                                    className="w-full text-left px-3 py-2 mb-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-extrabold flex items-center justify-between transition-colors border border-rose-200/70"
+                                                    className="w-full text-left px-3 py-2 mb-2 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-extrabold flex items-center justify-between transition-colors border border-rose-200/80 shadow-2xs"
                                                 >
                                                     <span className="flex items-center gap-2 truncate">
-                                                        <MapPin size={13} className="shrink-0 text-rose-600" />
-                                                        <span className="truncate">Use &ldquo;{citySearchText.trim()}&rdquo; (Any Location)</span>
+                                                        <MapPin size={14} className="shrink-0 text-rose-600" />
+                                                        <span className="truncate">Select &ldquo;{citySearchText.trim()}&rdquo; (Any Location)</span>
                                                     </span>
-                                                    <span className="text-[10px] uppercase font-black bg-rose-200/70 text-rose-800 px-1.5 py-0.5 rounded shrink-0">Set</span>
+                                                    <span className="text-[10px] uppercase font-black bg-rose-200/80 text-rose-800 px-2 py-0.5 rounded-full shrink-0">Set</span>
                                                 </button>
                                             )}
 
@@ -237,21 +240,25 @@ const Hero = () => {
                                                     setCity('');
                                                     setIsCityOpen(false);
                                                 }}
-                                                className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between transition-colors mb-1 ${
+                                                className={`w-full text-left px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-between transition-colors mb-1.5 ${
                                                     !city ? 'bg-zinc-100 text-rose-600 font-extrabold' : 'text-zinc-700 hover:bg-zinc-50'
                                                 }`}
                                             >
-                                                <span className="flex items-center gap-2">
-                                                    <span>🇮🇳</span>
-                                                    <span>All India (Show All Cities)</span>
+                                                <span className="flex items-center gap-2.5">
+                                                    <span className="text-sm">🇮🇳</span>
+                                                    <div>
+                                                        <p className="font-extrabold text-zinc-900 leading-none">All India (Show All Cities)</p>
+                                                        <p className="text-[10px] text-zinc-400 font-medium mt-0.5">Explore stays in every Indian city</p>
+                                                    </div>
                                                 </span>
-                                                {!city && <Check size={13} className="text-rose-600 shrink-0" />}
+                                                {!city && <Check size={14} className="text-rose-600 shrink-0" />}
                                             </button>
 
-                                            {/* Popular Hubs list across India */}
-                                            <div className="max-h-56 overflow-y-auto space-y-0.5 pr-1 text-xs border-t border-zinc-100 pt-1">
-                                                <div className="px-3 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                                                    Popular Indian Hubs
+                                            {/* Pan-India Cities List */}
+                                            <div className="max-h-64 overflow-y-auto space-y-1 pr-1 text-xs border-t border-zinc-100 pt-2">
+                                                <div className="px-2 py-0.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+                                                    <span>{selectedRegion} Cities ({filteredHubs.length})</span>
+                                                    {citySearchText && <span>Search Matches</span>}
                                                 </div>
                                                 {filteredHubs.map((hub) => {
                                                     const isSelected = city.toLowerCase() === hub.name.toLowerCase() || (city && hub.name.toLowerCase().includes(city.toLowerCase()));
@@ -263,14 +270,17 @@ const Hero = () => {
                                                                 setCity(hub.name.split(' (')[0]);
                                                                 setIsCityOpen(false);
                                                             }}
-                                                            className={`w-full text-left px-3 py-1.5 rounded-lg flex items-center justify-between transition-colors ${
+                                                            className={`w-full text-left px-3 py-2 rounded-xl flex items-center justify-between transition-colors ${
                                                                 isSelected
-                                                                    ? 'bg-rose-50 text-rose-700 font-extrabold'
-                                                                    : 'text-zinc-700 hover:bg-zinc-50'
+                                                                    ? 'bg-rose-50 text-rose-700 font-extrabold border border-rose-200/60'
+                                                                    : 'text-zinc-700 hover:bg-zinc-50 border border-transparent'
                                                             }`}
                                                         >
-                                                            <span className="truncate pr-2 font-medium">{hub.name}</span>
-                                                            <span className="text-[9px] font-bold text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded shrink-0">
+                                                            <div className="min-w-0 pr-2">
+                                                                <p className="font-extrabold text-zinc-900 text-xs truncate">{hub.name}</p>
+                                                                <p className="text-[10px] text-zinc-400 font-medium truncate">{hub.state}</p>
+                                                            </div>
+                                                            <span className="text-[9px] font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full shrink-0">
                                                                 {hub.badge}
                                                             </span>
                                                         </button>
