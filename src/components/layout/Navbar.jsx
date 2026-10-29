@@ -68,13 +68,23 @@ const Navbar = () => {
                 } ${isVisible ? 'translate-y-0' : '-translate-y-full shadow-none'}`}
             >
                 <div className="max-w-7xl mx-auto px-2">
-                    <div className="flex justify-between h-14 items-center relative">
+                    <div className="flex justify-between h-16 items-center relative">
                         
                         {/* Logo on Left */}
-                        <div className="flex items-center gap-8">
-                            <Link to="/" className="flex items-center gap-2 group" onClick={() => setIsOpen(false)}>
-                                <div className="h-10 px-1 py-0.5 flex items-center justify-center">
-                                    <img src="/logo.png" alt="StaySetu Logo" className="h-9 w-auto object-contain" />
+                        <div className="flex items-center gap-6 lg:gap-8">
+                            <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group select-none" onClick={() => setIsOpen(false)}>
+                                <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center p-0.5 transition-transform duration-300 group-hover:scale-105 bg-rose-50/40 border border-rose-100/60 shadow-2xs">
+                                    <img src="/logo.png" alt="StaySetu Logo" className="h-full w-full object-contain filter drop-shadow-xs" />
+                                </div>
+                                <div className="flex flex-col leading-none">
+                                    <div className="flex items-center tracking-tight font-black text-xl sm:text-2xl font-outfit text-zinc-950">
+                                        <span>Stay</span>
+                                        <span className="bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 bg-clip-text text-transparent">Setu</span>
+                                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-500 ml-0.5 animate-pulse" />
+                                    </div>
+                                    <span className="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 font-sans mt-0.5">
+                                        Verified Student Living
+                                    </span>
                                 </div>
                             </Link>
 

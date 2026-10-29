@@ -73,11 +73,17 @@ const Signup = () => {
             <div className="w-full max-w-md relative z-10">
                 <div className="card-elevated p-8 animate-slide-up">
 
-                    {/* Logo */}
+                    {/* Logo & Brand */}
                     <div className="text-center mb-6">
-                        <div className="w-32 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4 p-2 bg-white shadow-sm border border-slate-100 overflow-hidden">
-                            <img src="/logo.png?v=8" alt="StaySetu Logo" className="w-full h-full object-contain" />
-                        </div>
+                        <Link to="/" className="inline-flex items-center gap-2.5 group mb-3">
+                            <div className="w-14 h-14 rounded-2xl flex items-center justify-center p-2 bg-rose-50/60 border border-rose-100 shadow-xs transition-transform duration-300 group-hover:scale-105">
+                                <img src="/logo.png?v=8" alt="StaySetu Logo" className="w-full h-full object-contain filter drop-shadow-xs" />
+                            </div>
+                            <div className="flex items-center tracking-tight font-black text-2xl font-outfit text-slate-900">
+                                <span>Stay</span>
+                                <span className="text-rose-600">Setu</span>
+                            </div>
+                        </Link>
                         <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Join StaySetu</h1>
                         <p className="text-slate-500 text-xs font-normal">Find your next stay or tenant in minutes</p>
                     </div>
