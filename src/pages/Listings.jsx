@@ -34,11 +34,13 @@ const Listings = () => {
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     const colleges = [
-        { id: 'all', label: 'All Colleges' },
-        { id: 'Sharda', label: '🎓 Sharda Univ' },
-        { id: 'Galgotias', label: '🎓 Galgotias Univ' },
-        { id: 'Amity', label: '🎓 Amity Univ' },
-        { id: 'Bennett', label: '🎓 Bennett Univ' },
+        { id: 'all', label: 'All Cities & Hubs' },
+        { id: 'Crossings', label: '📍 Crossings Republik' },
+        { id: 'ABES', label: '🎓 ABES Engg College' },
+        { id: 'IMS', label: '🎓 IMS Ghaziabad' },
+        { id: 'AKGEC', label: '🎓 AKGEC Ghaziabad' },
+        { id: 'Noida', label: '📍 Noida / Gr. Noida' },
+        { id: 'Lucknow', label: '📍 Lucknow' },
     ];
 
     const amenityOptions = ['WiFi', 'AC', 'Food', 'Parking', 'Laundry'];
@@ -75,11 +77,11 @@ const Listings = () => {
 
             let results = res.documents || [];
 
-            // College filter
+            // College / Area filter
             if (collegeFilter !== 'all') {
                 results = results.filter(l => {
-                    const c = (l.nearbyCollege || l.nearby_college || l.location || l.title || '').toLowerCase();
-                    return c.includes(collegeFilter.toLowerCase());
+                    const text = `${l.nearbyCollege || ''} ${l.nearby_college || ''} ${l.location || ''} ${l.city || ''} ${l.locality || ''} ${l.title || ''}`.toLowerCase();
+                    return text.includes(collegeFilter.toLowerCase());
                 });
             }
 
@@ -91,12 +93,16 @@ const Listings = () => {
                 });
             }
 
-            // Client-side filtering for search, price, amenities, gender
+            // Client-side filtering for search (All India support)
             if (searchQuery) {
-                const q = searchQuery.toLowerCase();
+                const q = searchQuery.toLowerCase().trim();
                 results = results.filter(l =>
                     (l.title || '').toLowerCase().includes(q) ||
                     (l.location || '').toLowerCase().includes(q) ||
+                    (l.city || '').toLowerCase().includes(q) ||
+                    (l.locality || '').toLowerCase().includes(q) ||
+                    (l.address || '').toLowerCase().includes(q) ||
+                    (l.description || '').toLowerCase().includes(q) ||
                     (l.nearbyCollege || l.nearby_college || '').toLowerCase().includes(q)
                 );
             }
@@ -209,7 +215,7 @@ const Listings = () => {
                 setViewMode('map');
             },
             () => {
-                alert('Could not access current location. Showing Greater Noida college hubs.');
+                alert('Could not access current location. Centering on Crossings Republik, Ghaziabad.');
                 setViewMode('map');
             },
             { enableHighAccuracy: true, timeout: 10000 }
@@ -433,19 +439,20 @@ const Listings = () => {
                         {/* City / Location Dropdown Pill */}
                         <div className="relative shrink-0">
                             <select
-                                value={collegeFilter === 'all' ? 'Lucknow' : collegeFilter}
+                                value={collegeFilter}
                                 onChange={(e) => {
-                                    const val = e.target.value;
-                                    setCollegeFilter(val === 'Lucknow' ? 'all' : val);
+                                    setCollegeFilter(e.target.value);
                                 }}
                                 className="appearance-none bg-zinc-50 border border-zinc-200 rounded-full pl-8 pr-8 py-2.5 text-xs font-bold text-zinc-800 focus:outline-none focus:border-rose-400 cursor-pointer w-full sm:w-auto"
                             >
+                                <option value="all">🇮🇳 All India (All Cities)</option>
+                                <option value="Crossings">📍 Crossings Republik</option>
+                                <option value="ABES">🎓 ABES Engg College (NH-24)</option>
+                                <option value="Ghaziabad">📍 Ghaziabad (Indirapuram / NH-24)</option>
+                                <option value="Noida">📍 Noida / Greater Noida</option>
+                                <option value="IMS">🎓 IMS Ghaziabad</option>
+                                <option value="AKGEC">🎓 AKGEC Ghaziabad</option>
                                 <option value="Lucknow">📍 Lucknow</option>
-                                <option value="Gomti Nagar">📍 Gomti Nagar</option>
-                                <option value="Alambagh">📍 Alambagh</option>
-                                <option value="Indira Nagar">📍 Indira Nagar</option>
-                                <option value="Sharda">🎓 Sharda (Gr Noida)</option>
-                                <option value="Galgotias">🎓 Galgotias</option>
                             </select>
                             <MapPin size={13} className="text-rose-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
@@ -458,8 +465,8 @@ const Listings = () => {
                                     type="text"
                                     placeholder={
                                         purposeFilter === 'sell'
-                                            ? "Search flats for sale, plots, villas in Lucknow..."
-                                            : "Search area, e.g. Gomti Nagar, Indira Nagar, Knowledge Park..."
+                                            ? "Search flats for sale, plots across India..."
+                                            : "Search any area, city, college across India (e.g. Crossings Republik, ABES, Noida)..."
                                     }
                                     className="w-full bg-zinc-50 border border-zinc-200 rounded-full pl-10 pr-9 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 transition-all"
                                     value={searchQuery}

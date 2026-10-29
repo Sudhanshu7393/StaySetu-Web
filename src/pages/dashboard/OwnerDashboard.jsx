@@ -977,7 +977,7 @@ const OwnerDashboard = () => {
                                         )}
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Property Title *</label>
-                                            <input type="text" name="title" required placeholder="e.g. Modern Boys PG near Knowledge Park"
+                                            <input type="text" name="title" required placeholder="e.g. Modern PG near ABES EC / Crossings Republik"
                                                 className="input-field" value={formData.title} onChange={handleChange} />
                                         </div>
                                         <div>
@@ -992,7 +992,7 @@ const OwnerDashboard = () => {
                                             <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Foundation / Association Name</label>
                                             <div className="relative">
                                                 <Building2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <input type="text" name="association" placeholder="e.g. Noida PG Association"
+                                                <input type="text" name="association" placeholder="e.g. Crossings Republik / Delhi NCR PG Association"
                                                     className="input-field pl-10" value={formData.association} onChange={handleChange} />
                                             </div>
                                         </div>
@@ -1000,7 +1000,7 @@ const OwnerDashboard = () => {
                                             <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Nearby College / University</label>
                                             <div className="relative">
                                                 <Users size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <input type="text" name="nearbyCollege" placeholder="e.g. GL Bajaj, Galgotias"
+                                                <input type="text" name="nearbyCollege" placeholder="e.g. ABES EC, IMS Ghaziabad, AKGEC"
                                                     className="input-field pl-10" value={formData.nearbyCollege} onChange={handleChange} />
                                             </div>
                                         </div>
@@ -1047,7 +1047,7 @@ const OwnerDashboard = () => {
                                             <div className="flex gap-2 mb-6">
                                                 <div className="relative flex-1">
                                                     <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                    <input type="text" name="location" required placeholder="e.g. Plot 12, Alpha 2, Greater Noida"
+                                                    <input type="text" name="location" required placeholder="e.g. Arihant Ambience, Crossings Republik, Ghaziabad"
                                                         className="input-field pl-10" value={formData.location} onChange={handleChange} />
                                                 </div>
                                                 <button
@@ -1262,7 +1262,7 @@ const OwnerDashboard = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Service Title *</label>
-                                        <input type="text" name="title" required placeholder="e.g. Experienced Cook Available near Knowledge Park"
+                                        <input type="text" name="title" required placeholder="e.g. Experienced Cook Available in Crossings Republik"
                                             className="input-field" value={maidForm.title} onChange={handleMaidChange} />
                                     </div>
                                     <div>
@@ -1288,7 +1288,7 @@ const OwnerDashboard = () => {
                                         <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Location *</label>
                                         <div className="relative">
                                             <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                            <input type="text" name="location" required placeholder="e.g. Alpha 2, Greater Noida"
+                                            <input type="text" name="location" required placeholder="e.g. Crossings Republik, Ghaziabad"
                                                 className="input-field pl-10" value={maidForm.location} onChange={handleMaidChange} />
                                         </div>
                                     </div>

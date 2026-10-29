@@ -129,7 +129,7 @@ const Footer = () => {
                                 <div className="w-7 h-7 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center shrink-0 border border-rose-500/20">
                                     <MapPin size={13} />
                                 </div>
-                                <span className="font-medium">Knowledge Park, Greater Noida, UP</span>
+                                <span className="font-medium">Crossings Republik, Ghaziabad, UP (Delhi NCR)</span>
                             </li>
                         </ul>
                     </div>

@@ -4,7 +4,7 @@ import { UserPlus, Search, MessageSquare, Home } from 'lucide-react';
 const steps = [
     {
         title: 'Select Your Area or Campus',
-        description: 'Search stays across Gomti Nagar, Knowledge Park, or directly around your university campus.',
+        description: 'Search stays across Crossings Republik, Ghaziabad, Noida, Lucknow, or any campus across India.',
         icon: Search,
     },
     {

@@ -86,7 +86,7 @@ const Maids = () => {
                         Find Verified Maids & Cooks
                     </h1>
                     <p className="text-zinc-500 text-sm sm:text-base font-normal leading-relaxed">
-                        Trusted, verified cooks, daily cleaning staff, and laundry helpers across student societies in Greater Noida & Noida.
+                        Trusted, verified cooks, daily cleaning staff, and laundry helpers across societies in Crossings Republik, Ghaziabad, Noida & Delhi NCR.
                     </p>
                 </div>
 
@@ -96,7 +96,7 @@ const Maids = () => {
                         <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                         <input
                             type="text"
-                            placeholder="Search by area (e.g. Knowledge Park, Alpha 1, Pari Chowk)..."
+                            placeholder="Search by area or society (e.g. Crossings Republik, ABES, Gaur City, Noida)..."
                             className="w-full pl-11 pr-4 py-3 rounded-2xl border border-zinc-200 bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none text-sm font-medium text-zinc-900 placeholder:text-zinc-400 shadow-xs"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}

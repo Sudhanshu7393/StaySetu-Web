@@ -715,7 +715,7 @@ const StudentDashboard = () => {
                                             <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Preferred Location *</label>
                                             <div className="relative">
                                                 <MapPin size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <input required type="text" placeholder="e.g. Knowledge Park, Noida"
+                                                <input required type="text" placeholder="e.g. Crossings Republik, Ghaziabad, Noida"
                                                     className="input-field pl-9 text-sm"
                                                     value={roommateForm.location}
                                                     onChange={e => setRoommateForm(p => ({ ...p, location: e.target.value }))} />
@@ -723,7 +723,7 @@ const StudentDashboard = () => {
                                         </div>
                                         <div>
                                             <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">College / University</label>
-                                            <input type="text" placeholder="e.g. GL Bajaj, NIET..."
+                                            <input type="text" placeholder="e.g. ABES EC, IMS Ghaziabad, AKGEC..."
                                                 className="input-field text-sm"
                                                 value={roommateForm.college}
                                                 onChange={e => setRoommateForm(p => ({ ...p, college: e.target.value }))} />

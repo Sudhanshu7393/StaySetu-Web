@@ -47,7 +47,7 @@ const Roommates = () => {
                 DATABASE_ID,
                 COLLECTION.roommateRequests,
                 [
-                    Query.equal('status', 'approved'),
+                    Query.equal('status', ['approved', 'active']),
                     Query.orderDesc('$createdAt'),
                 ]
             );
@@ -200,7 +200,7 @@ const Roommates = () => {
                         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Preferred Location</label>
-                                <input type="text" required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-amber-400 focus:bg-white" placeholder="e.g. Alpha 1, Greater Noida" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} />
+                                <input type="text" required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-amber-400 focus:bg-white" placeholder="e.g. Crossings Republik, Ghaziabad, Noida" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Budget (₹/month)</label>
@@ -208,7 +208,7 @@ const Roommates = () => {
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">College/University</label>
-                                <input type="text" required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-amber-400 focus:bg-white" placeholder="Your college name" value={form.college} onChange={e => setForm({ ...form, college: e.target.value })} />
+                                <input type="text" required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-amber-400 focus:bg-white" placeholder="e.g. ABES EC, IMS Ghaziabad, AKGEC" value={form.college} onChange={e => setForm({ ...form, college: e.target.value })} />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">WhatsApp Number</label>
@@ -245,7 +245,7 @@ const Roommates = () => {
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-rose-500 transition-colors" size={16} />
                         <input
                             type="text"
-                            placeholder="Search by location, college..."
+                            placeholder="Search by location, college across India (e.g. Crossings Republik, ABES)..."
                             className="w-full bg-white border border-zinc-200/90 rounded-full pl-10 pr-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 transition-all shadow-sm"
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}

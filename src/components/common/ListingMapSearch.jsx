@@ -8,14 +8,15 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-// Well-known coordinates for key Greater Noida & Noida college hubs
+// Well-known coordinates for Crossings Republik, Ghaziabad & Delhi NCR college hubs
 const COLLEGE_HUBS = [
-    { name: 'Sharda Univ', lat: 28.4731, lng: 77.4938, college: 'Sharda University' },
-    { name: 'Galgotias Univ', lat: 28.4619, lng: 77.4975, college: 'Galgotias University' },
-    { name: 'Bennett Univ', lat: 28.4526, lng: 77.5855, college: 'Bennett University' },
-    { name: 'Amity Noida', lat: 28.5449, lng: 77.3332, college: 'Amity Noida' },
-    { name: 'Pari Chowk', lat: 28.4688, lng: 77.5085, college: 'Pari Chowk' },
-    { name: 'Knowledge Park', lat: 28.4680, lng: 77.4950, college: 'Knowledge Park' },
+    { name: 'Crossings Republik', lat: 28.6280, lng: 77.4385, college: 'Crossings Republik' },
+    { name: 'ABES College', lat: 28.6360, lng: 77.4470, college: 'ABES Engineering College' },
+    { name: 'IMS Ghaziabad', lat: 28.6750, lng: 77.4520, college: 'IMS Ghaziabad' },
+    { name: 'AKGEC', lat: 28.6766, lng: 77.5028, college: 'AKGEC Ghaziabad' },
+    { name: 'Noida Sec 62', lat: 28.6258, lng: 77.3688, college: 'Noida Sector 62' },
+    { name: 'Indirapuram', lat: 28.6410, lng: 77.3750, college: 'Indirapuram' },
+    { name: 'Sharda / Galgotias', lat: 28.4731, lng: 77.4938, college: 'Sharda University' },
 ];
 
 // Helper to determine coordinates for any listing
@@ -36,24 +37,29 @@ const getListingCoords = (listing, index = 0) => {
         }
     }
 
-    const text = `${listing?.title || ''} ${listing?.location || ''} ${listing?.nearbyCollege || ''}`.toLowerCase();
+    const text = `${listing?.title || ''} ${listing?.location || ''} ${listing?.city || ''} ${listing?.locality || ''} ${listing?.nearbyCollege || ''}`.toLowerCase();
 
+    // Crossings Republik, Ghaziabad (Core Headquarters)
+    if (text.includes('crossings') || text.includes('arihant') || text.includes('gh 7') || text.includes('gh7') || text.includes('vikrant')) {
+        return { lat: 28.6280 + (index % 5) * 0.0012, lng: 77.4385 + (index % 4) * 0.0015 };
+    }
+    if (text.includes('abes')) return { lat: 28.6360 + (index % 4) * 0.0012, lng: 77.4470 + (index % 4) * 0.0015 };
+    if (text.includes('ims')) return { lat: 28.6750 + (index % 4) * 0.0014, lng: 77.4520 + (index % 4) * 0.0012 };
+    if (text.includes('akgec') || text.includes('ajay kumar')) return { lat: 28.6766 + (index % 4) * 0.0012, lng: 77.5028 + (index % 4) * 0.0014 };
+    if (text.includes('indirapuram') || text.includes('vaishali')) return { lat: 28.6410 + (index % 5) * 0.0014, lng: 77.3750 + (index % 4) * 0.0012 };
+    if (text.includes('ghaziabad') || text.includes('raj nagar')) return { lat: 28.6692 + (index % 5) * 0.0015, lng: 77.4538 + (index % 4) * 0.0012 };
+    if (text.includes('sector 62') || text.includes('noida 62')) return { lat: 28.6258 + (index % 5) * 0.0015, lng: 77.3688 + (index % 4) * 0.0012 };
+    if (text.includes('lucknow') || text.includes('gomti') || text.includes('alambagh')) return { lat: 26.8467 + (index % 5) * 0.002, lng: 80.9462 + (index % 4) * 0.002 };
     if (text.includes('sharda')) return { lat: 28.4731 + (index % 5) * 0.0012, lng: 77.4938 + (index % 4) * 0.0015 };
     if (text.includes('galgotia')) return { lat: 28.4619 + (index % 5) * 0.0014, lng: 77.4975 + (index % 4) * 0.0012 };
-    if (text.includes('bennett')) return { lat: 28.4526 + (index % 4) * 0.0015, lng: 77.5855 + (index % 3) * 0.0012 };
-    if (text.includes('amity') || text.includes('125')) return { lat: 28.5449 + (index % 5) * 0.0015, lng: 77.3332 + (index % 4) * 0.0012 };
-    if (text.includes('niet')) return { lat: 28.4628 + (index % 4) * 0.0012, lng: 77.4912 + (index % 4) * 0.0015 };
-    if (text.includes('pari chowk')) return { lat: 28.4688 + (index % 5) * 0.0012, lng: 77.5085 + (index % 4) * 0.0015 };
-    if (text.includes('alpha')) return { lat: 28.4715 + (index % 5) * 0.0015, lng: 77.5120 + (index % 4) * 0.0012 };
-    if (text.includes('beta')) return { lat: 28.4746 + (index % 5) * 0.0012, lng: 77.5029 + (index % 4) * 0.0014 };
-    if (text.includes('sector 62')) return { lat: 28.6258 + (index % 5) * 0.0015, lng: 77.3688 + (index % 4) * 0.0012 };
+    if (text.includes('amity')) return { lat: 28.5449 + (index % 5) * 0.0015, lng: 77.3332 + (index % 4) * 0.0012 };
 
-    // Default student hub center (Knowledge Park) with gentle deterministic distribution
+    // Default student hub center (Crossings Republik, Ghaziabad) with gentle deterministic distribution
     const angle = (index * 67.5) * (Math.PI / 180);
     const radius = 0.004 + (index % 6) * 0.0025;
     return {
-        lat: 28.4670 + Math.sin(angle) * radius,
-        lng: 77.4960 + Math.cos(angle) * radius
+        lat: 28.6280 + Math.sin(angle) * radius,
+        lng: 77.4385 + Math.cos(angle) * radius
     };
 };
 
@@ -153,7 +159,7 @@ const ListingMapSearch = ({
 }) => {
     const [selectedListing, setSelectedListing] = useState(null);
     const [mapStyle, setMapStyle] = useState('streets'); // 'streets' | 'satellite'
-    const [mapCenter, setMapCenter] = useState([28.4680, 77.4950]);
+    const [mapCenter, setMapCenter] = useState([28.6280, 77.4385]);
     const [mapZoom, setMapZoom] = useState(13);
     const [locating, setLocating] = useState(false);
     const [locationError, setLocationError] = useState(null);
@@ -198,9 +204,9 @@ const ListingMapSearch = ({
             },
             () => {
                 setLocating(false);
-                setLocationError('Unable to retrieve your location. Showing Greater Noida hubs.');
-                // Fallback to Knowledge Park
-                setMapCenter([28.4680, 77.4950]);
+                setLocationError('Unable to retrieve your location. Showing Crossings Republik, Ghaziabad.');
+                // Fallback to Crossings Republik
+                setMapCenter([28.6280, 77.4385]);
             },
             { enableHighAccuracy: true, timeout: 10000 }
         );

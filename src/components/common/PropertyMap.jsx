@@ -42,8 +42,8 @@ const MapUpdater = ({ center }) => {
 };
 
 const PropertyMap = ({ position, onLocationChange, isPicker = false, zoom = 15 }) => {
-    // Default to Greater Noida (popular for the current context of staysetu) if no position provided
-    const defaultPosition = [28.4595, 77.4975];
+    // Default to Crossings Republik, Ghaziabad if no position provided
+    const defaultPosition = [28.6280, 77.4385];
     const mapPosition = position && position.lat && position.lng
         ? [position.lat, position.lng]
         : defaultPosition;

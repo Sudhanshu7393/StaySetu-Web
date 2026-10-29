@@ -486,7 +486,7 @@ const AddListing = () => {
                                             <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Foundation / Association Name</label>
                                             <div className="relative">
                                                 <Building2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <input type="text" name="association" placeholder="e.g. Noida PG Association"
+                                                <input type="text" name="association" placeholder="e.g. Crossings Republik / Delhi NCR PG Association"
                                                     className="input-field pl-10" value={formData.association} onChange={handleChange} />
                                             </div>
                                         </div>
@@ -495,7 +495,7 @@ const AddListing = () => {
                                             <label className="block text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Nearby College / Landmark</label>
                                             <div className="relative">
                                                 <Users size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                <input type="text" name="nearbyCollege" placeholder="e.g. GL Bajaj, Sharda Univ"
+                                                <input type="text" name="nearbyCollege" placeholder="e.g. ABES EC, IMS Ghaziabad, AKGEC"
                                                     className="input-field pl-10" value={formData.nearbyCollege} onChange={handleChange} />
                                             </div>
                                         </div>
@@ -581,7 +581,7 @@ const AddListing = () => {
                                                 type="text"
                                                 name="location"
                                                 required
-                                                placeholder="e.g. Plot 12, Alpha 2, Greater Noida"
+                                                placeholder="e.g. Arihant Ambience, Crossings Republik, Ghaziabad"
                                                 className="input-field pl-10"
                                                 value={formData.location}
                                                 onChange={handleChange}

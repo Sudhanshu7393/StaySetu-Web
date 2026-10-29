@@ -433,7 +433,7 @@ const EditListing = () => {
                                         type="text"
                                         name="title"
                                         required
-                                        placeholder={formData.purpose === 'sell' ? "e.g. 3 BHK Luxury Apartment in Gomti Nagar" : "e.g. Modern Boys PG near Knowledge Park"}
+                                        placeholder={formData.purpose === 'sell' ? "e.g. 3 BHK Luxury Apartment in Crossings Republik" : "e.g. Modern Girls PG near ABES College"}
                                         className="input-field"
                                         value={formData.title}
                                         onChange={handleChange}
@@ -528,7 +528,7 @@ const EditListing = () => {
                                             <input
                                                 type="text"
                                                 name="association"
-                                                placeholder="e.g. Noida PG Association"
+                                                placeholder="e.g. Crossings Republik / Delhi NCR PG Association"
                                                 className="input-field"
                                                 value={formData.association}
                                                 onChange={handleChange}
@@ -539,7 +539,7 @@ const EditListing = () => {
                                             <input
                                                 type="text"
                                                 name="nearbyCollege"
-                                                placeholder="e.g. GL Bajaj, Sharda Univ"
+                                                placeholder="e.g. ABES EC, IMS Ghaziabad, AKGEC"
                                                 className="input-field"
                                                 value={formData.nearbyCollege}
                                                 onChange={handleChange}
@@ -627,7 +627,7 @@ const EditListing = () => {
                                                 type="text"
                                                 name="location"
                                                 required
-                                                placeholder="e.g. Plot 12, Alpha 2, Greater Noida"
+                                                placeholder="e.g. Arihant Ambience, Crossings Republik, Ghaziabad"
                                                 className="input-field pl-10"
                                                 value={formData.location}
                                                 onChange={handleChange}

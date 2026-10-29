@@ -24,7 +24,7 @@ const Hero = () => {
     const [purpose, setPurpose] = useState('rent');
     const [propertyType, setPropertyType] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
-    const [city, setCity] = useState('Lucknow');
+    const [city, setCity] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -94,7 +94,7 @@ const Hero = () => {
         if (purpose) params.append('purpose', purpose);
         if (searchQuery.trim()) params.append('q', searchQuery.trim());
         if (propertyType !== 'All') params.append('type', propertyType);
-        if (city) params.append('city', city);
+        if (city && city !== 'All India') params.append('city', city);
         navigate(`/listings?${params.toString()}`);
     };
 
@@ -138,10 +138,12 @@ const Hero = () => {
                                         onChange={(e) => setCity(e.target.value)}
                                         className="text-xs font-bold bg-transparent border-0 focus:outline-none cursor-pointer text-rose-700"
                                     >
-                                        <option value="Lucknow">Lucknow</option>
-                                        <option value="Greater Noida">Greater Noida</option>
-                                        <option value="Noida">Noida</option>
+                                        <option value="">All India (All Cities)</option>
+                                        <option value="Crossings Republik">Crossings Republik (Ghaziabad)</option>
+                                        <option value="Ghaziabad">Ghaziabad / ABES</option>
+                                        <option value="Noida">Noida / Gr. Noida</option>
                                         <option value="Delhi NCR">Delhi NCR</option>
+                                        <option value="Lucknow">Lucknow</option>
                                     </select>
                                 </div>
 
@@ -205,8 +207,8 @@ const Hero = () => {
                                         type="text"
                                         placeholder={
                                             purpose === 'sell'
-                                                ? "Search flats for sale, plots, villas in Lucknow..."
-                                                : "Search area, college (e.g. Gomti Nagar, Amity)..."
+                                                ? "Search flats, plots, villas across India (e.g. Crossings Republik, Lucknow)..."
+                                                : "Search any area, college, city across India (e.g. Crossings Republik, ABES, Noida)..."
                                         }
                                         value={searchQuery}
                                         onChange={(e) => {
@@ -289,7 +291,7 @@ const Hero = () => {
                                         {t === 'All' ? 'All Stays' : t}
                                     </button>
                                 ))}
-                                {['Gomti Nagar', 'Alambagh', 'Knowledge Park'].map((tag) => (
+                                {['Crossings Republik', 'ABES Engg', 'Noida Sec 62', 'Indirapuram', 'Lucknow'].map((tag) => (
                                     <button
                                         key={tag}
                                         type="button"
