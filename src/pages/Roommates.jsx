@@ -33,9 +33,9 @@ const Roommates = () => {
             const res = await databases.listDocuments(
                 DATABASE_ID,
                 COLLECTION.roommateConnectRequests,
-                [Query.equal('requesterId', user.$id)]
+                [Query.equal('requesterId', user.$id || user.id)]
             );
-            setSentRequests(res.documents.map(d => d.roommatePostId));
+            setSentRequests(res.documents.map(d => d.target_id || d.roommatePostId));
         } catch (err) {
             console.error('Fetch sent requests error:', err);
         }
@@ -48,11 +48,13 @@ const Roommates = () => {
                 DATABASE_ID,
                 COLLECTION.roommateRequests,
                 [
-                    Query.equal('status', ['approved', 'active']),
                     Query.orderDesc('$createdAt'),
+                    Query.limit(100),
                 ]
             );
-            setRequests(res.documents);
+            // Display all approved and active posts
+            const valid = (res.documents || []).filter(d => d.status !== 'rejected');
+            setRequests(valid);
         } catch (err) {
             console.error('Fetch error:', err);
         }
@@ -66,33 +68,51 @@ const Roommates = () => {
     }, [user, fetchRequests, fetchSentRequests]);
 
     const handleSendRequest = async (post) => {
-        if (!user) return alert('Please login to send a request');
-        if (sentRequests.includes(post.$id)) return;
+        if (!user) return alert('Please login to send a connect request');
+        const postId = post.$id || post.id;
+        if (sentRequests.includes(postId)) return;
 
-        // Ensure we have the poster's ID
-        const posterId = post.userId || post.ownerId;
-        if (!posterId) return alert('Invalid post data. Cannot send request.');
+        // Ensure we have the poster's user ID
+        const posterId = post.user_id || post.userId || post.ownerId || post.id;
+        if (!posterId) return alert('Cannot send request to this post.');
+
+        if (posterId === (user.$id || user.id)) {
+            return alert('This is your own requirement post!');
+        }
 
         setSubmitting(true);
         try {
+            const requesterName = profile?.fullName || profile?.name || user.name || user.email || 'StaySetu Student';
+            const requesterPhone = form.whatsapp || profile?.phone || profile?.whatsapp || user.phone || '';
+            const postLoc = post.locality || post.location || post.city || 'Crossings Republik';
+            const postCol = post.college || '';
+
             await databases.createDocument(
                 DATABASE_ID,
                 COLLECTION.roommateConnectRequests,
                 ID.unique(),
                 {
-                    roommatePostId: post.$id,
+                    requester_id: user.$id || user.id,
+                    target_id: posterId,
+                    requesterId: user.$id || user.id,
                     posterId: posterId,
-                    requesterId: user.$id,
-                    requesterName: profile?.fullName || profile?.name || user.name || user.email,
-                    requesterPhone: profile?.whatsapp || user.phone || user.email || '',
+                    requesterName,
+                    requesterPhone,
+                    postLocation: postLoc,
+                    postCollege: postCol,
                     status: 'pending',
-                    createdAt: new Date().toISOString(),
-                    postLocation: post.location || 'Unknown',
-                    postCollege: post.college || 'Unknown'
+                    message: JSON.stringify({
+                        requesterName,
+                        requesterPhone,
+                        postLocation: postLoc,
+                        postCollege: postCol,
+                        note: `Hi! I saw your roommate requirement on StaySetu and want to connect with you.`
+                    }),
+                    createdAt: new Date().toISOString()
                 }
             );
-            setSentRequests(prev => [...prev, post.$id]);
-            alert('Request sent successfully!');
+            setSentRequests(prev => [...prev, postId, posterId]);
+            alert('Interest request sent! The user will be notified in their dashboard.');
         } catch (err) {
             console.error('Send request error:', err);
             alert('Failed to send request: ' + (err.message || 'Please try again.'));
@@ -103,35 +123,49 @@ const Roommates = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user) return alert('Please login to post');
+        if (!user) return alert('Please login to post your roommate requirement');
 
         setSubmitting(true);
         setSuccess(false);
         try {
-            await databases.createDocument(
+            const newDoc = await databases.createDocument(
                 DATABASE_ID,
                 COLLECTION.roommateRequests,
                 ID.unique(),
                 {
-                    userId: user.$id,
-                    name: profile?.fullName || profile?.name || user.name || user.email,
+                    user_id: user.$id || user.id,
+                    userId: user.$id || user.id,
+                    name: profile?.fullName || profile?.name || user.name || (user.email ? user.email.split('@')[0] : 'Student'),
+                    locality: form.location,
                     location: form.location,
+                    city: form.location.includes(',') ? form.location.split(',')[1].trim() : 'Ghaziabad',
                     college: form.college,
                     budget: parseFloat(form.budget) || 0,
+                    contact_phone: form.whatsapp,
                     whatsapp: form.whatsapp,
-                    genderPreference: form.gender_preference,
+                    gender: form.gender_preference || 'any',
+                    genderPreference: form.gender_preference || 'any',
+                    about: form.description,
                     description: form.description,
+                    move_in_date: form.move_in_date || null,
                     moveInDate: form.move_in_date || null,
-                    status: 'pending',
+                    habits: [],
+                    status: 'active',
                     createdAt: new Date().toISOString()
                 }
             );
+            
+            // Add immediately to local state so user sees it right away
+            if (newDoc) {
+                setRequests(prev => [newDoc, ...prev]);
+            }
+            
             setSuccess(true);
             setForm({ location: '', budget: '', college: '', whatsapp: '', gender_preference: 'any', move_in_date: '', description: '' });
             setTimeout(() => {
                 setSuccess(false);
                 setShowForm(false);
-            }, 3000);
+            }, 2500);
             fetchRequests();
         } catch (err) {
             console.error('Submit error:', err);
@@ -142,12 +176,14 @@ const Roommates = () => {
     };
 
     const filtered = requests.filter(r => {
-        const matchSearch = !searchQuery ||
-            r.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.college?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.description?.toLowerCase().includes(searchQuery.toLowerCase());
-
-        const matchGender = filterGender === 'all' || r.genderPreference === filterGender;
+        const text = `${r.location || ''} ${r.locality || ''} ${r.city || ''} ${r.college || ''} ${r.description || ''} ${r.about || ''} ${r.name || ''}`.toLowerCase();
+        const matchSearch = !searchQuery || text.includes(searchQuery.toLowerCase().trim());
+        const gen = (r.gender || r.genderPreference || 'any').toLowerCase();
+        const targetGender = filterGender.toLowerCase();
+        const matchGender = targetGender === 'all' || 
+            (targetGender === 'male' && (gen === 'boys' || gen === 'male')) ||
+            (targetGender === 'female' && (gen === 'girls' || gen === 'female')) ||
+            gen === 'any';
 
         return matchSearch && matchGender;
     });
@@ -301,33 +337,25 @@ const Roommates = () => {
                                     </div>
 
                                     {/* Description */}
-                                    <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-2">{req.description}</p>
-
-                                    {/* Compatibility Score Badge */}
-                                    <div className="mb-4 flex items-center justify-between p-2.5 bg-rose-50/50 rounded-xl border border-rose-100">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-rose-900 text-xs font-black">⚡ Match Score</span>
-                                        </div>
-                                        <span className="text-xs font-black text-rose-700 bg-rose-100/90 px-2 py-0.5 rounded-md border border-rose-200">
-                                            {req.compatibilityScore || (88 + (req.name.charCodeAt(0) % 10))}% Match
-                                        </span>
-                                    </div>
+                                    <p className="text-zinc-600 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-2">
+                                        {req.description || req.about || "Looking for a flatmate / roommate near campus with clean habits."}
+                                    </p>
 
                                     {/* Info pills */}
                                     <div className="flex flex-wrap gap-2 mb-4">
-                                        {req.location && (
+                                        {(req.location || req.locality || req.city) && (
                                             <span className="flex items-center gap-1.5 text-[11px] font-medium bg-zinc-50 text-zinc-700 border border-zinc-200/80 px-2.5 py-1 rounded-lg">
-                                                <MapPin size={10} className="text-rose-500" /> {req.location}
+                                                <MapPin size={10} className="text-rose-500" /> {req.location || req.locality || req.city}
                                             </span>
                                         )}
                                         {req.budget && (
                                             <span className="flex items-center gap-1 text-[11px] font-medium bg-zinc-50 text-zinc-700 border border-zinc-200/80 px-2.5 py-1 rounded-lg">
-                                                <IndianRupee size={10} className="text-rose-500" /> {req.budget?.toLocaleString()}/mo
+                                                <IndianRupee size={10} className="text-rose-500" /> {Number(req.budget).toLocaleString()}/mo
                                             </span>
                                         )}
-                                        {(req.genderPreference || req.gender_preference) !== 'any' && (
-                                            <span className="flex items-center gap-1 text-[11px] font-medium bg-zinc-50 text-zinc-700 border border-zinc-200/80 px-2.5 py-1 rounded-lg">
-                                                <User size={10} className="text-rose-500" /> {req.genderPreference || req.gender_preference}
+                                        {(req.genderPreference || req.gender) && (req.genderPreference || req.gender) !== 'any' && (
+                                            <span className="flex items-center gap-1 text-[11px] font-medium bg-zinc-50 text-zinc-700 border border-zinc-200/80 px-2.5 py-1 rounded-lg capitalize">
+                                                <User size={10} className="text-rose-500" /> {req.genderPreference || req.gender}
                                             </span>
                                         )}
                                     </div>
@@ -335,9 +363,9 @@ const Roommates = () => {
 
                                 {/* Actions */}
                                 <div className="space-y-2 pt-3 border-t border-zinc-100 mt-auto">
-                                    {req.whatsapp && (
+                                    {(req.whatsapp || req.contact_phone) && (
                                         <a
-                                            href={`https://wa.me/${normalizeWhatsAppNumber(req.whatsapp)}?text=${encodeURIComponent(`Hi ${req.name}, I saw your roommate requirement on StaySetu for ${req.college || req.location}. Let's connect!`)}`}
+                                            href={`https://wa.me/${normalizeWhatsAppNumber(req.whatsapp || req.contact_phone)}?text=${encodeURIComponent(`Hi ${req.name}, I saw your roommate requirement on StaySetu for ${req.college || req.location || req.locality || 'our area'}. Let's connect!`)}`}
                                             target="_blank"
                                             rel="noreferrer"
                                             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-extrabold text-xs bg-[#25D366] text-white hover:bg-[#20ba59] shadow-sm transition-all"
@@ -345,16 +373,16 @@ const Roommates = () => {
                                             <Phone size={14} /> Chat on WhatsApp
                                         </a>
                                     )}
-                                    {req.userId !== user?.$id ? (
+                                    {(req.user_id || req.userId) !== (user?.$id || user?.id) ? (
                                         <button
                                             onClick={() => handleSendRequest(req)}
-                                            disabled={sentRequests.includes(req.$id) || submitting}
-                                            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-extrabold text-xs transition-all ${sentRequests.includes(req.$id)
+                                            disabled={sentRequests.includes(req.$id || req.id) || submitting}
+                                            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-extrabold text-xs transition-all ${sentRequests.includes(req.$id || req.id)
                                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
-                                                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200/80'
+                                                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200/80 cursor-pointer'
                                                 }`}
                                         >
-                                            {sentRequests.includes(req.$id) ? (
+                                            {sentRequests.includes(req.$id || req.id) ? (
                                                 <>
                                                     <CheckCircle2 size={14} /> Request Sent
                                                 </>

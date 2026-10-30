@@ -58,9 +58,9 @@ const StudentDashboard = () => {
             const res = await databases.listDocuments(
                 DATABASE_ID,
                 COLLECTION.roommateConnectRequests,
-                [Query.equal('posterId', user.$id), Query.orderDesc('$createdAt')]
+                [Query.equal('posterId', user.$id || user.id), Query.orderDesc('$createdAt')]
             );
-            setIncomingRequests(res.documents);
+            setIncomingRequests(res.documents || []);
         } catch (err) {
             console.error('Fetch incoming requests error:', err);
         } finally {
@@ -116,15 +116,12 @@ const StudentDashboard = () => {
         if (!user) return;
         setRoommateLoading(true);
         try {
-            const approvedRes = await databases.listDocuments(DATABASE_ID, COLLECTION.roommateRequests, [
-                Query.equal('status', 'approved'), Query.orderDesc('$createdAt'),
+            const res = await databases.listDocuments(DATABASE_ID, COLLECTION.roommateRequests, [
+                Query.orderDesc('$createdAt'),
+                Query.limit(50),
             ]);
-            const myRes = await databases.listDocuments(DATABASE_ID, COLLECTION.roommateRequests, [
-                Query.equal('userId', user.$id), Query.orderDesc('$createdAt'),
-            ]);
-            const allDocs = [...approvedRes.documents, ...myRes.documents];
-            const unique = Array.from(new Map(allDocs.map(d => [d.$id, d])).values());
-            setRoommateRequests(unique);
+            const valid = (res.documents || []).filter(d => d.status !== 'rejected');
+            setRoommateRequests(valid);
         } catch (err) {
             console.error('Roommate fetch error:', err);
         } finally {
@@ -144,19 +141,30 @@ const StudentDashboard = () => {
         e.preventDefault();
         setRoommateSubmitting(true);
         try {
-            await databases.createDocument(DATABASE_ID, COLLECTION.roommateRequests, ID.unique(), {
-                userId: user.$id,
-                name: profile?.fullName || profile?.name || user.email,
+            const newDoc = await databases.createDocument(DATABASE_ID, COLLECTION.roommateRequests, ID.unique(), {
+                user_id: user.$id || user.id,
+                userId: user.$id || user.id,
+                name: profile?.fullName || profile?.name || user.name || (user.email ? user.email.split('@')[0] : 'Student'),
+                locality: roommateForm.location,
                 location: roommateForm.location,
-                budget: parseFloat(roommateForm.budget) || null,
-                genderPreference: roommateForm.gender_preference,
-                moveInDate: roommateForm.move_in_date || null,
-                description: roommateForm.description,
-                whatsapp: roommateForm.whatsapp,
+                city: roommateForm.location.includes(',') ? roommateForm.location.split(',')[1].trim() : 'Ghaziabad',
                 college: roommateForm.college,
-                status: 'pending',
+                budget: parseFloat(roommateForm.budget) || null,
+                gender: roommateForm.gender_preference || 'any',
+                genderPreference: roommateForm.gender_preference || 'any',
+                move_in_date: roommateForm.move_in_date || null,
+                moveInDate: roommateForm.move_in_date || null,
+                about: roommateForm.description,
+                description: roommateForm.description,
+                contact_phone: roommateForm.whatsapp,
+                whatsapp: roommateForm.whatsapp,
+                habits: [],
+                status: 'active',
                 createdAt: new Date().toISOString(),
             });
+            if (newDoc) {
+                setRoommateRequests(prev => [newDoc, ...prev]);
+            }
             setRoommateSuccess(true);
             setRoommateForm({ location: '', budget: '', gender_preference: 'any', move_in_date: '', description: '', whatsapp: '', college: '' });
             await fetchRoommateRequests();
@@ -894,10 +902,10 @@ const StudentDashboard = () => {
                                         </div>
 
                                         {/* Connect Button */}
-                                        {req.whatsapp && req.userId !== user.$id && (
+                                        {(req.whatsapp || req.contact_phone) && (req.userId || req.user_id) !== (user.$id || user.id) && (
                                             <div className="px-5 pb-5">
                                                 <a
-                                                    href={`https://wa.me/${req.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi! I saw your roommate requirement on StaySetu. I'm also looking in ${req.location}. Let's connect!`)}`}
+                                                    href={`https://wa.me/${(req.whatsapp || req.contact_phone).replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi! I saw your roommate requirement on StaySetu. I'm also looking in ${req.location || req.locality || 'the area'}. Let's connect!`)}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-2xl transition-all active:scale-95 text-sm shadow-md shadow-green-100"
@@ -907,7 +915,7 @@ const StudentDashboard = () => {
                                                 </a>
                                             </div>
                                         )}
-                                        {req.userId === user.$id && (
+                                        {(req.userId || req.user_id) === (user.$id || user.id) && (
                                             <div className="px-5 pb-5">
                                                 <span className="w-full flex items-center justify-center gap-2 bg-blue-50 text-blue-600 font-bold py-3 rounded-2xl text-sm">
                                                     <CheckCircle size={16} /> Your Post

@@ -161,6 +161,21 @@ export const filterDocuments = (docs, queries = []) => {
 };
 
 // Supabase Database Adapter (High Performance)
+const COLUMN_QUERY_MAP = {
+    userId: 'user_id',
+    ownerId: 'owner_id',
+    senderId: 'sender_id',
+    receiverId: 'receiver_id',
+    isRead: 'is_read',
+    isVerified: 'is_verified',
+    listingId: 'listing_id',
+    requesterId: 'requester_id',
+    posterId: 'target_id',
+    targetId: 'target_id',
+    roommatePostId: 'target_id',
+    $createdAt: 'created_at',
+};
+
 export const databases = {
     async listDocuments(_databaseId, collectionId, queries = []) {
         const table = TABLES[collectionId] || collectionId;
@@ -171,19 +186,18 @@ export const databases = {
 
                 for (const q of queries) {
                     if (!q) continue;
+                    const colName = COLUMN_QUERY_MAP[q.attribute] || q.attribute;
                     if (q.method === 'equal' && q.attribute) {
                         const val = q.values && q.values.length === 1 ? q.values[0] : q.values;
                         if (Array.isArray(val)) {
-                            query = query.in(q.attribute, val);
+                            query = query.in(colName, val);
                         } else {
-                            query = query.eq(q.attribute, val);
+                            query = query.eq(colName, val);
                         }
                     } else if (q.method === 'orderDesc' && q.attribute) {
-                        const col = q.attribute === '$createdAt' ? 'created_at' : q.attribute;
-                        query = query.order(col, { ascending: false });
+                        query = query.order(colName, { ascending: false });
                     } else if (q.method === 'orderAsc' && q.attribute) {
-                        const col = q.attribute === '$createdAt' ? 'created_at' : q.attribute;
-                        query = query.order(col, { ascending: true });
+                        query = query.order(colName, { ascending: true });
                     } else if (q.method === 'limit' && q.values?.[0]) {
                         query = query.limit(q.values[0]);
                     }
@@ -191,13 +205,37 @@ export const databases = {
 
                 const { data, error } = await query;
                 if (!error && Array.isArray(data)) {
-                    const normalized = data.map(item => ({
-                        ...item,
-                        $id: item.id?.toString(),
-                        $createdAt: item.created_at || item.createdAt,
-                        amenities: parseJsonField(item.amenities),
-                        images: parseJsonField(item.images),
-                    }));
+                    const normalized = data.map(item => {
+                        let parsedMessage = null;
+                        if (table === 'roommate_connect_requests' && typeof item.message === 'string' && item.message.startsWith('{')) {
+                            try { parsedMessage = JSON.parse(item.message); } catch { /* ignore */ }
+                        }
+                        return {
+                            ...item,
+                            $id: item.id?.toString(),
+                            $createdAt: item.created_at || item.createdAt,
+                            amenities: parseJsonField(item.amenities),
+                            images: parseJsonField(item.images),
+                            // Unified field mappings (camelCase <-> snake_case)
+                            userId: item.user_id || item.userId,
+                            location: item.location || [item.locality, item.city].filter(Boolean).join(', ') || item.locality,
+                            description: item.description || item.about,
+                            about: item.about || item.description,
+                            whatsapp: item.whatsapp || item.contact_phone,
+                            contact_phone: item.contact_phone || item.whatsapp,
+                            genderPreference: item.genderPreference || item.gender,
+                            gender: item.gender || item.genderPreference,
+                            moveInDate: item.moveInDate || item.move_in_date,
+                            // roommate_connect_requests fields
+                            requesterName: parsedMessage?.requesterName || item.requesterName || 'Student',
+                            requesterPhone: parsedMessage?.requesterPhone || item.requesterPhone || '',
+                            postLocation: parsedMessage?.postLocation || item.postLocation || 'NCR',
+                            postCollege: parsedMessage?.postCollege || item.postCollege || '',
+                            note: parsedMessage?.note || parsedMessage?.text || item.message,
+                            posterId: item.target_id || item.posterId,
+                            requesterId: item.requester_id || item.requesterId,
+                        };
+                    });
                     return { documents: normalized, total: normalized.length };
                 }
             } catch (err) {
@@ -224,6 +262,10 @@ export const databases = {
                         $createdAt: data.created_at || data.createdAt,
                         amenities: parseJsonField(data.amenities),
                         images: parseJsonField(data.images),
+                        userId: data.user_id || data.userId,
+                        location: data.location || [data.locality, data.city].filter(Boolean).join(', ') || data.locality,
+                        description: data.description || data.about,
+                        whatsapp: data.whatsapp || data.contact_phone,
                     };
                 }
             } catch (err) {
@@ -255,12 +297,57 @@ export const databases = {
 
         if (isSupabaseConfigured) {
             try {
-                // Prepare DB row for Supabase table
-                const dbRow = { ...newDoc };
+                let dbRow = { ...newDoc };
                 delete dbRow.$id;
                 delete dbRow.$createdAt;
                 delete dbRow.$updatedAt;
-                await supabase.from(table).insert([dbRow]);
+
+                if (table === 'roommate_requests') {
+                    dbRow = {
+                        id: dbRow.id,
+                        user_id: dbRow.user_id || dbRow.userId || null,
+                        name: dbRow.name || 'Anonymous',
+                        college: dbRow.college || '',
+                        city: dbRow.city || 'Ghaziabad',
+                        locality: dbRow.locality || dbRow.location || 'Crossings Republik',
+                        budget: Number(dbRow.budget) || 0,
+                        gender: dbRow.gender || dbRow.genderPreference || dbRow.gender_preference || 'any',
+                        move_in_date: dbRow.move_in_date || dbRow.moveInDate || null,
+                        habits: Array.isArray(dbRow.habits) ? dbRow.habits : [],
+                        about: dbRow.about || dbRow.description || '',
+                        contact_phone: dbRow.contact_phone || dbRow.whatsapp || '',
+                        contact_email: dbRow.contact_email || '',
+                        status: dbRow.status || 'active',
+                        created_at: dbRow.created_at || now,
+                        updated_at: dbRow.updated_at || now,
+                    };
+                } else if (table === 'roommate_connect_requests') {
+                    dbRow = {
+                        id: dbRow.id,
+                        requester_id: dbRow.requester_id || dbRow.requesterId || null,
+                        target_id: dbRow.target_id || dbRow.targetId || dbRow.posterId || null,
+                        message: typeof dbRow.message === 'string' ? dbRow.message : JSON.stringify(dbRow.message || {
+                            requesterName: dbRow.requesterName,
+                            requesterPhone: dbRow.requesterPhone,
+                            postLocation: dbRow.postLocation,
+                            postCollege: dbRow.postCollege,
+                        }),
+                        status: dbRow.status || 'pending',
+                        created_at: dbRow.created_at || now,
+                    };
+                } else if (table === 'favorites') {
+                    dbRow = {
+                        id: dbRow.id,
+                        user_id: dbRow.user_id || dbRow.userId || null,
+                        listing_id: dbRow.listing_id || dbRow.listingId || null,
+                        created_at: dbRow.created_at || now,
+                    };
+                }
+
+                const { error: insErr } = await supabase.from(table).insert([dbRow]);
+                if (insErr) {
+                    console.warn(`Supabase insert error on ${table}:`, insErr);
+                }
             } catch (err) {
                 console.warn(`Supabase insert failed on ${table}:`, err);
             }
