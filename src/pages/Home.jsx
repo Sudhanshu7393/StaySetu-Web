@@ -154,8 +154,8 @@ const Home = () => {
                             </h3>
                             <p className="text-zinc-500 text-xs sm:text-sm font-normal mb-6 leading-relaxed">
                                 {purpose === 'sell'
-                                    ? 'Are you an owner or broker with a flat, villa, or plot to sell? List on StaySetu with direct buyer connects.'
-                                    : 'Are you an owner or broker? List your flat, PG, or property on StaySetu with 100% direct connects.'}
+                                    ? 'Are you a property owner or seller with a flat, villa, or plot to sell? List on StaySetu with direct buyer connects.'
+                                    : 'Are you an owner or landlord? List your flat, PG, or property on StaySetu with 100% direct connects.'}
                             </p>
                             <div className="flex flex-wrap items-center justify-center gap-3">
                                 <Link to={`/dashboard/add-listing?purpose=${purpose}`} className="bg-rose-500 hover:bg-rose-600 text-white font-extrabold py-2.5 px-5 rounded-full text-xs shadow-xs transition-colors">

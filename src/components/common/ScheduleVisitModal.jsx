@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Calendar, Clock, MapPin, MessageCircle, Sparkles, CheckCircle2, User, Phone, GraduationCap, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { trackWhatsAppClick, openStaySetuDeskWhatsApp } from '../../lib/whatsappTracker';
+import { formatPropertyPrice } from '../../lib/formatters';
 
 const VISIT_SLOTS = [
     'Today (5:00 PM - 7:00 PM)',
@@ -23,15 +24,23 @@ const MOVE_IN_TIMELINES = [
     'Next Month 1st',
 ];
 
+const PURCHASE_TIMELINES = [
+    'Ready to Buy Immediately',
+    'Within 1 Month',
+    'Within 3 Months',
+    'Exploring / Site Visit',
+];
+
 const ScheduleVisitModal = ({ isOpen, onClose, property, initialMode = 'visit' }) => {
     const { user, profile } = useAuth();
+    const isSale = property?.purpose === 'sell' || property?.purpose === 'sale' || Number(property?.price) >= 500000;
     
     const [name, setName] = useState(profile?.fullName || profile?.name || user?.name || '');
     const [phone, setPhone] = useState(profile?.phone || profile?.whatsapp || user?.phone || '');
     const [college, setCollege] = useState(profile?.college || '');
     const [selectedSlot, setSelectedSlot] = useState(VISIT_SLOTS[0]);
     const [roomType, setRoomType] = useState(ROOM_PREFERENCES[0]);
-    const [moveIn, setMoveIn] = useState(MOVE_IN_TIMELINES[0]);
+    const [moveIn, setMoveIn] = useState(isSale ? PURCHASE_TIMELINES[0] : MOVE_IN_TIMELINES[0]);
     const [submitting, setSubmitting] = useState(false);
 
     if (!isOpen || !property) return null;
@@ -47,20 +56,32 @@ const ScheduleVisitModal = ({ isOpen, onClose, property, initialMode = 'visit' }
 
         setSubmitting(true);
 
-        const studentName = name.trim() || profile?.fullName || user?.name || 'A Student';
-        const studentCollege = college.trim() ? ` (${college.trim()})` : '';
+        const clientName = name.trim() || profile?.fullName || user?.name || (isSale ? 'Buyer' : 'Student');
+        const clientCollege = (!isSale && college.trim()) ? ` (${college.trim()})` : '';
 
-        const ownerName = property.owner?.name || (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Property Owner' : 'Broker');
+        const ownerName = property.owner?.name || (isSale ? 'Property Seller' : (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Property Owner' : 'Broker'));
         const ownerNumber = property.whatsappNumber || property.phoneNumber || property.phone_number || property.owner_phone || '';
 
-        const messageText = 
+        const messageText = isSale ?
+`Hi StaySetu Team, I am interested in this property for sale! 🏢
+
+🏠 Property: "${property.title}"
+📍 Location: ${property.location || 'StaySetu Listing'}
+💰 Price: ${formatPropertyPrice(property.price, 'sell')} (Total Price)
+
+👤 Buyer Name: ${clientName}
+📞 WhatsApp / Call: +91 ${cleanPhone}
+🗓️ Purchase Timeline: ${moveIn}
+⏰ Preferred Visit Time: ${selectedSlot}
+
+Please coordinate my site visit with the seller!`:
 `Hi StaySetu Team, I want to ${initialMode === 'chat' ? 'inquire about' : 'schedule a visit for'} this stay! 🏠
 
 🏡 Property: "${property.title}"
 📍 Location: ${property.location || 'StaySetu Listing'}
 💰 Rent: ₹${property.price ? Number(property.price).toLocaleString() : 'N/A'}/month
 
-👤 Student Name: ${studentName}${studentCollege}
+👤 Name: ${clientName}${clientCollege}
 📞 WhatsApp / Call: +91 ${cleanPhone}
 🛏️ Preference: ${roomType}
 🗓️ Move-in: ${moveIn}
@@ -69,17 +90,17 @@ const ScheduleVisitModal = ({ isOpen, onClose, property, initialMode = 'visit' }
 Listing Owner: ${ownerName} (Ph: ${ownerNumber || 'Listed on Platform'})
 Please coordinate my visit and connect me!`;
 
-        // 1. Save lead to StaySetu database with student phone and owner details
+        // 1. Save lead to StaySetu database with client phone and owner details
         await trackWhatsAppClick({
             studentPhone: cleanPhone,
-            studentName,
+            studentName: clientName,
             studentEmail: user?.email || '',
             listingId: property.$id || property.id || '',
             listingTitle: property.title || '',
             listingLocation: property.location || '',
             ownerName,
             ownerPhone: ownerNumber,
-            source: initialMode === 'chat' ? 'whatsapp_inquiry' : 'schedule_visit_modal',
+            source: initialMode === 'chat' ? (isSale ? 'property_sale_inquiry' : 'whatsapp_inquiry') : (isSale ? 'schedule_site_visit' : 'schedule_visit_modal'),
             message: messageText,
             status: 'new'
         });
@@ -110,10 +131,10 @@ Please coordinate my visit and connect me!`;
                         <Sparkles size={12} className="text-emerald-600" /> StaySetu Verified Desk • 100% Free
                     </span>
                     <h3 className="text-xl sm:text-2xl font-extrabold text-zinc-900">
-                        {initialMode === 'chat' ? 'Connect with StaySetu Desk' : 'Schedule a Free Visit'}
+                        {initialMode === 'chat' ? (isSale ? 'Inquire with StaySetu Desk' : 'Connect with StaySetu Desk') : (isSale ? 'Schedule a Site Visit' : 'Schedule a Free Visit')}
                     </h3>
                     <p className="text-zinc-500 text-xs sm:text-sm font-normal mt-1">
-                        Inquiring about <span className="text-zinc-900 font-semibold">{property.title}</span>. Our desk directly arranges your physical visit with the landlord with 100% transparent terms.
+                        Inquiring about <span className="text-zinc-900 font-semibold">{property.title}</span>. Our desk directly arranges your {isSale ? 'site visit with the seller' : 'physical visit with the landlord'} with 100% transparent terms.
                     </p>
                 </div>
 
@@ -155,19 +176,21 @@ Please coordinate my visit and connect me!`;
                         </div>
                     </div>
 
-                    {/* University / College */}
-                    <div>
-                        <label className="block text-[10px] font-extrabold text-zinc-500 uppercase tracking-wider mb-1.5">
-                            Your University / College (Optional)
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="e.g. ABES, AKGEC, IMS, Galgotias, DU"
-                            value={college}
-                            onChange={(e) => setCollege(e.target.value)}
-                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-rose-400 transition-colors"
-                        />
-                    </div>
+                    {/* University / College (Only for rent) */}
+                    {!isSale && (
+                        <div>
+                            <label className="block text-[10px] font-extrabold text-zinc-500 uppercase tracking-wider mb-1.5">
+                                Your University / College (Optional)
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="e.g. ABES, AKGEC, IMS, Galgotias, DU"
+                                value={college}
+                                onChange={(e) => setCollege(e.target.value)}
+                                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-rose-400 transition-colors"
+                            />
+                        </div>
+                    )}
 
                     {/* Preferred Visit Time Slot */}
                     <div>
@@ -192,36 +215,38 @@ Please coordinate my visit and connect me!`;
                         </div>
                     </div>
 
-                    {/* Room Type Preference */}
-                    <div>
-                        <label className="block text-[10px] font-extrabold text-zinc-500 uppercase tracking-wider mb-1.5">
-                            Room Type Needed
-                        </label>
-                        <div className="flex flex-wrap gap-1.5">
-                            {ROOM_PREFERENCES.map((room) => (
-                                <button
-                                    key={room}
-                                    type="button"
-                                    onClick={() => setRoomType(room)}
-                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition-all border ${
-                                        roomType === room
-                                            ? 'bg-rose-500 text-white border-rose-500 shadow-xs'
-                                            : 'bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-100'
-                                    }`}
-                                >
-                                    {room}
-                                </button>
-                            ))}
+                    {/* Room Type Preference (Only for rent) */}
+                    {!isSale && (
+                        <div>
+                            <label className="block text-[10px] font-extrabold text-zinc-500 uppercase tracking-wider mb-1.5">
+                                Room Type Needed
+                            </label>
+                            <div className="flex flex-wrap gap-1.5">
+                                {ROOM_PREFERENCES.map((room) => (
+                                    <button
+                                        key={room}
+                                        type="button"
+                                        onClick={() => setRoomType(room)}
+                                        className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold transition-all border ${
+                                            roomType === room
+                                                ? 'bg-rose-500 text-white border-rose-500 shadow-xs'
+                                                : 'bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-100'
+                                        }`}
+                                    >
+                                        {room}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
-                    {/* Move-in Timeline */}
+                    {/* Move-in / Purchase Timeline */}
                     <div>
                         <label className="block text-[10px] font-extrabold text-zinc-500 uppercase tracking-wider mb-1.5">
-                            Target Move-in
+                            {isSale ? 'Target Purchase Timeline' : 'Target Move-in'}
                         </label>
                         <div className="flex flex-wrap gap-1.5">
-                            {MOVE_IN_TIMELINES.map((time) => (
+                            {(isSale ? PURCHASE_TIMELINES : MOVE_IN_TIMELINES).map((time) => (
                                 <button
                                     key={time}
                                     type="button"

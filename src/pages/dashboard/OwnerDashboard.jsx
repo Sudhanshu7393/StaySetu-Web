@@ -657,7 +657,7 @@ const OwnerDashboard = () => {
                                                         {formatPropertyPrice(listing.price, listing.purpose)}
                                                     </div>
                                                     <span className="text-[10px] text-slate-400 font-normal">
-                                                        {listing.purpose === 'sell' ? 'Total Price' : '/month'}
+                                                        {(listing.purpose === 'sell' || Number(listing.price || 0) >= 500000) ? 'Total Price' : '/month'}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">

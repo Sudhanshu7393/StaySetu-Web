@@ -775,7 +775,9 @@ const Listings = () => {
                         <div className="flex items-center justify-between p-5 border-b border-zinc-100">
                             <div>
                                 <h3 className="text-lg font-extrabold text-zinc-900">Filter Properties</h3>
-                                <p className="text-xs text-zinc-500 font-medium">Select rent, type & amenities</p>
+                                <p className="text-xs text-zinc-500 font-medium">
+                                    {purposeFilter === 'sell' ? 'Select budget, type & amenities' : 'Select rent, type & amenities'}
+                                </p>
                             </div>
                             <button
                                 onClick={() => setShowFilters(false)}

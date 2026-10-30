@@ -302,7 +302,9 @@ const PropertyDetails = () => {
                     <div className="flex items-center gap-2 text-xs text-zinc-400 overflow-x-auto">
                         <button onClick={() => navigate('/')} className="hover:text-rose-600 transition-colors">Home</button>
                         <span>&gt;</span>
-                        <button onClick={() => navigate('/listings')} className="hover:text-rose-600 transition-colors">Lucknow rooms</button>
+                        <button onClick={() => navigate(isSale ? '/listings?purpose=sell' : '/listings?purpose=rent')} className="hover:text-rose-600 transition-colors">
+                            {isSale ? 'Properties for Sale' : `${property.city || 'Available'} rooms`}
+                        </button>
                         <span>&gt;</span>
                         <span className="text-zinc-700 font-semibold truncate max-w-[200px]">{property.location || 'Property Details'}</span>
                     </div>
@@ -609,35 +611,37 @@ const PropertyDetails = () => {
                                 </div>
                             </div>
 
-                            <div className="mb-10">
-                                <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Available Room Types</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                    {(property.occupancy || []).map((occ, idx) => {
-                                        const isObj = typeof occ === 'object' && occ !== null;
-                                        const type = isObj ? occ.type : occ;
-                                        const price = isObj ? occ.price : null;
+                            {!isSale && property.occupancy && property.occupancy.length > 0 && (
+                                <div className="mb-10">
+                                    <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Available Room Types</h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                        {(property.occupancy || []).map((occ, idx) => {
+                                            const isObj = typeof occ === 'object' && occ !== null;
+                                            const type = isObj ? occ.type : occ;
+                                            const price = isObj ? occ.price : null;
 
-                                        return (
-                                            <div key={idx} className="flex flex-col gap-1 p-3.5 bg-emerald-50 rounded-xl border border-emerald-100">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-emerald-600 border border-emerald-100">
-                                                        <UsersIcon size={16} />
+                                            return (
+                                                <div key={idx} className="flex flex-col gap-1 p-3.5 bg-emerald-50 rounded-xl border border-emerald-100">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-emerald-600 border border-emerald-100">
+                                                            <UsersIcon size={16} />
+                                                        </div>
+                                                        <span className="font-bold text-emerald-700 text-xs uppercase tracking-tight">
+                                                            {type === 'single' ? 'Single' : type === 'double' ? 'Double Sharing' : type === 'triple' ? 'Triple Sharing' : (type.replace('-', ' ') + ' Sharing')}
+                                                        </span>
                                                     </div>
-                                                    <span className="font-bold text-emerald-700 text-xs uppercase tracking-tight">
-                                                        {type === 'single' ? 'Single' : type === 'double' ? 'Double Sharing' : type === 'triple' ? 'Triple Sharing' : (type.replace('-', ' ') + ' Sharing')}
-                                                    </span>
+                                                    {price && price > 0 && (
+                                                        <div className="mt-2 pt-2 border-t border-emerald-100/50 flex items-center justify-between">
+                                                            <span className="text-[10px] text-emerald-600/70 font-bold uppercase tracking-wider">Rent</span>
+                                                            <span className="font-black text-emerald-700 text-sm">₹{price.toLocaleString()}</span>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                {price && price > 0 && (
-                                                    <div className="mt-2 pt-2 border-t border-emerald-100/50 flex items-center justify-between">
-                                                        <span className="text-[10px] text-emerald-600/70 font-bold uppercase tracking-wider">Rent</span>
-                                                        <span className="font-black text-emerald-700 text-sm">₹{price.toLocaleString()}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             <div>
                                 <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Location</h3>
@@ -661,13 +665,19 @@ const PropertyDetails = () => {
                         <div className="bg-white rounded-3xl border border-zinc-200/80 p-6 shadow-sm sticky top-24">
                             {/* Price */}
                             <div className="mb-6">
-                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Starting from</span>
+                                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">
+                                    {isSale ? 'Total Price' : 'Starting from'}
+                                </span>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-3xl font-black text-slate-900 flex items-center">
                                         <IndianRupee size={22} className="mr-1" />
-                                        {property.price?.toLocaleString() || 'N/A'}
+                                        {isSale 
+                                            ? formatPropertyPrice(property.price, 'sell').replace('₹', '') 
+                                            : (property.price?.toLocaleString() || 'N/A')}
                                     </span>
-                                    <span className="text-slate-500 font-normal text-sm">/ month</span>
+                                    {!isSale && (
+                                        <span className="text-slate-500 font-normal text-sm">/ month</span>
+                                    )}
                                 </div>
                             </div>
 
@@ -682,7 +692,7 @@ const PropertyDetails = () => {
                                     className="w-full py-3.5 justify-center text-xs font-black uppercase tracking-widest rounded-full flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white transition-all shadow-md shadow-rose-500/25 hover:scale-[1.01]"
                                 >
                                     <Calendar size={16} />
-                                    Schedule a Free Visit
+                                    {isSale ? 'Schedule Site Visit' : 'Schedule a Free Visit'}
                                 </button>
 
                                 <button
@@ -695,20 +705,24 @@ const PropertyDetails = () => {
                                     }`}
                                 >
                                     {isUnavailable ? <Home size={16} /> : <Phone size={16} />}
-                                    {isSold ? 'Sold Out' : isRented ? 'Already Rented Out' : 'Connect via WhatsApp'}
+                                    {isSold ? 'Sold Out' : isRented ? 'Already Rented Out' : (isSale ? 'Inquire on WhatsApp' : 'Connect via WhatsApp')}
                                 </button>
                             </div>
-                            <p className="text-center text-[11px] text-zinc-500 font-medium mb-3">⚡ {String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'} typically replies within 5 mins</p>
+                            <p className="text-center text-[11px] text-zinc-500 font-medium mb-3">
+                                ⚡ {isSale 
+                                    ? 'Direct seller typically replies within 5 mins' 
+                                    : `${String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'} typically replies within 5 mins`}
+                            </p>
                             
                             <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 py-1.5 px-3 rounded-full border border-emerald-200/80 mb-6">
                                 <ShieldCheck size={13} className="text-emerald-600 shrink-0" />
                                 <span>100% Free Platform • Transparent Pricing • Direct Connect</span>
                             </div>
 
-                            {/* Transparent Pricing Breakdown with Broker Fee Disclosed */}
+                            {/* Transparent Pricing Breakdown */}
                             <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200/80 mb-6">
                                 <div className="flex items-center gap-2 mb-3 text-zinc-900 font-extrabold text-xs uppercase tracking-wider">
-                                    <Calculator size={14} className="text-rose-500" /> Transparent Pricing Breakdown
+                                    <Calculator size={14} className="text-rose-500" /> {isSale ? 'Property Pricing & Specs' : 'Transparent Pricing Breakdown'}
                                 </div>
                                 <div className="space-y-2.5 text-xs">
                                     <div className="flex justify-between text-zinc-600">
@@ -725,16 +739,18 @@ const PropertyDetails = () => {
                                             </span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between items-center text-zinc-600">
-                                        <span>Brokerage / Commission:</span>
-                                        <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
-                                            (property.brokerageFee && !property.brokerageFee.includes('Zero') && property.brokerageFee !== '0' && property.brokerageFee !== '₹0 (Direct Owner)' && property.brokerageFee !== '₹0 (No Brokerage)') || String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
-                                                ? 'bg-amber-50 text-amber-900 border border-amber-200'
-                                                : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                        }`}>
-                                            {property.brokerageFee || property.brokerage_fee || (String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker' ? (isSale ? '1% - 2%' : '15 Days Rent') : '₹0 (No Brokerage)')}
-                                        </span>
-                                    </div>
+                                    {!isSale && (
+                                        <div className="flex justify-between items-center text-zinc-600">
+                                            <span>Brokerage / Commission:</span>
+                                            <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
+                                                (property.brokerageFee && !property.brokerageFee.includes('Zero') && property.brokerageFee !== '0' && property.brokerageFee !== '₹0 (Direct Owner)' && property.brokerageFee !== '₹0 (No Brokerage)') || String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
+                                                    ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                                                    : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                            }`}>
+                                                {property.brokerageFee || property.brokerage_fee || (String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker' ? '15 Days Rent' : '₹0 (No Brokerage)')}
+                                            </span>
+                                        </div>
+                                    )}
                                     {!isSale && (
                                         <div className="pt-2.5 border-t border-zinc-200 flex justify-between font-black text-zinc-900 text-sm">
                                             <span>Estimated Move-in:</span>
@@ -744,8 +760,28 @@ const PropertyDetails = () => {
                                             </span>
                                         </div>
                                     )}
+                                    {isSale && property.area && (
+                                        <div className="flex justify-between text-zinc-600">
+                                            <span>Super Built-up Area:</span>
+                                            <span className="font-extrabold text-zinc-900">{property.area}</span>
+                                        </div>
+                                    )}
+                                    {isSale && (
+                                        <div className="flex justify-between text-zinc-600">
+                                            <span>Possession Status:</span>
+                                            <span className="font-extrabold text-zinc-900">{property.possession || 'Ready to Move'}</span>
+                                        </div>
+                                    )}
+                                    {isSale && (
+                                        <div className="flex justify-between text-zinc-600">
+                                            <span>Ownership Title:</span>
+                                            <span className="font-extrabold text-zinc-900">{property.ownership || 'Freehold Title'}</span>
+                                        </div>
+                                    )}
                                     <p className="text-[10px] text-zinc-400 mt-1 italic leading-tight">
-                                        * All pricing & brokerage fees are explicitly stated upfront. No hidden surprises.
+                                        {isSale 
+                                            ? '* Verified direct sale listing with 100% transparent terms.'
+                                            : '* All pricing & brokerage fees are explicitly stated upfront. No hidden surprises.'}
                                     </p>
                                 </div>
                             </div>
@@ -754,30 +790,30 @@ const PropertyDetails = () => {
 
                             <div className="flex items-center gap-3 mb-5">
                                 <div className="w-11 h-11 bg-rose-500 rounded-2xl flex items-center justify-center text-white font-extrabold text-sm shadow-sm shadow-rose-500/20">
-                                    {(property.owner?.name || 'O').charAt(0).toUpperCase()}
+                                    {(property.owner?.name || (isSale ? 'S' : 'O')).charAt(0).toUpperCase()}
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-zinc-900 text-sm">
-                                        {property.owner?.name || (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Property Owner' : 'Verified Broker')}
+                                        {property.owner?.name || (isSale ? 'Property Seller' : (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Property Owner' : 'Verified Broker'))}
                                     </h4>
                                     <p className="text-emerald-700 text-xs font-bold flex items-center gap-1">
-                                        <CheckCircle2 size={11} /> Verified {String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'}
+                                        <CheckCircle2 size={11} /> {isSale ? 'Verified Seller' : `Verified ${String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'Owner' : 'Broker'}`}
                                     </p>
                                 </div>
                             </div>
 
                             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/60 mb-6">
                                 <p className="text-sm text-slate-600 leading-relaxed italic font-normal">
-                                    "Hi, I'm {property.owner?.name || (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'the owner' : 'the broker')}. Feel free to reach out — I'll help you find the perfect stay!"
+                                    "Hi, I'm {property.owner?.name || (isSale ? 'the seller' : (String(property.listedBy || 'owner').toLowerCase() === 'owner' ? 'the owner' : 'the broker'))}. Feel free to reach out — I'll help you with all the details of this {isSale ? 'property' : 'stay'}!"
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-2.5">
                                 {[
-                                    String(property.listedBy || 'owner').toLowerCase() !== 'owner' ? 'Broker Managed' : 'Direct from Owner',
+                                    isSale ? 'Direct Seller' : (String(property.listedBy || 'owner').toLowerCase() !== 'owner' ? 'Broker Managed' : 'Direct from Owner'),
                                     'Safe & Verified',
                                     'Direct Contact',
-                                    'Easy Move-in'
+                                    isSale ? 'Ready Possession' : 'Easy Move-in'
                                 ].map((t) => (
                                     <div key={t} className="flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
                                         <CheckCircle2 size={10} className="text-emerald-500 shrink-0" />{t}

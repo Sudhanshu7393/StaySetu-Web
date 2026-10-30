@@ -89,10 +89,23 @@ const MapViewController = ({ center, zoom }) => {
 };
 
 // Create custom price pin element for Leaflet
-const createCustomPriceIcon = (price, isSelected, title) => {
-    const formattedPrice = Number(price || 0) >= 1000 
-        ? `₹${(Number(price) / 1000).toFixed(1)}k` 
-        : `₹${Number(price || 0)}`;
+const createCustomPriceIcon = (price, isSelected, title, purpose) => {
+    const isSale = purpose === 'sell' || purpose === 'sale' || Number(price || 0) >= 500000;
+    let formattedPrice;
+    if (isSale) {
+        const num = Number(price || 0);
+        if (num >= 10000000) {
+            formattedPrice = `₹${(num / 10000000).toFixed(2).replace(/\.00$/, '')} Cr`;
+        } else if (num >= 100000) {
+            formattedPrice = `₹${(num / 100000).toFixed(1).replace(/\.0$/, '')} L`;
+        } else {
+            formattedPrice = `₹${num.toLocaleString('en-IN')}`;
+        }
+    } else {
+        formattedPrice = Number(price || 0) >= 1000 
+            ? `₹${(Number(price) / 1000).toFixed(1)}k` 
+            : `₹${Number(price || 0)}`;
+    }
 
     const bg = isSelected ? '#FBBF24' : '#1c1f26';
     const text = isSelected ? '#09090b' : '#ffffff';
@@ -357,7 +370,7 @@ const ListingMapSearch = ({
                             <Marker
                                 key={item.$id || item.id}
                                 position={[item.coords.lat, item.coords.lng]}
-                                icon={createCustomPriceIcon(item.price, isSelected, item.title)}
+                                icon={createCustomPriceIcon(item.price, isSelected, item.title, item.purpose)}
                                 eventHandlers={{
                                     click: () => {
                                         setSelectedListing(item);
@@ -425,9 +438,17 @@ const ListingMapSearch = ({
                                     <div className="flex items-center justify-between pt-1 border-t border-white/10">
                                         <div>
                                             <span className="text-base font-black text-[#FBBF24]">
-                                                ₹{Number(selectedListing.price || 0).toLocaleString()}
+                                                {(selectedListing.purpose === 'sell' || Number(selectedListing.price || 0) >= 500000)
+                                                    ? (Number(selectedListing.price) >= 10000000 
+                                                        ? `₹${(Number(selectedListing.price) / 10000000).toFixed(2).replace(/\.00$/, '')} Cr`
+                                                        : (Number(selectedListing.price) >= 100000
+                                                            ? `₹${(Number(selectedListing.price) / 100000).toFixed(2).replace(/\.00$/, '')} Lac`
+                                                            : `₹${Number(selectedListing.price || 0).toLocaleString()}`))
+                                                    : `₹${Number(selectedListing.price || 0).toLocaleString()}`}
                                             </span>
-                                            <span className="text-[10px] text-zinc-400 font-normal"> / mo</span>
+                                            {selectedListing.purpose !== 'sell' && Number(selectedListing.price || 0) < 500000 && (
+                                                <span className="text-[10px] text-zinc-400 font-normal"> / mo</span>
+                                            )}
                                         </div>
 
                                         <Link

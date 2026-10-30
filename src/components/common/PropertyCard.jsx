@@ -226,15 +226,9 @@ const PropertyCard = ({ property }) => {
                                     <div className="text-[10px] text-zinc-500 font-medium flex items-center gap-1.5 flex-wrap mt-0.5">
                                         <span>{property?.area ? `${property.area} • ` : ''}{property?.possession || 'Ready'}</span>
                                         <span className="text-zinc-300">•</span>
-                                        {String(property?.listedBy || property?.listed_by || '').toLowerCase() === 'broker' ? (
-                                            <span className="text-zinc-700 font-semibold bg-zinc-100 px-1.5 py-0.5 rounded text-[10px]">
-                                                🤝 Broker
-                                            </span>
-                                        ) : (
-                                            <span className="text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] border border-emerald-100">
-                                                🏠 Direct Owner
-                                            </span>
-                                        )}
+                                        <span className="text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] border border-emerald-100">
+                                            ✨ Verified Deal
+                                        </span>
                                     </div>
                                 </div>
                             ) : (

@@ -375,7 +375,7 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
                                 <div className="mt-1.5 sm:mt-2.5">
                                     <p className="hidden sm:block text-zinc-600 text-sm md:text-base font-normal max-w-lg leading-relaxed">
                                         {activePurpose === 'sell'
-                                            ? 'Flats, plots and independent villas in prime locations. Direct owner and verified broker deals with 100% upfront pricing.'
+                                            ? 'Flats, plots and independent villas in prime locations. Direct owner and verified seller deals with 100% upfront pricing.'
                                             : 'Explore vetted flats, apartments, PGs & rental stays with upfront rent, clear deposits, and honest broker terms. Connect directly on WhatsApp.'}
                                     </p>
                                     <div className="flex sm:hidden items-center gap-1.5 text-[11px] font-bold text-zinc-600 flex-wrap">
@@ -609,7 +609,9 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
                                             </span>
                                             <span>•</span>
                                             <span className="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] border border-emerald-100 shrink-0">
-                                                {String(currentSpotlight?.listedBy || 'owner').toLowerCase() === 'owner' ? '🏠 ₹0 Brokerage' : '🤝 Broker Fee Disclosed'}
+                                                {activePurpose === 'sell'
+                                                    ? '✨ Verified Property'
+                                                    : (String(currentSpotlight?.listedBy || 'owner').toLowerCase() === 'owner' ? '🏠 ₹0 Brokerage' : '🤝 Broker Fee Disclosed')}
                                             </span>
                                         </div>
                                     </div>
