@@ -185,15 +185,24 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
                ========================================================================= */}
             <div className="sm:hidden relative w-full h-[93dvh] min-h-[580px] flex flex-col justify-between overflow-hidden text-white pt-20 pb-6 px-4">
                 
-                {/* Full-bleed Luxury Architectural Background */}
+                {/* Full-bleed Architectural Backgrounds with Smooth Crossfade */}
                 <img
-                    src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=85"
-                    alt="Luxury Modern Architecture"
-                    className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
+                    src="/hero/hero_apartments_rent.jpg"
+                    alt="Modern Residential Apartments"
+                    className={`absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-700 ease-in-out ${
+                        activePurpose === 'rent' ? 'opacity-100' : 'opacity-0'
+                    }`}
+                />
+                <img
+                    src="/hero/hero_dream_house_buy.jpg"
+                    alt="Luxury Dream House Architecture"
+                    className={`absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-700 ease-in-out ${
+                        activePurpose === 'sell' ? 'opacity-100' : 'opacity-0'
+                    }`}
                 />
 
-                {/* Dramatic Gradient Overlay for Readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/40 pointer-events-none" />
+                {/* Dramatic Gradient Overlay for Readability & Contrast */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/35 pointer-events-none" />
 
                 {/* Top Section: Frosted Glass Purpose Switcher */}
                 <div className="relative z-10 flex items-center justify-between gap-2">
@@ -348,15 +357,24 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
             <div className="hidden sm:block relative w-full pt-20 sm:pt-24 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                 <div className="relative rounded-[2.5rem] overflow-hidden min-h-[540px] flex items-center p-8 sm:p-12 lg:p-14 border border-zinc-200/80 shadow-xl bg-zinc-950">
                     
-                    {/* Background Image */}
+                    {/* Background Images with Dynamic Purpose Crossfade */}
                     <img
-                        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=85"
-                        alt="Luxury Modern Architecture"
-                        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
+                        src="/hero/hero_apartments_rent.jpg"
+                        alt="Modern Residential Apartments"
+                        className={`absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-700 ease-in-out ${
+                            activePurpose === 'rent' ? 'opacity-100' : 'opacity-0'
+                        }`}
+                    />
+                    <img
+                        src="/hero/hero_dream_house_buy.jpg"
+                        alt="Luxury Dream House Architecture"
+                        className={`absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-700 ease-in-out ${
+                            activePurpose === 'sell' ? 'opacity-100' : 'opacity-0'
+                        }`}
                     />
 
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-black/30 pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-black/25 pointer-events-none" />
 
                     <div className="relative z-10 max-w-2xl space-y-6 text-left text-white">
                         
