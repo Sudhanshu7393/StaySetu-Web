@@ -61,13 +61,15 @@ const Navbar = () => {
     const isAdmin = profile?.role === 'admin' || (user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase()));
     const dashPath = (role === 'owner' || role === 'broker') ? '/owner-dashboard' : '/dashboard';
 
+    const isTransparent = location.pathname === '/' && !scrolled && !isOpen;
+
     return (
         <>
             <nav
                 className={`fixed top-0 w-full z-50 transition-all duration-300 px-4 py-2 ${
-                    scrolled
-                        ? 'bg-white/95 backdrop-blur-xl border-b border-zinc-200/80 shadow-sm'
-                        : 'bg-white/90 backdrop-blur-md border-b border-zinc-100'
+                    isTransparent
+                        ? 'bg-gradient-to-b from-black/80 via-black/40 to-transparent border-transparent text-white'
+                        : 'bg-white/95 backdrop-blur-xl border-b border-zinc-200/80 shadow-sm text-zinc-900'
                 } ${isVisible ? 'translate-y-0' : '-translate-y-full shadow-none'}`}
             >
                 <div className="max-w-7xl mx-auto px-2">
@@ -76,12 +78,14 @@ const Navbar = () => {
                         {/* Logo on Left */}
                         <div className="flex items-center gap-6 lg:gap-8">
                             <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group select-none" onClick={() => setIsOpen(false)}>
-                                <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center p-0.5 transition-transform duration-300 group-hover:scale-105 bg-rose-50/40 border border-rose-100/60 shadow-2xs">
+                                <div className={`h-11 w-11 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center p-0.5 transition-transform duration-300 group-hover:scale-105 border shadow-2xs ${
+                                    isTransparent ? 'bg-white/10 border-white/20' : 'bg-rose-50/40 border-rose-100/60'
+                                }`}>
                                     <img src="/logo.png" alt="StaySetu Logo" className="h-full w-full object-contain filter drop-shadow-xs" />
                                 </div>
                                 <div className="flex flex-col leading-none">
-                                    <div className="flex items-center tracking-tight font-black text-xl sm:text-2xl font-outfit text-zinc-950">
-                                        <span>Stay</span>
+                                    <div className="flex items-center tracking-tight font-black text-xl sm:text-2xl font-outfit">
+                                        <span className={isTransparent ? 'text-white' : 'text-zinc-950'}>Stay</span>
                                         <span className="bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 bg-clip-text text-transparent">Setu</span>
                                         <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-500 ml-0.5 animate-pulse" />
                                     </div>
@@ -98,8 +102,8 @@ const Navbar = () => {
                                             to={link.path}
                                             className={`relative py-1.5 text-xs font-extrabold transition-all ${
                                                 active
-                                                    ? 'text-rose-600'
-                                                    : 'text-zinc-600 hover:text-zinc-950'
+                                                    ? 'text-rose-500'
+                                                    : (isTransparent ? 'text-zinc-200 hover:text-white' : 'text-zinc-600 hover:text-zinc-950')
                                             }`}
                                         >
                                             {link.name}
@@ -118,16 +122,24 @@ const Navbar = () => {
                                 href="https://www.instagram.com/stay.setu/" 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="hidden lg:flex items-center gap-1.5 text-xs font-extrabold text-rose-600 hover:text-white bg-rose-50 hover:bg-gradient-to-r hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 border border-rose-200/90 px-3 py-1.5 rounded-full transition-all duration-200 shadow-2xs group"
+                                className={`hidden lg:flex items-center gap-1.5 text-xs font-extrabold border px-3 py-1.5 rounded-full transition-all duration-200 shadow-2xs group ${
+                                    isTransparent
+                                        ? 'text-white bg-white/10 hover:bg-white/20 border-white/20'
+                                        : 'text-rose-600 hover:text-white bg-rose-50 hover:bg-gradient-to-r hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 border-rose-200/90'
+                                }`}
                                 title="Follow StaySetu on Instagram (@stay.setu)"
                             >
-                                <Instagram size={13} className="text-rose-600 group-hover:text-white transition-colors" />
+                                <Instagram size={13} className={isTransparent ? 'text-white' : 'text-rose-600 group-hover:text-white'} />
                                 <span>Instagram</span>
                             </a>
 
                             <Link 
                                 to="/signup" 
-                                className="text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5"
+                                className={`text-xs font-bold border px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 ${
+                                    isTransparent
+                                        ? 'text-white bg-white/15 hover:bg-white/25 border-white/30'
+                                        : 'text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border-rose-200/80'
+                                }`}
                             >
                                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                                 <span>List Property</span>
@@ -137,15 +149,19 @@ const Navbar = () => {
                                 <div className="relative">
                                     <button
                                         onClick={() => setDropdownOpen(!dropdownOpen)}
-                                        className="flex items-center gap-2.5 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 pl-1.5 pr-3 py-1.5 rounded-full transition-all shadow-xs text-zinc-900 group"
+                                        className={`flex items-center gap-2.5 border pl-1.5 pr-3 py-1.5 rounded-full transition-all shadow-xs group ${
+                                            isTransparent
+                                                ? 'bg-white/15 hover:bg-white/25 border-white/25 text-white'
+                                                : 'bg-zinc-50 hover:bg-zinc-100 border-zinc-200 text-zinc-900'
+                                        }`}
                                     >
                                         <div className="w-7 h-7 rounded-full bg-rose-500 flex items-center justify-center text-white text-xs font-extrabold shadow-xs">
                                             {(profile?.fullName || profile?.name || 'U').charAt(0).toUpperCase()}
                                         </div>
-                                        <span className="text-xs font-bold text-zinc-800">
+                                        <span className={`text-xs font-bold ${isTransparent ? 'text-white' : 'text-zinc-800'}`}>
                                             {(profile?.fullName || profile?.name || 'User').split(' ')[0]}
                                         </span>
-                                        <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                                        <ChevronDown size={14} className={`transition-transform duration-200 ${isTransparent ? 'text-zinc-300' : 'text-zinc-400'} ${dropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
 
                                     {/* Dropdown Menu */}
@@ -187,7 +203,9 @@ const Navbar = () => {
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2">
-                                    <Link to="/login" className="text-xs font-extrabold text-zinc-700 hover:text-zinc-950 px-3 py-1.5 transition-colors">
+                                    <Link to="/login" className={`text-xs font-extrabold px-3 py-1.5 transition-colors ${
+                                        isTransparent ? 'text-zinc-200 hover:text-white' : 'text-zinc-700 hover:text-zinc-950'
+                                    }`}>
                                         Log In
                                     </Link>
                                     <Link 
@@ -203,7 +221,11 @@ const Navbar = () => {
                         {/* Mobile Hamburger */}
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl text-zinc-900 bg-zinc-100 border border-zinc-200"
+                            className={`md:hidden w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${
+                                isTransparent
+                                    ? 'text-white bg-white/15 backdrop-blur-md border-white/25'
+                                    : 'text-zinc-900 bg-zinc-100 border-zinc-200'
+                            }`}
                         >
                             {isOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>

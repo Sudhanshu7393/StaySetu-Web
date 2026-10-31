@@ -178,309 +178,332 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
     };
 
     return (
-        <div className="relative bg-[#FAFAFB] pt-20 sm:pt-24 pb-4 sm:pb-8 px-3 sm:px-6 lg:px-8">
-            <div className="max-w-7xl mx-auto">
+        <div className="relative w-full bg-zinc-950">
+            
+            {/* =========================================================================
+                1. MOBILE VIEW (Full-Screen Immersive UI matching user mockup)
+               ========================================================================= */}
+            <div className="sm:hidden relative w-full h-[93dvh] min-h-[580px] flex flex-col justify-between overflow-hidden text-white pt-20 pb-6 px-4">
                 
-                {/* Modern Hero Card */}
-                <div className="relative rounded-3xl sm:rounded-[2.5rem] bg-white border border-zinc-200/80 p-5 sm:p-8 lg:p-10 shadow-sm overflow-hidden">
+                {/* Full-bleed Luxury Architectural Background */}
+                <img
+                    src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=85"
+                    alt="Luxury Modern Architecture"
+                    className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
+                />
+
+                {/* Dramatic Gradient Overlay for Readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/40 pointer-events-none" />
+
+                {/* Top Section: Frosted Glass Purpose Switcher */}
+                <div className="relative z-10 flex items-center justify-between gap-2">
+                    <div className="inline-flex items-center p-1 bg-black/40 backdrop-blur-xl rounded-full border border-white/20 shadow-lg">
+                        <button
+                            type="button"
+                            onClick={() => handleSetPurpose('rent')}
+                            className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+                                activePurpose === 'rent'
+                                    ? 'bg-rose-500 text-white shadow-md'
+                                    : 'text-zinc-200 hover:text-white'
+                            }`}
+                        >
+                            🏠 Rent
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => handleSetPurpose('sell')}
+                            className={`px-3.5 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+                                activePurpose === 'sell'
+                                    ? 'bg-rose-500 text-white shadow-md'
+                                    : 'text-zinc-200 hover:text-white'
+                            }`}
+                        >
+                            🏷️ Buy / Sell
+                        </button>
+                    </div>
+
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-xs">
+                        <Sparkles size={12} className="text-rose-400 fill-rose-400" />
+                        0% Brokerage
+                    </span>
+                </div>
+
+                {/* Bottom Section: Typography, Search Bar & 2 Primary Action Buttons (Mockup Exact Match) */}
+                <div className="relative z-10 space-y-4 pb-2">
                     
-                    {/* Subtle ambient gradient in background */}
-                    <div className="absolute top-0 right-0 w-80 sm:w-96 h-80 sm:h-96 bg-gradient-to-bl from-rose-100/50 via-rose-50/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+                    {/* Typography matching reference mockup */}
+                    <div className="space-y-1.5">
+                        <h1 className="text-3xl font-extrabold text-white tracking-tight leading-tight font-serif drop-shadow-md">
+                            {activePurpose === 'sell' ? 'Search Your Dream House' : 'Find Your Dream Stay & Home'}
+                        </h1>
+                        <p className="text-zinc-300 text-xs font-normal leading-relaxed max-w-sm drop-shadow-sm">
+                            &ldquo;Discover your ideal home with us, whether you&rsquo;re looking to buy or rent with 100% upfront pricing.&rdquo;
+                        </p>
+                    </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center relative z-10">
-                        
-                        {/* Left Column: Headline, Purpose Switcher, Search */}
-                        <div className="lg:col-span-7 space-y-4 sm:space-y-5 text-left">
-                            
-                            {/* Purpose Toggle: Rent vs Buy/Sell */}
-                            <div className="flex items-center gap-2">
-                                <div className="inline-flex items-center p-1 bg-zinc-100/90 rounded-full border border-zinc-200/60 shadow-2xs">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleSetPurpose('rent')}
-                                        className={`px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
-                                            activePurpose === 'rent'
-                                                ? 'bg-rose-500 text-white shadow-xs'
-                                                : 'text-zinc-600 hover:text-zinc-950'
-                                        }`}
-                                    >
-                                        🏠 Rent Stays
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleSetPurpose('sell')}
-                                        className={`px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
-                                            activePurpose === 'sell'
-                                                ? 'bg-rose-500 text-white shadow-xs'
-                                                : 'text-zinc-600 hover:text-zinc-950'
-                                        }`}
-                                    >
-                                        🏷️ Buy / Sell
-                                    </button>
-                                </div>
-
-                                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/80">
-                                    <Check size={12} className="text-emerald-600" />
-                                    100% Upfront Pricing
-                                </span>
-                            </div>
-
-                            {/* Headline */}
-                            <div>
-                                <h1 className="text-2xl sm:text-4xl lg:text-[42px] font-black text-zinc-950 tracking-tight leading-[1.2]">
-                                    {activePurpose === 'sell' ? (
-                                        <>
-                                            Verified Properties for Sale, <br className="hidden sm:inline" />
-                                            <span className="text-rose-600">With 100% Direct Connect.</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            Find Verified Rooms & Flats, <br className="hidden sm:inline" />
-                                            <span className="text-rose-600">Right Where You Need.</span>
-                                        </>
-                                    )}
-                                </h1>
-                                <p className="text-zinc-500 text-xs sm:text-sm font-normal mt-2 max-w-lg leading-relaxed">
-                                    {activePurpose === 'sell'
-                                        ? 'Flats, plots and luxury villas in prime locations with verified titles and direct seller connects.'
-                                        : 'Vetted student PGs, hostels, flats, and rooms with clear rent, honest deposits, and direct WhatsApp contact.'}
-                                </p>
-                            </div>
-
-                            {/* Unified Search Bar */}
-                            <form
-                                onSubmit={handleSearch}
-                                ref={searchRef}
-                                className="bg-zinc-50 hover:bg-white focus-within:bg-white rounded-2xl sm:rounded-full p-1.5 sm:p-2 border border-zinc-200 focus-within:border-rose-400 focus-within:shadow-md transition-all flex flex-col sm:flex-row items-stretch sm:items-center gap-2 max-w-xl"
+                    {/* Compact Glass Search Bar */}
+                    <form
+                        onSubmit={handleSearch}
+                        className="bg-black/45 backdrop-blur-xl rounded-2xl p-1.5 border border-white/25 shadow-xl flex items-center gap-1.5"
+                    >
+                        {/* City Selector */}
+                        <div className="relative" ref={cityRef}>
+                            <button
+                                type="button"
+                                onClick={() => setIsCityOpen(!isCityOpen)}
+                                className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-white/10 text-white text-xs font-bold border border-white/10 shrink-0"
                             >
-                                {/* City Popover Trigger */}
-                                <div className="relative shrink-0" ref={cityRef}>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsCityOpen(!isCityOpen)}
-                                        className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 px-3 py-2 rounded-xl sm:rounded-full bg-white sm:bg-transparent border sm:border-r sm:border-0 border-zinc-200 text-xs font-bold text-zinc-800 hover:text-rose-600 transition-colors"
-                                    >
-                                        <MapPin size={14} className="text-rose-500 shrink-0" />
-                                        <span className="truncate max-w-[140px] text-left">
-                                            {city || 'All India'}
-                                        </span>
-                                        <ChevronDown size={13} className={`text-zinc-400 transition-transform ${isCityOpen ? 'rotate-180' : ''}`} />
-                                    </button>
+                                <MapPin size={12} className="text-rose-400 shrink-0" />
+                                <span className="truncate max-w-[85px]">{city || 'All Cities'}</span>
+                                <ChevronDown size={11} className={`text-zinc-400 transition-transform ${isCityOpen ? 'rotate-180' : ''}`} />
+                            </button>
 
-                                    {/* City Dropdown Menu */}
-                                    {isCityOpen && (
-                                        <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-xl border border-zinc-200 z-50 p-2.5 text-xs animate-fade-in">
-                                            <div className="relative mb-2">
-                                                <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                                <input
-                                                    type="text"
-                                                    value={citySearchText}
-                                                    onChange={(e) => setCitySearchText(e.target.value)}
-                                                    placeholder="Search city or campus..."
-                                                    autoFocus
-                                                    className="w-full pl-7 pr-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-medium focus:outline-none focus:border-rose-400"
-                                                />
-                                            </div>
-
-                                            <div className="max-h-48 overflow-y-auto space-y-1">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => { setCity(''); setIsCityOpen(false); }}
-                                                    className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-bold ${!city ? 'bg-rose-50 text-rose-600' : 'hover:bg-zinc-50 text-zinc-700'}`}
-                                                >
-                                                    <span>🇮🇳 All India (All Cities)</span>
-                                                    {!city && <Check size={12} className="text-rose-600" />}
-                                                </button>
-                                                {['Crossings Republik', 'Ghaziabad', 'Noida', 'Greater Noida', 'Lucknow', 'Delhi NCR'].map((c) => (
-                                                    <button
-                                                        key={c}
-                                                        type="button"
-                                                        onClick={() => { setCity(c); setIsCityOpen(false); }}
-                                                        className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-semibold ${city === c ? 'bg-rose-50 text-rose-600' : 'hover:bg-zinc-50 text-zinc-700'}`}
-                                                    >
-                                                        <span>📍 {c}</span>
-                                                        {city === c && <Check size={12} className="text-rose-600" />}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
+                            {isCityOpen && (
+                                <div className="absolute bottom-full left-0 mb-2 w-72 bg-zinc-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/20 z-50 p-2.5 text-xs text-white animate-fade-in">
+                                    <div className="max-h-48 overflow-y-auto space-y-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => { setCity(''); setIsCityOpen(false); }}
+                                            className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-bold ${!city ? 'bg-rose-500 text-white' : 'hover:bg-white/10 text-zinc-300'}`}
+                                        >
+                                            <span>🇮🇳 All India (All Cities)</span>
+                                            {!city && <Check size={12} />}
+                                        </button>
+                                        {['Crossings Republik', 'Ghaziabad', 'Noida', 'Greater Noida', 'Lucknow', 'Delhi NCR'].map((c) => (
+                                            <button
+                                                key={c}
+                                                type="button"
+                                                onClick={() => { setCity(c); setIsCityOpen(false); }}
+                                                className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-semibold ${city === c ? 'bg-rose-500 text-white' : 'hover:bg-white/10 text-zinc-300'}`}
+                                            >
+                                                <span>📍 {c}</span>
+                                                {city === c && <Check size={12} />}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
+                            )}
+                        </div>
 
-                                {/* Text Search Input */}
-                                <div className="flex-1 flex items-center px-2 relative min-w-0">
-                                    <input
-                                        type="text"
-                                        placeholder={
-                                            activePurpose === 'sell'
-                                                ? 'Search 2/3 BHK flats, plots, society...'
-                                                : 'Search PG, flat, college or area...'
-                                        }
-                                        value={searchQuery}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            setSearchQuery(val);
-                                            if (val.length > 1) {
-                                                const filtered = suggestions.filter(s =>
-                                                    s.toLowerCase().includes(val.toLowerCase())
-                                                ).slice(0, 5);
-                                                setFilteredSuggestions(filtered);
-                                                setShowSuggestions(filtered.length > 0);
-                                            } else {
-                                                setShowSuggestions(false);
-                                            }
-                                        }}
-                                        onFocus={() => {
-                                            if (searchQuery.length > 1 && filteredSuggestions.length > 0) {
-                                                setShowSuggestions(true);
-                                            }
-                                        }}
-                                        className="w-full text-xs sm:text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 focus:outline-none bg-transparent truncate"
-                                    />
+                        {/* Search Input */}
+                        <div className="flex-1 min-w-0 pr-1">
+                            <input
+                                type="text"
+                                placeholder={activePurpose === 'sell' ? 'Search 2/3 BHK flat, plot...' : 'Search PG, flat, area...'}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full bg-transparent text-xs font-semibold text-white placeholder:text-zinc-400 focus:outline-none truncate"
+                            />
+                        </div>
 
-                                    <button
-                                        type="button"
-                                        onClick={handleNearMe}
-                                        className="p-1.5 text-zinc-400 hover:text-rose-500 transition-colors shrink-0"
-                                        title="Near me"
-                                    >
-                                        <Crosshair size={15} />
-                                    </button>
+                        {/* Search Action */}
+                        <button
+                            type="submit"
+                            className="bg-rose-500 hover:bg-rose-600 active:scale-95 text-white p-2.5 rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-rose-500/30 cursor-pointer"
+                        >
+                            <Search size={14} />
+                        </button>
+                    </form>
 
-                                    {/* Auto-suggestions dropdown */}
-                                    {showSuggestions && filteredSuggestions.length > 0 && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-zinc-100 z-50 overflow-hidden text-left py-1">
-                                            {filteredSuggestions.map((suggestion, index) => (
+                    {/* 2 Main Action Buttons exactly like the reference photo */}
+                    <div className="grid grid-cols-2 gap-2.5 pt-1">
+                        <Link
+                            to={`/listings?purpose=${activePurpose}`}
+                            className="w-full bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-2xl flex items-center justify-center gap-1.5 text-center shadow-lg shadow-rose-500/30 transition-all"
+                        >
+                            <span>Explore Stays</span>
+                            <ArrowRight size={14} />
+                        </Link>
+                        <Link
+                            to={`/dashboard/add-listing?purpose=${activePurpose}`}
+                            className="w-full bg-white/15 hover:bg-white/25 active:scale-95 backdrop-blur-md border border-white/35 text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-2xl flex items-center justify-center gap-1.5 text-center transition-all shadow-md"
+                        >
+                            <span>+ List Property</span>
+                        </Link>
+                    </div>
+
+                    {/* Quick Popular Location Tags on Mobile */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-nowrap pt-1">
+                        {['Crossings Republik', 'Noida', 'Greater Noida', 'Ghaziabad', 'Lucknow'].map((loc) => (
+                            <button
+                                key={loc}
+                                type="button"
+                                onClick={() => {
+                                    setSearchQuery(loc);
+                                    navigate(`/listings?purpose=${activePurpose}&q=${encodeURIComponent(loc)}`);
+                                }}
+                                className="px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-[10px] font-bold text-zinc-200 shrink-0 whitespace-nowrap"
+                            >
+                                📍 {loc}
+                            </button>
+                        ))}
+                    </div>
+
+                </div>
+            </div>
+
+            {/* =========================================================================
+                2. DESKTOP & TABLET VIEW (Cinematic Wide Hero with Glass Search)
+               ========================================================================= */}
+            <div className="hidden sm:block relative w-full pt-20 sm:pt-24 pb-6 sm:pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+                <div className="relative rounded-[2.5rem] overflow-hidden min-h-[540px] flex items-center p-8 sm:p-12 lg:p-14 border border-zinc-200/80 shadow-xl bg-zinc-950">
+                    
+                    {/* Background Image */}
+                    <img
+                        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600&q=85"
+                        alt="Luxury Modern Architecture"
+                        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
+                    />
+
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-black/30 pointer-events-none" />
+
+                    <div className="relative z-10 max-w-2xl space-y-6 text-left text-white">
+                        
+                        {/* Purpose Toggle: Rent vs Buy/Sell */}
+                        <div className="flex items-center gap-3">
+                            <div className="inline-flex items-center p-1 bg-white/15 backdrop-blur-xl rounded-full border border-white/20 shadow-md">
+                                <button
+                                    type="button"
+                                    onClick={() => handleSetPurpose('rent')}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+                                        activePurpose === 'rent'
+                                            ? 'bg-rose-500 text-white shadow-md'
+                                            : 'text-zinc-200 hover:text-white'
+                                    }`}
+                                >
+                                    🏠 Rent Stays
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleSetPurpose('sell')}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+                                        activePurpose === 'sell'
+                                            ? 'bg-rose-500 text-white shadow-md'
+                                            : 'text-zinc-200 hover:text-white'
+                                    }`}
+                                >
+                                    🏷️ Buy / Sell
+                                </button>
+                            </div>
+
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-white bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
+                                <Check size={13} className="text-emerald-400" />
+                                100% Upfront Pricing • 0% Brokerage
+                            </span>
+                        </div>
+
+                        {/* Main Headline */}
+                        <div className="space-y-2">
+                            <h1 className="text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.18] font-serif">
+                                {activePurpose === 'sell' ? (
+                                    <>Search Your Dream House & Property</>
+                                ) : (
+                                    <>Find Your Dream Stay, Room & Flat</>
+                                )}
+                            </h1>
+                            <p className="text-zinc-300 text-sm md:text-base font-normal max-w-lg leading-relaxed">
+                                {activePurpose === 'sell'
+                                    ? 'Discover verified flats, plots, and luxury residences with direct seller connects and transparent pricing.'
+                                    : 'Vetted student rooms, PGs, and apartments near college campuses with 100% upfront rent and direct WhatsApp contact.'}
+                            </p>
+                        </div>
+
+                        {/* Desktop Search Console */}
+                        <form
+                            onSubmit={handleSearch}
+                            ref={searchRef}
+                            className="bg-black/50 backdrop-blur-xl rounded-full p-2 border border-white/25 shadow-2xl flex items-center gap-2 max-w-xl"
+                        >
+                            {/* City Dropdown Trigger */}
+                            <div className="relative shrink-0" ref={cityRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsCityOpen(!isCityOpen)}
+                                    className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
+                                >
+                                    <MapPin size={14} className="text-rose-400 shrink-0" />
+                                    <span className="truncate max-w-[120px]">{city || 'All India'}</span>
+                                    <ChevronDown size={12} className={`text-zinc-400 transition-transform ${isCityOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {isCityOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-72 bg-zinc-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/20 z-50 p-2.5 text-xs text-white animate-fade-in">
+                                        <div className="max-h-48 overflow-y-auto space-y-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => { setCity(''); setIsCityOpen(false); }}
+                                                className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-bold ${!city ? 'bg-rose-500 text-white' : 'hover:bg-white/10 text-zinc-300'}`}
+                                            >
+                                                <span>🇮🇳 All India (All Cities)</span>
+                                                {!city && <Check size={12} />}
+                                            </button>
+                                            {['Crossings Republik', 'Ghaziabad', 'Noida', 'Greater Noida', 'Lucknow', 'Delhi NCR'].map((c) => (
                                                 <button
-                                                    key={index}
+                                                    key={c}
                                                     type="button"
-                                                    onClick={() => {
-                                                        setSearchQuery(suggestion);
-                                                        setShowSuggestions(false);
-                                                    }}
-                                                    className="w-full text-left px-3.5 py-2 hover:bg-rose-50 transition-colors flex items-center gap-2 text-zinc-800 text-xs font-semibold"
+                                                    onClick={() => { setCity(c); setIsCityOpen(false); }}
+                                                    className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between font-semibold ${city === c ? 'bg-rose-500 text-white' : 'hover:bg-white/10 text-zinc-300'}`}
                                                 >
-                                                    <MapPin size={12} className="text-rose-500 shrink-0" />
-                                                    <span>{suggestion}</span>
+                                                    <span>📍 {c}</span>
+                                                    {city === c && <Check size={12} />}
                                                 </button>
                                             ))}
                                         </div>
-                                    )}
-                                </div>
-
-                                {/* Submit Button */}
-                                <button
-                                    type="submit"
-                                    className="bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-extrabold text-xs sm:text-sm py-2.5 sm:py-3 px-5 sm:px-6 rounded-xl sm:rounded-full flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-rose-500/20 shrink-0 cursor-pointer"
-                                >
-                                    <Search size={14} />
-                                    <span>Search</span>
-                                </button>
-                            </form>
-
-                            {/* Popular Quick Location Chips */}
-                            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-nowrap pt-0.5">
-                                <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 shrink-0">
-                                    Popular:
-                                </span>
-                                {(activePurpose === 'sell' ? [
-                                    { label: 'Crossings Republik', q: 'Crossings Republik' },
-                                    { label: 'Gomti Nagar Lucknow', q: 'Gomti Nagar' },
-                                    { label: 'Noida Expressway', q: 'Noida' },
-                                    { label: 'Indirapuram', q: 'Indirapuram' },
-                                    { label: 'Greater Noida', q: 'Greater Noida' },
-                                ] : [
-                                    { label: 'ABES College', q: 'ABES' },
-                                    { label: 'Crossings Republik', q: 'Crossings Republik' },
-                                    { label: 'IMS Ghaziabad', q: 'IMS' },
-                                    { label: 'Noida Sec 62', q: 'Noida' },
-                                    { label: 'Lucknow', q: 'Lucknow' },
-                                ]).map((tag) => (
-                                    <button
-                                        key={tag.label}
-                                        type="button"
-                                        onClick={() => {
-                                            setSearchQuery(tag.q);
-                                            navigate(`/listings?purpose=${activePurpose}&q=${encodeURIComponent(tag.q)}`);
-                                        }}
-                                        className="px-2.5 py-1 rounded-full bg-zinc-50 hover:bg-rose-50 text-zinc-600 hover:text-rose-600 border border-zinc-200/80 text-[11px] font-bold transition-colors shrink-0 whitespace-nowrap cursor-pointer"
-                                    >
-                                        📍 {tag.label}
-                                    </button>
-                                ))}
+                                    </div>
+                                )}
                             </div>
 
-                        </div>
-
-                        {/* Right Column: Featured Spotlight Card */}
-                        <div className="lg:col-span-5 relative group">
-                            <Link
-                                to={`/property/${currentSpotlight?.$id || currentSpotlight?.id || '69cbc4bc0023a8c61505'}`}
-                                className="block relative aspect-[16/10] sm:aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg border-2 border-white transition-all duration-300 hover:shadow-xl hover:scale-[1.01]"
-                            >
-                                <img
-                                    src={
-                                        (Array.isArray(currentSpotlight?.images) && currentSpotlight.images.length > 0)
-                                            ? currentSpotlight.images[0]
-                                            : (typeof currentSpotlight?.images === 'string' && currentSpotlight.images.startsWith('[')
-                                                ? JSON.parse(currentSpotlight.images)[0]
-                                                : (currentSpotlight?.images || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&q=80'))
-                                    }
-                                    alt={currentSpotlight?.title || 'Property'}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=900&q=80';
-                                    }}
+                            {/* Search Input */}
+                            <div className="flex-1 flex items-center px-2 relative min-w-0">
+                                <input
+                                    type="text"
+                                    placeholder={activePurpose === 'sell' ? 'Search 2/3 BHK flat, plot, area...' : 'Search PG, flat, campus, area...'}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full text-sm font-semibold text-white placeholder:text-zinc-400 focus:outline-none bg-transparent truncate"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/30 pointer-events-none" />
+                                <button
+                                    type="button"
+                                    onClick={handleNearMe}
+                                    className="p-1.5 text-zinc-400 hover:text-rose-400 transition-colors shrink-0"
+                                    title="Near me"
+                                >
+                                    <Crosshair size={15} />
+                                </button>
+                            </div>
 
-                                {/* Top Floating Badges */}
-                                <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/95 backdrop-blur-md text-zinc-900 text-[11px] font-black shadow-xs">
-                                        <Sparkles size={12} className="text-rose-500 fill-rose-500" />
-                                        {activePurpose === 'sell' ? 'Verified Sale Deal' : 'Featured Stay'}
-                                    </span>
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[11px] font-black shadow-xs">
-                                        {activePurpose === 'sell'
-                                            ? '🏷️ For Sale'
-                                            : (currentSpotlight?.genderPreference === 'girls' ? '🌸 Girls PG' : (currentSpotlight?.type || 'PG'))}
-                                    </span>
-                                </div>
+                            {/* Search Button */}
+                            <button
+                                type="submit"
+                                className="bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-extrabold text-sm py-2.5 px-6 rounded-full flex items-center justify-center gap-1.5 transition-all shadow-md shadow-rose-500/25 shrink-0 cursor-pointer"
+                            >
+                                <Search size={14} />
+                                <span>Search</span>
+                            </button>
+                        </form>
 
-                                {/* Bottom Info Glass Card */}
-                                <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 shadow-lg border border-zinc-100 flex items-center justify-between gap-3">
-                                    <div className="min-w-0">
-                                        <h3 className="text-xs sm:text-sm font-black text-zinc-900 truncate">
-                                            {currentSpotlight?.title || 'VIKRANT GIRLS PG'}
-                                        </h3>
-                                        <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-medium mt-0.5 truncate">
-                                            <MapPin size={11} className="text-rose-500 shrink-0" />
-                                            <span className="truncate">{currentSpotlight?.location || 'Crossings Republik'}</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="text-right shrink-0">
-                                        <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
-                                            {activePurpose === 'sell' ? 'Price' : 'Rent'}
-                                        </div>
-                                        <div className="text-sm sm:text-base font-black text-zinc-950">
-                                            {activePurpose === 'sell'
-                                                ? formatPropertyPrice(currentSpotlight?.price, 'sell')
-                                                : `₹${Number(currentSpotlight?.price || 10000).toLocaleString()}`}
-                                            {activePurpose !== 'sell' && (
-                                                <span className="text-[10px] text-zinc-400 font-medium">/mo</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                        {/* Quick Action Chips & Links */}
+                        <div className="flex items-center gap-3 pt-2">
+                            <Link
+                                to={`/listings?purpose=${activePurpose}`}
+                                className="inline-flex items-center gap-2 bg-white text-zinc-900 font-extrabold text-xs px-5 py-2.5 rounded-full hover:bg-zinc-100 transition-all shadow-md"
+                            >
+                                <span>Browse All Listings</span>
+                                <ArrowRight size={13} />
+                            </Link>
+                            <Link
+                                to={`/dashboard/add-listing?purpose=${activePurpose}`}
+                                className="inline-flex items-center gap-1.5 bg-white/15 hover:bg-white/25 text-white font-extrabold text-xs px-5 py-2.5 rounded-full border border-white/30 backdrop-blur-md transition-all shadow-sm"
+                            >
+                                <span>+ List Property Free</span>
                             </Link>
                         </div>
 
                     </div>
                 </div>
-
             </div>
+
         </div>
     );
 };
