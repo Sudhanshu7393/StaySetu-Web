@@ -78,10 +78,10 @@ const Navbar = () => {
                         {/* Logo on Left */}
                         <div className="flex items-center gap-6 lg:gap-8">
                             <Link to="/" className="flex items-center gap-2.5 sm:gap-3 group select-none" onClick={() => setIsOpen(false)}>
-                                <div className={`h-11 w-11 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center p-0.5 transition-transform duration-300 group-hover:scale-105 border shadow-2xs ${
-                                    isTransparent ? 'bg-white/10 border-white/20' : 'bg-rose-50/40 border-rose-100/60'
+                                <div className={`h-10 w-10 sm:h-11 sm:w-11 rounded-2xl flex items-center justify-center p-1.5 transition-transform duration-300 group-hover:scale-105 border shadow-sm overflow-hidden ${
+                                    isTransparent ? 'bg-white/95 border-white/40 shadow-black/20' : 'bg-white border-zinc-200/80'
                                 }`}>
-                                    <img src="/logo.png" alt="StaySetu Logo" className="h-full w-full object-contain filter drop-shadow-xs" />
+                                    <img src="/logo-icon.png" alt="StaySetu Logo" className="h-full w-full object-contain filter drop-shadow-xs" />
                                 </div>
                                 <div className="flex flex-col leading-none">
                                     <div className="flex items-center tracking-tight font-black text-xl sm:text-2xl font-outfit">

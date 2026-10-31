@@ -389,7 +389,7 @@ const EditListing = () => {
                                             {formData.listed_by === 'broker' ? 'Disclosed Broker Fee / Commission' : 'Brokerage Fee (Optional - Defaults to ₹0)'}
                                         </label>
                                         <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${formData.listed_by === 'broker' ? 'text-amber-800 bg-amber-100' : 'text-emerald-800 bg-emerald-100'}`}>
-                                            {formData.listed_by === 'broker' ? 'Transparent Brokerage' : '₹0 Brokerage Default'}
+                                            {formData.listed_by === 'broker' ? 'Transparent Brokerage' : 'Direct Owner (₹0 Fee)'}
                                         </span>
                                     </div>
                                     <p className="text-[11px] text-zinc-500 mb-3 font-medium">
@@ -397,7 +397,7 @@ const EditListing = () => {
                                     </p>
                                     <div className="flex flex-wrap gap-2 mb-3">
                                         {[
-                                            '₹0 (Zero Brokerage)',
+                                            '₹0 (Direct Connect)',
                                             ...(formData.purpose === 'sell' 
                                                 ? ['1% Deal Value', '2% Deal Value', '₹25,000 Flat']
                                                 : ['15 Days Rent', '1 Month Rent', '₹5,000 Flat'])

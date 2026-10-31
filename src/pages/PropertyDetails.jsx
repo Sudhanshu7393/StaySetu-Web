@@ -747,7 +747,7 @@ const PropertyDetails = () => {
                                                     ? 'bg-amber-50 text-amber-900 border border-amber-200'
                                                     : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                                             }`}>
-                                                {property.brokerageFee || property.brokerage_fee || (String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker' ? '15 Days Rent' : '₹0 (No Brokerage)')}
+                                                {property.brokerageFee || property.brokerage_fee || (String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker' ? '15 Days Rent' : '₹0 (Direct Connect)')}
                                             </span>
                                         </div>
                                     )}

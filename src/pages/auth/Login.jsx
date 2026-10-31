@@ -81,8 +81,8 @@ const Login = () => {
                     {/* Logo & Brand Header */}
                     <div className="flex flex-col items-center justify-center mb-6">
                         <Link to="/" className="flex items-center gap-2.5 group mb-2" title="Go to StaySetu Home">
-                            <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center p-2 bg-rose-50/70 border border-rose-100 shadow-xs transition-transform duration-300 group-hover:scale-105">
-                                <img src="/logo.png?v=8" alt="StaySetu Logo" className="w-full h-full object-contain filter drop-shadow-xs" />
+                            <div className="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center p-2 bg-white border border-zinc-200/80 shadow-xs transition-transform duration-300 group-hover:scale-105 overflow-hidden">
+                                <img src="/logo-icon.png" alt="StaySetu Logo" className="w-full h-full object-contain filter drop-shadow-xs" />
                             </div>
                             <div className="flex items-center tracking-tight font-black text-2xl sm:text-3xl text-zinc-900">
                                 <span>Stay</span>

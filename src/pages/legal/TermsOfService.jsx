@@ -59,10 +59,10 @@ const TermsOfService = () => {
                     <div className="bg-white rounded-3xl p-8 border border-zinc-200/80 shadow-xs">
                         <h2 className="text-lg sm:text-xl font-bold text-zinc-900 mb-4 flex items-center gap-2">
                             <span className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-xs font-black">2</span>
-                            Zero-Fee & No-Brokerage Policy
+                            Transparent Pricing & Direct Connect Policy
                         </h2>
                         <p className="text-xs sm:text-sm text-zinc-600 mb-3">
-                            StaySetu is built to eliminate predatory offline brokerage fees:
+                            StaySetu is built to ensure complete pricing transparency and direct connects:
                         </p>
                         <ul className="space-y-2.5 list-disc list-inside text-xs sm:text-sm text-zinc-600">
                             <li><strong className="text-zinc-900">For Students:</strong> Searching, filtering, viewing room tours, and contacting property owners or roommates is 100% free of charge.</li>

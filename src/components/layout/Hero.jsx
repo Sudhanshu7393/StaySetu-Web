@@ -233,7 +233,7 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
 
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 shadow-xs">
                         <Sparkles size={12} className="text-rose-400 fill-rose-400" />
-                        0% Brokerage
+                        Direct Connect
                     </span>
                 </div>
 
@@ -407,7 +407,7 @@ const Hero = ({ purpose = 'rent', onPurposeChange }) => {
 
                             <span className="inline-flex items-center gap-1 text-xs font-bold text-white bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
                                 <Check size={13} className="text-emerald-400" />
-                                100% Upfront Pricing • 0% Brokerage
+                                100% Upfront Pricing • Direct Connect
                             </span>
                         </div>
 

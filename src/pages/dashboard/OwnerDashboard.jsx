@@ -44,7 +44,7 @@ const OwnerDashboard = () => {
         latitude: '',
         longitude: '',
         listed_by: 'owner',
-        brokerage_fee: '₹0 (Zero Brokerage - Free)',
+        brokerage_fee: '₹0 (Direct Owner - Free)',
         association: '',
         nearbyCollege: ''
     });
@@ -335,7 +335,7 @@ const OwnerDashboard = () => {
                 deposit: '', available_from: '',
                 latitude: '', longitude: '',
                 listed_by: 'owner',
-                brokerage_fee: '₹0 (Zero Brokerage - Free)',
+                brokerage_fee: '₹0 (Direct Owner - Free)',
                 association: '',
                 nearbyCollege: ''
             });
@@ -980,14 +980,14 @@ const OwnerDashboard = () => {
                                                     {formData.listed_by === 'broker' ? 'Disclosed Broker Fee / Commission' : 'Brokerage Fee (Optional - Defaults to ₹0)'}
                                                 </label>
                                                 <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${formData.listed_by === 'broker' ? 'text-amber-800 bg-amber-100' : 'text-emerald-800 bg-emerald-100'}`}>
-                                                    {formData.listed_by === 'broker' ? 'Transparent Brokerage' : '₹0 Brokerage Default'}
+                                                    {formData.listed_by === 'broker' ? 'Transparent Brokerage' : 'Direct Owner (₹0 Fee)'}
                                                 </span>
                                             </div>
                                             <p className="text-[11px] text-zinc-500 mb-3 font-medium">
                                                 Agar aap koi brokerage fee lete hain toh yahan bharein. Agar nahi lete toh khali chhod dein (clients ko ₹0 show hoga).
                                             </p>
                                             <div className="flex flex-wrap gap-2 mb-3">
-                                                {['₹0 (Zero Brokerage)', '15 Days Rent', '1 Month Rent', '₹5,000 Flat', '1% Deal Value'].map((opt) => (
+                                                {['₹0 (Direct Connect)', '15 Days Rent', '1 Month Rent', '₹5,000 Flat', '1% Deal Value'].map((opt) => (
                                                     <button
                                                         key={opt}
                                                         type="button"

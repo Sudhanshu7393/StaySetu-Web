@@ -11,8 +11,8 @@ const Footer = () => {
                     {/* Brand */}
                     <div className="col-span-1 lg:col-span-1">
                         <Link to="/" className="flex items-center gap-3 mb-5 group select-none">
-                            <div className="h-12 w-12 rounded-2xl flex items-center justify-center p-1 bg-white/5 border border-white/10 shadow-xs transition-transform duration-300 group-hover:scale-105">
-                                <img src="/logo.png?v=8" alt="StaySetu Logo" className="h-full w-full object-contain brightness-110" />
+                            <div className="h-11 w-11 rounded-2xl flex items-center justify-center p-1.5 bg-white shadow-sm border border-white/20 transition-transform duration-300 group-hover:scale-105 overflow-hidden">
+                                <img src="/logo-icon.png" alt="StaySetu Logo" className="h-full w-full object-contain" />
                             </div>
                             <div className="flex flex-col leading-none">
                                 <div className="flex items-center tracking-tight font-black text-2xl font-outfit text-white">
