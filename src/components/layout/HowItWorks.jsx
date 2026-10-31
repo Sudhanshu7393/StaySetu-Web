@@ -1,61 +1,48 @@
 import React from 'react';
-import { UserPlus, Search, MessageSquare, Home } from 'lucide-react';
+import { Search, MessageSquare, CheckCircle } from 'lucide-react';
 
 const steps = [
     {
-        title: 'Select Your Area or Campus',
-        description: 'Search stays across Crossings Republik, Ghaziabad, Noida, Lucknow, or any campus across India.',
+        title: '1. Search & Shortlist',
+        description: 'Browse verified stays and flats with transparent rent, deposit, and real photos.',
         icon: Search,
     },
     {
-        title: 'Review Transparent Pricing',
-        description: 'Monthly rent, security deposit, and exact brokerage (if any, or ₹0) — all 100% disclosed upfront.',
-        icon: Home,
-    },
-    {
-        title: 'Connect Directly on WhatsApp',
-        description: 'Connect with landlords and our verified desk with 100% clarity, and schedule a room visit.',
+        title: '2. Direct WhatsApp Connect',
+        description: 'Chat directly with owners or schedule an in-person site visit with zero broker fees.',
         icon: MessageSquare,
     },
     {
-        title: 'Inspect & Move In Confidently',
-        description: 'Take an in-person tour, verify room amenities, finalize your booking, and shift in smoothly.',
-        icon: UserPlus,
+        title: '3. Move in Confidently',
+        description: 'Inspect the property, finalize your agreement, and shift into your new home smoothly.',
+        icon: CheckCircle,
     },
 ];
 
 const HowItWorks = () => {
     return (
-        <section className="py-20 md:py-24 bg-white text-zinc-900 relative overflow-hidden border-b border-zinc-200/60">
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center max-w-2xl mx-auto mb-14">
-                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-rose-50 text-rose-700 text-xs font-black uppercase tracking-wider border border-rose-200/80 mb-3 shadow-xs">
-                        Simple & Transparent
+        <section className="py-12 sm:py-16 bg-white text-zinc-900 border-b border-zinc-200/60">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center max-w-xl mx-auto mb-10">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-black uppercase tracking-wider border border-rose-200/80 mb-2.5">
+                        Simple & Fast
                     </span>
-                    <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight">
-                        Finding Your Ideal Stay in 4 Easy Steps
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-zinc-900 tracking-tight">
+                        How StaySetu Works
                     </h2>
-                    <p className="text-zinc-500 font-normal text-xs sm:text-sm md:text-base mt-2">
-                        Zero hidden surprises — complete clarity from your initial search to move-in day.
+                    <p className="text-zinc-500 font-normal text-xs sm:text-sm mt-1.5">
+                        Three simple steps from finding a place to moving into your new home.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                     {steps.map((step, index) => (
-                        <div key={index} className="relative z-10 flex flex-col items-center text-center group">
-                            {/* Card */}
-                            <div className="p-7 flex-1 w-full bg-[#F8FAFC] rounded-3xl border border-zinc-200/80 hover:border-rose-300 hover:bg-white shadow-xs hover:shadow-lg flex flex-col items-center transition-all duration-300">
-                                {/* Step number + icon */}
-                                <div className="relative mb-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 shadow-xs">
-                                        <step.icon size={24} />
-                                    </div>
-                                    <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-zinc-900 text-white rounded-full flex items-center justify-center text-[10px] font-black shadow-xs">
-                                        {index + 1}
-                                    </div>
-                                </div>
-
-                                <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 mb-2">{step.title}</h3>
+                        <div key={index} className="p-6 sm:p-7 bg-[#F8FAFC] rounded-3xl border border-zinc-200/80 hover:border-rose-300 hover:bg-white shadow-2xs hover:shadow-md transition-all duration-300 flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                                <step.icon size={22} />
+                            </div>
+                            <div>
+                                <h3 className="text-sm sm:text-base font-extrabold text-zinc-900 mb-1">{step.title}</h3>
                                 <p className="text-zinc-500 text-xs leading-relaxed font-normal">{step.description}</p>
                             </div>
                         </div>

@@ -113,20 +113,17 @@ const Home = () => {
 
                     {/* Filter Pills Row */}
                     <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1 scrollbar-none">
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 shrink-0">
-                            {purpose === 'sell' ? '✓ Verified Real Estate with Direct Contacts' : '✓ Stays in Crossings Republik, Ghaziabad & Pan-India'}
-                        </span>
-                        {['All', 'Crossings Republik', 'Ghaziabad', 'Noida', 'Delhi NCR', 'Lucknow'].map((loc) => (
+                        {['All', 'Crossings Republik', 'Ghaziabad', 'Noida', 'Greater Noida', 'Lucknow'].map((loc) => (
                             <button
                                 key={loc}
                                 onClick={() => handleCityFilter(loc)}
-                                className={`px-3 py-1 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
                                     selectedCity === loc
                                         ? 'bg-rose-500 text-white shadow-xs'
-                                        : 'bg-white text-zinc-600 border border-zinc-200/80 hover:bg-zinc-50'
+                                        : 'bg-white text-zinc-600 border border-zinc-200/80 hover:bg-zinc-50 hover:border-zinc-300'
                                 }`}
                             >
-                                {loc}
+                                {loc === 'All' ? '🌟 All Locations' : `📍 ${loc}`}
                             </button>
                         ))}
                     </div>

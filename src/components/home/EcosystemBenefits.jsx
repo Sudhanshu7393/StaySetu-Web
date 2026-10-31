@@ -1,259 +1,143 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-    Home, Users, Sparkles, MapPin, Phone, MessageCircle, 
-    ArrowRight, CheckCircle2, ShieldCheck, Clock, Building2,
-    Calendar, HeartHandshake, Eye, Instagram
+    Home, Users, Sparkles, ArrowRight, CheckCircle2, Building2,
+    MessageCircle, Instagram
 } from 'lucide-react';
 
 const EcosystemBenefits = () => {
     return (
-        <section className="py-16 md:py-24 bg-[#F8FAFC] relative overflow-hidden border-b border-zinc-200/60">
-            {/* Subtle Brand Ambient Glows */}
-            <div className="absolute top-1/4 left-10 w-96 h-96 bg-rose-400/5 rounded-full blur-[140px] pointer-events-none" />
-            <div className="absolute bottom-10 right-10 w-96 h-96 bg-rose-500/5 rounded-full blur-[140px] pointer-events-none" />
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <section className="py-12 sm:py-16 bg-[#F8FAFC] border-b border-zinc-200/60">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
                 {/* Header */}
-                <div className="text-center max-w-3xl mx-auto mb-14">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-black uppercase tracking-wider border border-emerald-200 mb-3 shadow-2xs">
-                        <CheckCircle2 size={14} className="text-emerald-600" />
-                        <span>100% Free Platform • Transparent Pricing • Direct Connect</span>
-                    </div>
-                    <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight leading-tight">
-                        The 3 Biggest Living & Housing Needs, <span className="text-rose-600">Solved in One Platform</span>
+                <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-black uppercase tracking-wider border border-rose-200/80 mb-2.5">
+                        <CheckCircle2 size={13} className="text-rose-600" />
+                        Everything You Need in One Place
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-zinc-900 tracking-tight">
+                        Living Made Simple & Transparent
                     </h2>
-                    <p className="text-zinc-500 font-normal text-sm sm:text-base mt-2.5 leading-relaxed">
-                        Finding a verified home, a compatible roommate, and reliable local housekeeping shouldn't be stressful. StaySetu brings complete clarity, upfront pricing, and direct connections.
+                    <p className="text-zinc-500 font-normal text-xs sm:text-sm mt-1.5 max-w-lg mx-auto">
+                        Verified homes, compatible flatmates, and trusted local help with zero hidden charges.
                     </p>
                 </div>
 
-                {/* 3 Real Feature Cards Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
+                {/* 3 Clean Feature Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-10">
                     
-                    {/* 1. VERIFIED STAYS */}
-                    <div className="bg-white rounded-3xl p-7 sm:p-8 border border-zinc-200/80 shadow-sm hover:shadow-xl hover:border-rose-300 transition-all duration-300 flex flex-col justify-between">
+                    {/* 1. Verified Stays */}
+                    <div className="bg-white rounded-3xl p-6 sm:p-7 border border-zinc-200/80 hover:border-rose-300 hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
                         <div>
-                            {/* Icon & Badge */}
-                            <div className="flex items-center justify-between mb-5">
-                                <div className="w-13 h-13 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shadow-2xs">
-                                    <Home size={26} />
-                                </div>
-                                <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-zinc-100 text-zinc-700">
-                                    1. Stays
-                                </span>
+                            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 mb-4 group-hover:scale-105 transition-transform">
+                                <Home size={22} />
                             </div>
-
-                            <h3 className="text-lg sm:text-xl font-extrabold text-zinc-900 mb-2">
-                                Verified PGs, Hostels & Flats
+                            <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 mb-1.5">
+                                Verified Stays & Flats
                             </h3>
-                            <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed mb-6">
-                                Explore vetted student stays around premier campuses with upfront pricing, real photos, and accurate locations.
+                            <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed mb-4">
+                                Vetted apartments, flats, and rooms with 100% upfront pricing, real photos, and direct WhatsApp connect.
                             </p>
-
-                            {/* Real Points */}
-                            <div className="space-y-3 mb-8">
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Interactive <strong>Map Search</strong> to find stays within walking distance of campus</span>
-                                </div>
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Rent, security deposit, and broker fee <strong>100% transparently disclosed</strong></span>
-                                </div>
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Schedule a <strong>Free In-Person Visit</strong> before paying any token amount</span>
-                                </div>
-                            </div>
                         </div>
 
-                        {/* Direct Button */}
-                        <div className="pt-4 border-t border-zinc-100 flex items-center gap-2">
-                            <Link
-                                to="/listings"
-                                className="flex-1 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold py-3 px-4 rounded-full text-center tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm shadow-rose-500/20"
-                            >
-                                <span>Browse Stays</span>
-                                <ArrowRight size={13} />
-                            </Link>
-                            <Link
-                                to="/listings?view=map"
-                                className="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/80 text-xs font-bold py-3 px-3.5 rounded-full transition-all"
-                                title="Open Map"
-                            >
-                                🗺️ Map
-                            </Link>
-                        </div>
+                        <Link
+                            to="/listings"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 hover:text-rose-700 pt-3 border-t border-zinc-100 group-hover:translate-x-1 transition-all"
+                        >
+                            <span>Browse verified stays</span>
+                            <ArrowRight size={14} />
+                        </Link>
                     </div>
 
-                    {/* 2. ROOMMATE FINDER */}
-                    <div className="bg-white rounded-3xl p-7 sm:p-8 border border-zinc-200/80 shadow-sm hover:shadow-xl hover:border-rose-300 transition-all duration-300 flex flex-col justify-between">
+                    {/* 2. Roommates */}
+                    <div className="bg-white rounded-3xl p-6 sm:p-7 border border-zinc-200/80 hover:border-rose-300 hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
                         <div>
-                            {/* Icon & Badge */}
-                            <div className="flex items-center justify-between mb-5">
-                                <div className="w-13 h-13 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shadow-2xs">
-                                    <Users size={26} />
-                                </div>
-                                <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-zinc-100 text-zinc-700">
-                                    2. Roommates
-                                </span>
+                            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 mb-4 group-hover:scale-105 transition-transform">
+                                <Users size={22} />
                             </div>
-
-                            <h3 className="text-lg sm:text-xl font-extrabold text-zinc-900 mb-2">
-                                Campus Roommate Matching
+                            <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 mb-1.5">
+                                Flatmate & Roommate Finder
                             </h3>
-                            <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed mb-6">
-                                Split your flat rent by 50% and find compatible batchmates from your college, department, or year.
+                            <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed mb-4">
+                                Split flat rent and match with compatible roommates based on campus, budget, and lifestyle habits.
                             </p>
-
-                            {/* Real Points */}
-                            <div className="space-y-3 mb-8">
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Filter profiles by university, branch, and target move-in date</span>
-                                </div>
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Match sleep schedules, study habits, and dietary preferences</span>
-                                </div>
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Direct connection on WhatsApp with zero middlemen</span>
-                                </div>
-                            </div>
                         </div>
 
-                        {/* Direct Button */}
-                        <div className="pt-4 border-t border-zinc-100">
-                            <Link
-                                to="/roommates"
-                                className="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold py-3 px-4 rounded-full text-center tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm"
-                            >
-                                <span>Find Roommates</span>
-                                <ArrowRight size={13} />
-                            </Link>
-                        </div>
+                        <Link
+                            to="/roommates"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 pt-3 border-t border-zinc-100 group-hover:translate-x-1 transition-all"
+                        >
+                            <span>Find roommates</span>
+                            <ArrowRight size={14} />
+                        </Link>
                     </div>
 
-                    {/* 3. MAID & COOK DIRECTORY */}
-                    <div className="bg-white rounded-3xl p-7 sm:p-8 border border-zinc-200/80 shadow-sm hover:shadow-xl hover:border-rose-300 transition-all duration-300 flex flex-col justify-between">
+                    {/* 3. Maids & Cooks */}
+                    <div className="bg-white rounded-3xl p-6 sm:p-7 border border-zinc-200/80 hover:border-rose-300 hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
                         <div>
-                            {/* Icon & Badge */}
-                            <div className="flex items-center justify-between mb-5">
-                                <div className="w-13 h-13 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shadow-2xs">
-                                    <Sparkles size={26} />
-                                </div>
-                                <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-zinc-100 text-zinc-700">
-                                    3. Maids & Cooks
-                                </span>
+                            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-105 transition-transform">
+                                <Sparkles size={22} />
                             </div>
-
-                            <h3 className="text-lg sm:text-xl font-extrabold text-zinc-900 mb-2">
-                                Verified Housekeeping & Cooks
+                            <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 mb-1.5">
+                                Cooks & Housekeeping
                             </h3>
-                            <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed mb-6">
-                                Settle into your flat with trusted home-cooked meals and daily cleaning assistance from verified neighborhood helpers.
+                            <p className="text-zinc-500 text-xs sm:text-sm leading-relaxed mb-4">
+                                Find trusted home cooks and daily housekeeping staff across Crossings Republik and nearby areas.
                             </p>
-
-                            {/* Real Points */}
-                            <div className="space-y-3 mb-8">
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Direct contact with local cooks and housekeeping specialists</span>
-                                </div>
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Compare monthly rates, food preferences (North/South Indian), and timings</span>
-                                </div>
-                                <div className="flex items-start gap-2.5 text-xs text-zinc-700">
-                                    <CheckCircle2 size={15} className="text-rose-600 shrink-0 mt-0.5" />
-                                    <span>Direct phone & WhatsApp connect with zero commission or fees</span>
-                                </div>
-                            </div>
                         </div>
 
-                        {/* Direct Button */}
-                        <div className="pt-4 border-t border-zinc-100">
-                            <Link
-                                to="/maids"
-                                className="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold py-3 px-4 rounded-full text-center tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm"
-                            >
-                                <span>Find Maid & Cook</span>
-                                <ArrowRight size={13} />
-                            </Link>
-                        </div>
+                        <Link
+                            to="/maids"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-700 pt-3 border-t border-zinc-100 group-hover:translate-x-1 transition-all"
+                        >
+                            <span>View helper directory</span>
+                            <ArrowRight size={14} />
+                        </Link>
                     </div>
 
                 </div>
 
-                {/* Instagram Community Card */}
-                <div className="rounded-3xl bg-gradient-to-r from-rose-50/90 via-white to-pink-100/50 p-6 sm:p-8 border border-rose-200/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-                    <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-rose-500/25">
-                            <Instagram size={24} />
+                {/* Sleek Owner & Community Banner */}
+                <div className="rounded-3xl bg-white p-5 sm:p-7 border border-zinc-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
+                        <div className="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                            <Building2 size={20} />
                         </div>
                         <div>
-                            <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-200/80 inline-block mb-1">
-                                Official Community • @stay.setu
-                            </span>
-                            <h4 className="text-base sm:text-lg font-black text-zinc-900">
-                                Join Our Community on Instagram
+                            <h4 className="text-sm sm:text-base font-extrabold text-zinc-900">
+                                Own a flat or PG? List it for ₹0 Free
                             </h4>
-                            <p className="text-zinc-600 text-xs sm:text-sm mt-0.5 max-w-2xl">
-                                Watch property walk-throughs, tower tours, locality reviews, and home tips directly on our official Instagram page.
+                            <p className="text-zinc-500 text-xs mt-0.5">
+                                Reach genuine buyers and tenants with direct WhatsApp inquiries.
                             </p>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
+                    <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0">
+                        <Link
+                            to="/dashboard/add-listing"
+                            className="flex-1 sm:flex-none bg-rose-500 hover:bg-rose-600 text-white font-extrabold px-5 py-2.5 rounded-full text-xs text-center transition-all shadow-xs"
+                        >
+                            + List Property
+                        </Link>
                         <a
                             href="https://www.instagram.com/stay.setu/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full md:w-auto bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:opacity-95 text-white font-extrabold px-6 py-3 rounded-full text-xs text-center transition-all shadow-md shadow-rose-600/25 flex items-center justify-center gap-2"
+                            className="p-2.5 rounded-full bg-zinc-100 hover:bg-pink-50 text-zinc-700 hover:text-pink-600 border border-zinc-200/80 transition-colors shrink-0"
+                            title="Follow @stay.setu on Instagram"
                         >
-                            <Instagram size={15} />
-                            <span>Follow @stay.setu</span>
+                            <Instagram size={16} />
                         </a>
-                    </div>
-                </div>
-
-                {/* Real Bottom Callout for Property Owners */}
-                <div className="rounded-3xl bg-white p-6 sm:p-8 border border-zinc-200/80 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
-                            <Building2 size={24} />
-                        </div>
-                        <div>
-                            <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200/70 inline-block mb-1">
-                                For Property Owners & Landlords
-                            </span>
-                            <h4 className="text-base sm:text-lg font-black text-zinc-900">
-                                Have a vacant PG, hostel, or flat near a campus?
-                            </h4>
-                            <p className="text-zinc-500 text-xs sm:text-sm mt-0.5">
-                                List for free on StaySetu to connect directly with genuine students, working professionals, and parents.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
-                        <Link
-                            to="/signup"
-                            className="w-full md:w-auto bg-rose-500 hover:bg-rose-600 text-white font-extrabold px-6 py-3 rounded-full text-xs text-center transition-all shadow-sm shadow-rose-500/25"
-                        >
-                            List Property Free
-                        </Link>
                         <a
-                            href="https://wa.me/917393011350?text=Hi%20StaySetu%20Team%2C%20I%20am%20a%20property%20owner%20and%20want%20to%20list%20my%20PG%2FFlat."
+                            href="https://wa.me/917393011350?text=Hi%20StaySetu%20Team%2C%20I%20am%20interested%20in%20listing%20my%20property."
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full md:w-auto bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-extrabold px-5 py-3 rounded-full text-xs text-center border border-zinc-200/80 transition-all flex items-center justify-center gap-1.5"
+                            className="p-2.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 transition-colors shrink-0"
+                            title="Connect on WhatsApp"
                         >
-                            <MessageCircle size={14} className="text-emerald-600" />
-                            <span>WhatsApp</span>
+                            <MessageCircle size={16} />
                         </a>
                     </div>
                 </div>
