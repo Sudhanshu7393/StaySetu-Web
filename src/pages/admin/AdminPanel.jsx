@@ -3,7 +3,8 @@ import {
     CheckCircle, Users, Home, MapPin, IndianRupee,
     Clock, Trash2, ShieldCheck, LogOut, Loader2, Plus,
     Upload, X, Image as ImageIcon, Save, Phone, Download, MessageCircle, Brush, Star,
-    Share2, PhoneCall, CheckCircle2, Send
+    Share2, PhoneCall, CheckCircle2, Send, Eye, ExternalLink, Calendar,
+    ChevronDown, ChevronUp, Mail, FileText
 } from 'lucide-react';
 import { useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -23,6 +24,7 @@ const AdminPanel = () => {
     const [stats, setStats] = useState({ users: 0, pending: 0, approved: 0, rented: 0, total: 0, roommate_pending: 0, wa_leads: 0, maid_pending: 0, sold: 0 });
     const [actionLoading, setActionLoading] = useState(null);
     const [editingItem, setEditingItem] = useState(null); // For editing photos
+    const [expandedLeadId, setExpandedLeadId] = useState(null);
     const [featuredHeroId, setFeaturedHeroId] = useState(() => localStorage.getItem('staysetu_hero_featured_id') || '69cbc4bc0023a8c61505');
     const fileInputRef = useRef(null);
     const editFileInputRef = useRef(null);
@@ -272,6 +274,20 @@ const AdminPanel = () => {
         setActionLoading(null);
     };
 
+    const deleteLead = async (id) => {
+        if (!window.confirm('Delete this inquiry / WhatsApp lead permanently?')) return;
+        setActionLoading(id + '_lead_del');
+        try {
+            await databases.deleteDocument(DATABASE_ID, COLLECTION.whatsappLeads, id);
+            setWhatsappLeads(prev => prev.filter(l => (l.$id || l.id) !== id));
+            setStats(prev => ({ ...prev, wa_leads: Math.max(0, (prev.wa_leads || 1) - 1) }));
+        } catch (err) {
+            console.error('Delete lead error:', err);
+            alert('Failed to delete lead: ' + err.message);
+        }
+        setActionLoading(null);
+    };
+
     const handleEditImageUpload = async (e) => {
         const files = Array.from(e.target.files);
         if (!files.length || !editingItem) return;
@@ -468,27 +484,28 @@ const AdminPanel = () => {
                     )}
 
                     {activeTab === 'whatsapp_leads' ? (
-                        <div className="p-6">
+                        <div className="p-4 sm:p-6">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                 <div>
                                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                                         <MessageCircle className="text-emerald-500" size={20} />
-                                        Concierge Lead Desk (StaySetu WhatsApp Leads)
+                                        Concierge Lead Desk (StaySetu WhatsApp & Visit Leads)
                                     </h3>
                                     <p className="text-xs text-slate-500 mt-0.5">
-                                        All student inquiries captured at +91 7393011350. Forward leads to owners and follow-up with students for reviews.
+                                        All user inquiries captured at +91 7393011350 with complete contact details, visit slots, and landlord info.
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => {
-                                        const csv = ['Student Name,Student Phone,Student Email,Listing,Owner Name,Owner Phone,Source,Time'];
+                                        const csv = ['User Name,User Phone,User Email,Listing,Owner Name,Owner Phone,Source,Time,Full Message'];
                                         whatsappLeads.forEach(l => {
-                                            const sPhone = l.studentPhone || 'Not provided';
-                                            const sName = l.studentName || l.clickerName || 'Student';
+                                            const sPhone = l.studentPhone || l.phoneNumber || '';
+                                            const sName = l.studentName || l.clickerName || 'User';
                                             const sEmail = l.studentEmail || l.clickerEmail || '';
                                             const oName = l.ownerName || 'Owner';
-                                            const oPhone = l.ownerPhone || l.phoneNumber || '';
-                                            csv.push(`"${sName}","${sPhone}","${sEmail}","${l.listingTitle || ''}","${oName}","${oPhone}","${l.source}","${l.clickedAt || l.$createdAt}"`);
+                                            const oPhone = l.ownerPhone || '';
+                                            const cleanMsg = (l.message || '').replace(/"/g, '""');
+                                            csv.push(`"${sName}","${sPhone}","${sEmail}","${l.listingTitle || ''}","${oName}","${oPhone}","${l.source}","${l.clickedAt || l.$createdAt}","${cleanMsg}"`);
                                         });
                                         const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
                                         const url = URL.createObjectURL(blob);
@@ -499,105 +516,278 @@ const AdminPanel = () => {
                                     <Download size={14} /> Export Leads CSV
                                 </button>
                             </div>
+
                             {loading ? (
                                 <div className="py-20 text-center"><Loader2 size={28} className="animate-spin mx-auto text-slate-300" /></div>
                             ) : whatsappLeads.length > 0 ? (
-                                <div className="overflow-x-auto">
+                                <div className="overflow-x-auto border border-slate-100 rounded-2xl shadow-xs">
                                     <table className="w-full text-left">
                                         <thead>
-                                            <tr className="bg-emerald-50/60 border-b border-emerald-100">
-                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider">#</th>
-                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider">Student Contact</th>
-                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider">Property & Landlord</th>
-                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider">Source / Time</th>
-                                                <th className="px-4 py-3 text-[10px] font-bold text-emerald-900 uppercase tracking-wider text-right">Concierge Actions</th>
+                                            <tr className="bg-emerald-50/70 border-b border-emerald-100">
+                                                <th className="px-4 py-3.5 text-[10px] font-bold text-emerald-950 uppercase tracking-wider">#</th>
+                                                <th className="px-4 py-3.5 text-[10px] font-bold text-emerald-950 uppercase tracking-wider">User / Buyer Contact</th>
+                                                <th className="px-4 py-3.5 text-[10px] font-bold text-emerald-950 uppercase tracking-wider">Property & Owner</th>
+                                                <th className="px-4 py-3.5 text-[10px] font-bold text-emerald-950 uppercase tracking-wider">Visit & Timeline Details</th>
+                                                <th className="px-4 py-3.5 text-[10px] font-bold text-emerald-950 uppercase tracking-wider text-right">Concierge Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
                                             {whatsappLeads.map((lead, i) => {
-                                                const sPhone = lead.studentPhone || lead.phoneNumber || '';
-                                                const sName = lead.studentName || lead.clickerName || 'Student';
+                                                const rawMsg = lead.message || '';
+                                                let sPhone = lead.studentPhone || lead.phoneNumber || '';
+                                                let cleanSPhone = (sPhone || '').replace(/\D/g, '');
+                                                if (cleanSPhone.length < 10 && rawMsg) {
+                                                    const match = rawMsg.match(/(?:📞|WhatsApp|Call|Phone|Ph:?)\s*(?:\+?91)?\s*([6-9]\d{9})/i);
+                                                    if (match && match[1]) {
+                                                        cleanSPhone = match[1];
+                                                        sPhone = match[1];
+                                                    }
+                                                }
+
+                                                const sName = lead.studentName || lead.clickerName || 'User';
                                                 const sEmail = lead.studentEmail || lead.clickerEmail || '';
-                                                const oName = lead.ownerName || 'Owner';
-                                                const oPhone = lead.ownerPhone || (lead.studentPhone ? lead.phoneNumber : '');
+                                                const oName = lead.ownerName || 'Property Owner';
+                                                let oPhone = lead.ownerPhone || '';
+                                                let cleanOPhone = (oPhone || '').replace(/\D/g, '');
+                                                if (cleanOPhone.length < 10 && rawMsg) {
+                                                    const match = rawMsg.match(/Listing Owner:.*?\(Ph:\s*(\d{10})/i);
+                                                    if (match && match[1]) {
+                                                        cleanOPhone = match[1];
+                                                        oPhone = match[1];
+                                                    }
+                                                }
+
+                                                // Extract quick highlights from message
+                                                const slotMatch = rawMsg.match(/(?:Preferred Visit Time|Preferred Visit|Scheduled Visit):\s*([^\n\r]+)/i);
+                                                const timelineMatch = rawMsg.match(/(?:Purchase Timeline|Move-in):\s*([^\n\r]+)/i);
+                                                const prefMatch = rawMsg.match(/(?:Preference):\s*([^\n\r]+)/i);
+
+                                                const isVisit = (lead.source || '').toLowerCase().includes('visit');
+                                                const isExpanded = expandedLeadId === (lead.$id || i);
 
                                                 return (
-                                                    <tr key={lead.$id || i} className="hover:bg-emerald-50/20 transition-colors text-sm">
-                                                        <td className="px-4 py-3.5 text-xs text-slate-400 font-mono">{i + 1}</td>
-                                                        <td className="px-4 py-3.5">
-                                                            <div>
-                                                                <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                                                                    <span>{sName}</span>
-                                                                </p>
-                                                                {sPhone && (
-                                                                    <a 
-                                                                        href={`tel:${sPhone}`}
-                                                                        className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full mt-1 hover:bg-emerald-100 transition-colors"
-                                                                    >
-                                                                        <Phone size={10} /> {sPhone}
-                                                                    </a>
-                                                                )}
-                                                                {sEmail && (
-                                                                    <p className="text-[10px] text-slate-400 mt-0.5">{sEmail}</p>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-4 py-3.5">
-                                                            <div className="max-w-[220px]">
-                                                                <p className="text-xs font-bold text-slate-900 truncate">{lead.listingTitle || 'StaySetu Property'}</p>
-                                                                <div className="flex items-center gap-1 text-[11px] text-slate-600 mt-1">
-                                                                    <span className="font-medium">Landlord:</span>
-                                                                    <span className="font-semibold text-slate-800">{oName}</span>
-                                                                </div>
-                                                                {oPhone && (
-                                                                    <p className="text-[10px] text-slate-400 font-mono">📱 {oPhone}</p>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-4 py-3.5">
-                                                            <div className="space-y-1">
-                                                                <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
-                                                                    {lead.source || 'inquiry'}
-                                                                </span>
-                                                                <p className="text-[11px] text-slate-400 whitespace-nowrap">
-                                                                    {new Date(lead.clickedAt || lead.$createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                                                                </p>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-4 py-3.5 text-right">
-                                                            <div className="flex items-center justify-end gap-2">
-                                                                {/* Forward to Owner */}
-                                                                <button
-                                                                    onClick={() => forwardLeadToOwner({
-                                                                        ownerPhone: oPhone,
-                                                                        ownerName: oName,
-                                                                        studentName: sName,
-                                                                        studentPhone: sPhone,
-                                                                        listingTitle: lead.listingTitle,
-                                                                    })}
-                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
-                                                                    title="Forward student contact & visit request to Landlord on WhatsApp"
-                                                                >
-                                                                    <Share2 size={12} />
-                                                                    <span>Forward to Owner</span>
-                                                                </button>
+                                                    <React.Fragment key={lead.$id || i}>
+                                                        <tr className={`transition-colors text-sm ${isExpanded ? 'bg-emerald-50/40' : 'hover:bg-slate-50/70'}`}>
+                                                            <td className="px-4 py-3.5 text-xs text-slate-400 font-mono align-top">
+                                                                {i + 1}
+                                                            </td>
 
-                                                                {/* Review / Follow-up Student */}
-                                                                <button
-                                                                    onClick={() => contactStudentForReview({
-                                                                        studentPhone: sPhone,
-                                                                        studentName: sName,
-                                                                        listingTitle: lead.listingTitle,
-                                                                    })}
-                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-colors"
-                                                                    title="Call or WhatsApp student to check on visit and ask for review"
-                                                                >
-                                                                    <PhoneCall size={12} />
-                                                                    <span>Follow-up & Review</span>
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
+                                                            {/* User Contact */}
+                                                            <td className="px-4 py-3.5 align-top">
+                                                                <div className="space-y-1.5">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-black text-xs flex items-center justify-center shrink-0 border border-emerald-200">
+                                                                            {sName.charAt(0).toUpperCase()}
+                                                                        </div>
+                                                                        <div className="min-w-0">
+                                                                            <span className="font-extrabold text-slate-900 text-xs sm:text-sm block truncate">{sName}</span>
+                                                                            {sEmail && (
+                                                                                <div className="text-[10px] text-slate-400 flex items-center gap-1">
+                                                                                    <Mail size={9} className="shrink-0" />
+                                                                                    <span className="truncate max-w-[140px]">{sEmail}</span>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {cleanSPhone ? (
+                                                                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                                                            <a
+                                                                                href={`tel:${cleanSPhone}`}
+                                                                                className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2 py-0.5 rounded-full transition-colors"
+                                                                                title="Call User Directly"
+                                                                            >
+                                                                                <Phone size={10} className="text-emerald-600" />
+                                                                                <span>{cleanSPhone}</span>
+                                                                            </a>
+                                                                            <a
+                                                                                href={`https://wa.me/91${cleanSPhone}?text=${encodeURIComponent(`Hi ${sName}, this is StaySetu Concierge team regarding your inquiry for "${lead.listingTitle || 'our property'}". How may I assist you?`)}`}
+                                                                                target="_blank"
+                                                                                rel="noreferrer"
+                                                                                className="inline-flex items-center gap-1 text-[11px] font-black text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full transition-colors"
+                                                                                title="Direct WhatsApp Chat with User"
+                                                                            >
+                                                                                <MessageCircle size={10} />
+                                                                                <span>WhatsApp</span>
+                                                                            </a>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <span className="text-[11px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md font-medium">No phone provided</span>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+
+                                                            {/* Property & Landlord */}
+                                                            <td className="px-4 py-3.5 align-top">
+                                                                <div className="max-w-[240px] space-y-1.5">
+                                                                    {lead.listingId ? (
+                                                                        <a
+                                                                            href={`/property/${lead.listingId}`}
+                                                                            target="_blank"
+                                                                            rel="noreferrer"
+                                                                            className="font-bold text-xs text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 line-clamp-1"
+                                                                        >
+                                                                            <span>{lead.listingTitle || 'StaySetu Property'}</span>
+                                                                            <ExternalLink size={10} className="shrink-0" />
+                                                                        </a>
+                                                                    ) : (
+                                                                        <p className="font-bold text-xs text-slate-900 line-clamp-1">{lead.listingTitle || 'StaySetu Property'}</p>
+                                                                    )}
+
+                                                                    <div className="text-[11px] text-slate-600 bg-slate-50 border border-slate-100 rounded-xl p-2 space-y-1">
+                                                                        <div className="flex items-center justify-between gap-1">
+                                                                            <span className="text-[10px] text-slate-400 uppercase font-bold">Owner / Host</span>
+                                                                            <span className="font-semibold text-slate-800 text-[11px] truncate">{oName}</span>
+                                                                        </div>
+                                                                        {cleanOPhone && (
+                                                                            <div className="flex items-center justify-between gap-1 pt-0.5 border-t border-slate-200/50">
+                                                                                <a href={`tel:${cleanOPhone}`} className="text-[10px] font-mono text-slate-600 hover:text-slate-900 flex items-center gap-0.5">
+                                                                                    <Phone size={9} /> {cleanOPhone}
+                                                                                </a>
+                                                                                <a
+                                                                                    href={`https://wa.me/91${cleanOPhone}`}
+                                                                                    target="_blank"
+                                                                                    rel="noreferrer"
+                                                                                    className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5"
+                                                                                >
+                                                                                    <MessageCircle size={9} /> Chat
+                                                                                </a>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+
+                                                            {/* Inquiry & Visit Details */}
+                                                            <td className="px-4 py-3.5 align-top">
+                                                                <div className="space-y-1 max-w-[240px]">
+                                                                    <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                                                                        <span className={`inline-block text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                                                                            isVisit 
+                                                                                ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                                                                                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                                        }`}>
+                                                                            {isVisit ? '🗓️ Visit Request' : '💬 WhatsApp Chat'}
+                                                                        </span>
+                                                                        <span className="text-[10px] text-slate-400 font-medium">
+                                                                            {new Date(lead.clickedAt || lead.$createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                                        </span>
+                                                                    </div>
+
+                                                                    {slotMatch && (
+                                                                        <div className="text-[11px] font-bold text-slate-800 bg-amber-50/80 border border-amber-200/60 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                                                            <Clock size={11} className="text-amber-600 shrink-0" />
+                                                                            <span className="truncate">{slotMatch[1].trim()}</span>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {timelineMatch && (
+                                                                        <div className="text-[10px] text-slate-600 flex items-center gap-1">
+                                                                            <span className="font-semibold text-slate-500">Timeline:</span>
+                                                                            <span className="font-medium text-slate-800 truncate">{timelineMatch[1].trim()}</span>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {prefMatch && (
+                                                                        <div className="text-[10px] text-slate-600 flex items-center gap-1">
+                                                                            <span className="font-semibold text-slate-500">Pref:</span>
+                                                                            <span className="font-medium text-slate-800 truncate">{prefMatch[1].trim()}</span>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {rawMsg && (
+                                                                        <button
+                                                                            onClick={() => setExpandedLeadId(isExpanded ? null : (lead.$id || i))}
+                                                                            className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 mt-1 transition-colors"
+                                                                        >
+                                                                            <FileText size={11} />
+                                                                            <span>{isExpanded ? 'Hide Notes' : 'View Message Notes'}</span>
+                                                                            {isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+
+                                                            {/* Actions */}
+                                                            <td className="px-4 py-3.5 align-top text-right">
+                                                                <div className="flex flex-col items-end gap-1.5">
+                                                                    <button
+                                                                        onClick={() => forwardLeadToOwner({
+                                                                            ownerPhone: cleanOPhone || oPhone,
+                                                                            ownerName: oName,
+                                                                            studentName: sName,
+                                                                            studentPhone: cleanSPhone || sPhone,
+                                                                            listingTitle: lead.listingTitle,
+                                                                        })}
+                                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors w-fit"
+                                                                        title="Forward student contact & visit request to Landlord on WhatsApp"
+                                                                    >
+                                                                        <Share2 size={12} />
+                                                                        <span>Forward to Owner</span>
+                                                                    </button>
+
+                                                                    <div className="flex items-center gap-1">
+                                                                        <button
+                                                                            onClick={() => contactStudentForReview({
+                                                                                studentPhone: cleanSPhone || sPhone,
+                                                                                studentName: sName,
+                                                                                listingTitle: lead.listingTitle,
+                                                                            })}
+                                                                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-colors"
+                                                                            title="Contact user for review"
+                                                                        >
+                                                                            <PhoneCall size={11} />
+                                                                            <span>Follow-up</span>
+                                                                        </button>
+
+                                                                        <button
+                                                                            onClick={() => deleteLead(lead.$id || lead.id)}
+                                                                            disabled={actionLoading === (lead.$id || lead.id) + '_lead_del'}
+                                                                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition-colors"
+                                                                            title="Delete Lead"
+                                                                        >
+                                                                            {actionLoading === (lead.$id || lead.id) + '_lead_del' ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+
+                                                        {/* Expanded Message View */}
+                                                        {isExpanded && rawMsg && (
+                                                            <tr className="bg-emerald-50/50">
+                                                                <td colSpan={5} className="px-6 py-4 border-t border-emerald-100">
+                                                                    <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-xs space-y-2">
+                                                                        <div className="flex items-center justify-between text-xs font-black uppercase tracking-wider text-emerald-900">
+                                                                            <span className="flex items-center gap-1.5">
+                                                                                <MessageCircle size={14} className="text-emerald-600" />
+                                                                                Full Inquiry / Visit Message Sent by User
+                                                                            </span>
+                                                                            <span className="text-[10px] font-mono text-slate-400">
+                                                                                Lead ID: {(lead.$id || lead.id || '').slice(0, 12)}
+                                                                            </span>
+                                                                        </div>
+                                                                        <pre className="text-xs font-sans text-slate-800 whitespace-pre-wrap bg-slate-50 p-3 rounded-xl border border-slate-200/70 leading-relaxed">
+                                                                            {rawMsg}
+                                                                        </pre>
+                                                                        <div className="flex items-center justify-end gap-2 pt-1">
+                                                                            {cleanSPhone && (
+                                                                                <a
+                                                                                    href={`https://wa.me/91${cleanSPhone}?text=${encodeURIComponent(rawMsg)}`}
+                                                                                    target="_blank"
+                                                                                    rel="noreferrer"
+                                                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white"
+                                                                                >
+                                                                                    <MessageCircle size={12} />
+                                                                                    <span>Reply on WhatsApp</span>
+                                                                                </a>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </React.Fragment>
                                                 );
                                             })}
                                         </tbody>
@@ -609,7 +799,7 @@ const AdminPanel = () => {
                                         <MessageCircle size={24} />
                                     </div>
                                     <p className="text-slate-500 font-bold">No WhatsApp leads yet.</p>
-                                    <p className="text-slate-400 text-xs mt-1">When students request a visit or click WhatsApp, they appear here for 1-click forwarding and review follow-ups.</p>
+                                    <p className="text-slate-400 text-xs mt-1">When users request a visit or click WhatsApp, their complete details and visit slots appear here.</p>
                                 </div>
                             )}
                         </div>
@@ -972,20 +1162,36 @@ const AdminPanel = () => {
                                                             {activeTab === 'listings' || activeTab === 'sold_listings' ? item.title : (item.name || 'Student')}
                                                         </h4>
                                                         <span className="text-[10px] font-medium text-slate-400 block italic">
-                                                            {activeTab === 'listings' || activeTab === 'sold_listings' ? `Owner: ${item.owner?.full_name || 'User'}` : `ID: ${item.$id.slice(0, 8)}...`}
+                                                            {activeTab === 'listings' || activeTab === 'sold_listings' ? `Owner: ${item.owner_name || item.ownerName || item.owner?.full_name || 'Direct Owner'}` : `ID: ${item.$id.slice(0, 8)}...`}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full w-fit flex items-center gap-1">
-                                                        WA: {item.whatsappNumber || item.whatsapp || '-'}
-                                                    </span>
-                                                    {(item.phoneNumber || item.phone) && (
-                                                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full w-fit">
-                                                            PH: {item.phoneNumber || item.phone}
+                                                    {(item.whatsappNumber || item.whatsapp || item.owner_phone) ? (
+                                                        <a
+                                                            href={`https://wa.me/91${String(item.whatsappNumber || item.whatsapp || item.owner_phone).replace(/\D/g, '')}`}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full w-fit flex items-center gap-1 transition-colors"
+                                                            title="Chat with Owner on WhatsApp"
+                                                        >
+                                                            <MessageCircle size={10} /> WA: {item.whatsappNumber || item.whatsapp || item.owner_phone}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full w-fit">
+                                                            WA: -
                                                         </span>
+                                                    )}
+                                                    {(item.phoneNumber || item.phone || item.owner_phone) && (
+                                                        <a
+                                                            href={`tel:${String(item.phoneNumber || item.phone || item.owner_phone).replace(/\D/g, '')}`}
+                                                            className="text-[10px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-2 py-0.5 rounded-full w-fit flex items-center gap-1 transition-colors"
+                                                            title="Call Owner Directly"
+                                                        >
+                                                            <Phone size={9} /> PH: {item.phoneNumber || item.phone || item.owner_phone}
+                                                        </a>
                                                     )}
                                                 </div>
                                             </td>
@@ -1012,6 +1218,15 @@ const AdminPanel = () => {
                                                 <div className="flex items-center justify-end gap-2">
                                                     {(activeTab === 'listings' || activeTab === 'sold_listings') && (
                                                         <>
+                                                            <a
+                                                                href={`/property/${item.$id}`}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all active:scale-90 border border-slate-200/80"
+                                                                title="Preview Property Page"
+                                                            >
+                                                                <Eye size={14} />
+                                                            </a>
                                                             <button
                                                                 onClick={() => {
                                                                     localStorage.setItem('staysetu_hero_featured_id', item.$id);
@@ -1056,10 +1271,11 @@ const AdminPanel = () => {
                                                         <button
                                                             onClick={() => approve(item.$id)}
                                                             disabled={actionLoading === item.$id + '_approve'}
-                                                            className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg flex items-center justify-center transition-all active:scale-90 disabled:opacity-50"
-                                                            style={{ boxShadow: '0 2px 8px -2px rgba(99,102,241,0.4)' }}
+                                                            className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg flex items-center gap-1.5 text-xs font-bold transition-all active:scale-90 disabled:opacity-50 shadow-xs"
+                                                            title="Approve Listing & Go Live"
                                                         >
-                                                            {actionLoading === item.$id + '_approve' ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+                                                            {actionLoading === item.$id + '_approve' ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle size={13} />}
+                                                            <span>Approve</span>
                                                         </button>
                                                     )}
                                                     <button

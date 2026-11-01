@@ -262,6 +262,22 @@ const PropertyDetails = () => {
             };
 
             await databases.createDocument(DATABASE_ID, 'visit_requests', ID.unique(), visitRecord);
+
+            // Also record into centralized WhatsApp Leads table for Admin Concierge Desk
+            await trackWhatsAppClick({
+                studentPhone: visitForm.phone || profile?.phone || '',
+                studentName: visitForm.name || profile?.fullName || user.name || 'User',
+                studentEmail: user?.email || '',
+                listingId: property.$id || id,
+                listingTitle: property.title || 'Property',
+                listingLocation: property.location || '',
+                ownerName: property.owner?.name || 'Owner',
+                ownerPhone: property.whatsappNumber || property.phoneNumber || property.phone_number || '',
+                source: 'scheduled_site_visit',
+                message: `📅 Scheduled Visit: ${visitForm.visitType || 'In-Person'} on ${visitForm.date || 'TBD'} (${visitForm.timeSlot || 'Slot TBD'})${visitForm.notes ? `\n📝 Notes: ${visitForm.notes}` : ''}`,
+                status: 'new'
+            });
+
             setVisitSuccess(true);
         } catch (err) {
             console.error('Schedule visit error:', err);

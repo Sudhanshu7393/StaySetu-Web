@@ -61,7 +61,7 @@ export async function trackWhatsAppClick({
                 listingLocation: (listingLocation || '').slice(0, 255),
                 ownerName: (ownerName || 'Owner').slice(0, 255),
                 ownerPhone: cleanOwnerPhone || '',
-                phoneNumber: cleanOwnerPhone || '', // Backward-compatibility
+                phoneNumber: cleanStudentPhone || cleanOwnerPhone || '', // Store student contact directly in phone column
 
                 // Metadata
                 source: source.slice(0, 50),

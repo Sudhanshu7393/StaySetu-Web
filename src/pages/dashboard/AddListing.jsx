@@ -361,7 +361,7 @@ const AddListing = () => {
                 amenities: formData.amenities,
                 images: finalImages,
                 ownerId: user.$id || user.id,
-                status: 'approved', // Live immediately!
+                status: profile?.role === 'admin' ? 'approved' : 'pending', // Pending review for users, auto-approved for admin
                 genderPreference: formData.gender_preference || 'any',
                 listedBy: formData.listed_by || 'owner',
                 brokerageFee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') 
@@ -377,10 +377,13 @@ const AddListing = () => {
             await databases.createDocument(DATABASE_ID, COLLECTION.listings, docId, newListingPayload);
 
             setSuccess(true);
-            // Redirect straight to live property details so owner can see their listing immediately!
             setTimeout(() => {
-                navigate(`/property/${docId}`);
-            }, 1200);
+                if (profile?.role === 'admin') {
+                    navigate(`/property/${docId}`);
+                } else {
+                    navigate('/dashboard?tab=my_listings');
+                }
+            }, 1800);
 
         } catch (err) {
             console.error('Submit listing error:', err);
@@ -408,7 +411,7 @@ const AddListing = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 border border-rose-200/80 text-rose-600 font-extrabold text-xs uppercase tracking-wider mb-2">
-                                    <Sparkles size={12} /> Instant Live Listing
+                                    <Sparkles size={12} /> Direct Verified Listing
                                 </span>
                                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                                     List Your Property
@@ -458,9 +461,12 @@ const AddListing = () => {
 
                         {/* Success Alert */}
                         {success && (
-                            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-700 text-sm">
-                                <CheckCircle2 size={20} className="shrink-0" />
-                                <span className="font-bold">Property listed successfully! Redirecting to your live property page...</span>
+                            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm">
+                                <CheckCircle2 size={22} className="shrink-0 text-emerald-600" />
+                                <div>
+                                    <p className="font-bold">Property submitted for verification!</p>
+                                    <p className="text-xs text-emerald-700 mt-0.5">StaySetu team review karegi aur verify hone ke baad live ho jayegi. Redirecting to your dashboard...</p>
+                                </div>
                             </div>
                         )}
 

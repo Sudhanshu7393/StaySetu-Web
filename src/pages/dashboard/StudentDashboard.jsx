@@ -625,10 +625,31 @@ const StudentDashboard = () => {
                                                         <h3 className="font-extrabold text-zinc-900 text-sm sm:text-base line-clamp-1">
                                                             {prop.title}
                                                         </h3>
-                                                        <span className="shrink-0 text-[10px] font-extrabold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                                                            <CheckCircle size={10} /> Live & Active
-                                                        </span>
+                                                        {prop.status === 'pending' ? (
+                                                            <span className="shrink-0 text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1.5 shadow-xs">
+                                                                <Clock size={11} className="text-amber-500 animate-pulse" /> ⏳ Under Review (Admin Approval Pending)
+                                                            </span>
+                                                        ) : prop.status === 'rented' ? (
+                                                            <span className="shrink-0 text-[10px] font-black px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1 shadow-xs">
+                                                                🏠 Rented Out
+                                                            </span>
+                                                        ) : prop.status === 'sold' ? (
+                                                            <span className="shrink-0 text-[10px] font-black px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1 shadow-xs">
+                                                                🏷️ Sold Out
+                                                            </span>
+                                                        ) : (
+                                                            <span className="shrink-0 text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 shadow-xs">
+                                                                <CheckCircle size={11} className="text-emerald-500" /> ✅ Live & Active
+                                                            </span>
+                                                        )}
                                                     </div>
+
+                                                    {prop.status === 'pending' && (
+                                                        <div className="mb-2 p-2 bg-amber-50/90 border border-amber-200/90 rounded-xl text-[11px] text-amber-800 flex items-start gap-1.5">
+                                                            <Clock size={13} className="text-amber-600 shrink-0 mt-0.5" />
+                                                            <span>StaySetu team review kar rahi hai. Verify hone ke baad ye platform par live ho jayegi.</span>
+                                                        </div>
+                                                    )}
 
                                                     <div className="flex items-center gap-1.5 text-xs text-zinc-500 mb-2">
                                                         <MapPin size={13} className="text-rose-500 shrink-0" />
@@ -653,7 +674,7 @@ const StudentDashboard = () => {
                                                             to={`/property/${prop.$id || prop.id}`}
                                                             className="px-3.5 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-extrabold transition-all"
                                                         >
-                                                            View Live
+                                                            {prop.status === 'pending' ? 'Preview' : 'View Live'}
                                                         </Link>
                                                         <Link
                                                             to={`/dashboard/edit-listing/${prop.$id || prop.id}`}

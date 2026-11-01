@@ -334,8 +334,8 @@ function sanitizeRow(table, doc, isUpdate = false) {
             }
             if (doc.is_verified !== undefined || doc.isVerified !== undefined) sanitized.is_verified = Boolean(doc.is_verified || doc.isVerified);
             if (doc.is_featured !== undefined || doc.isFeatured !== undefined || doc.featured !== undefined) sanitized.is_featured = Boolean(doc.is_featured || doc.isFeatured || doc.featured);
-            // Default status to approved so new listings are immediately live and visible
-            sanitized.status = doc.status && doc.status !== 'pending' ? doc.status : 'approved';
+            // Status defaults to pending so Admin can review and approve before going live
+            sanitized.status = doc.status || 'pending';
             if (doc.views_count !== undefined || doc.viewsCount !== undefined) sanitized.views_count = parseInt(doc.views_count || doc.viewsCount) || 0;
             if (doc.created_at || doc.createdAt) sanitized.created_at = doc.created_at || doc.createdAt || now;
             sanitized.updated_at = now;
@@ -412,8 +412,8 @@ function sanitizeRow(table, doc, isUpdate = false) {
 
         case 'whatsapp_leads': {
             if (doc.id) sanitized.id = doc.id;
-            if (doc.phone_number !== undefined || doc.phoneNumber !== undefined || doc.studentPhone !== undefined || doc.ownerPhone !== undefined) {
-                sanitized.phone_number = doc.phone_number || doc.phoneNumber || doc.studentPhone || doc.ownerPhone || '';
+            if (doc.studentPhone !== undefined || doc.phone_number !== undefined || doc.phoneNumber !== undefined || doc.ownerPhone !== undefined) {
+                sanitized.phone_number = doc.studentPhone || doc.phone_number || doc.phoneNumber || doc.ownerPhone || '';
             }
             if (doc.listing_id !== undefined || doc.listingId !== undefined) sanitized.listing_id = doc.listing_id || doc.listingId || '';
             if (doc.listing_title !== undefined || doc.listingTitle !== undefined) sanitized.listing_title = doc.listing_title || doc.listingTitle || 'StaySetu Property';
@@ -608,10 +608,19 @@ function normalizeDocument(table, item) {
         isRead: item.is_read !== undefined ? item.is_read : item.isRead,
 
         // whatsapp_leads
-        studentEmail: item.clicker_email || item.studentEmail,
-        clickerName: item.clicker_name || item.clickerName,
-        clickerEmail: item.clicker_email || item.clickerEmail,
-        clickedAt: item.clicked_at || item.clickedAt,
+        studentPhone: item.phone_number || item.studentPhone || item.phoneNumber || '',
+        phoneNumber: item.phone_number || item.phoneNumber || item.studentPhone || '',
+        studentName: item.clicker_name || item.studentName || item.clickerName || 'User',
+        studentEmail: item.clicker_email || item.studentEmail || item.clickerEmail || '',
+        clickerName: item.clicker_name || item.studentName || item.clickerName || 'User',
+        clickerEmail: item.clicker_email || item.studentEmail || item.clickerEmail || '',
+        listingTitle: item.listing_title || item.listingTitle || 'StaySetu Property',
+        listingId: item.listing_id || item.listingId || '',
+        ownerName: item.owner_name || item.ownerName || 'Owner',
+        ownerPhone: item.owner_phone || item.ownerPhone || '',
+        source: item.source || 'inquiry',
+        message: item.message || '',
+        clickedAt: item.clicked_at || item.clickedAt || item.created_at || item.$createdAt,
 
         // maid_services
         title: item.name || item.title,
