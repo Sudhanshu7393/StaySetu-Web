@@ -15,6 +15,42 @@ import {
 import PropertyMap from '../../components/common/PropertyMap';
 import { formatPropertyPrice, getPropertyTypeLabel } from '../../lib/formatters';
 
+// Client-side image compression
+const compressImageFile = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const maxWidth = 1280;
+                const maxHeight = 1280;
+                let { width, height } = img;
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.82));
+            };
+            img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+    });
+};
+
 const OwnerDashboard = () => {
     const { user, profile, signOut, refreshProfile } = useAuth();
     const navigate = useNavigate();
@@ -259,12 +295,17 @@ const OwnerDashboard = () => {
 
         for (const file of toUpload) {
             try {
-                const result = await storage.createFile(BUCKET_ID, ID.unique(), file);
-                let url = result.url || result.viewUrl || getImageUrl(result.$id);
-                if (file.type.startsWith('video/')) {
-                    url += (url.includes('?') ? '&' : '?') + 'is_video=true';
+                if (file.type.startsWith('image/')) {
+                    const dataUrl = await compressImageFile(file);
+                    newUploads.push({ url: dataUrl, name: file.name, isVideo: false });
+                } else {
+                    const result = await storage.createFile(BUCKET_ID, ID.unique(), file);
+                    let url = result.url || result.viewUrl || getImageUrl(result.$id);
+                    if (file.type.startsWith('video/')) {
+                        url += (url.includes('?') ? '&' : '?') + 'is_video=true';
+                    }
+                    newUploads.push({ url, name: file.name, fileId: result.$id, isVideo: file.type.startsWith('video/') });
                 }
-                newUploads.push({ url, name: file.name, fileId: result.$id, isVideo: file.type.startsWith('video/') });
             } catch (err) {
                 console.error('Upload error:', err);
                 alert(`Failed to upload ${file.name}: ${err.message}`);
@@ -288,32 +329,36 @@ const OwnerDashboard = () => {
         try {
             if (!user) throw new Error('You must be logged in to add a listing');
 
-            const imageUrls = uploadedImages.map(img => img.url);
+            let imageUrls = uploadedImages.map(img => img.url);
+            if (imageUrls.length === 0) {
+                imageUrls = ['/properties/crossings/crossings_republik_towers.jpg'];
+            }
 
-            await databases.createDocument(DATABASE_ID, COLLECTION.listings, ID.unique(), {
+            const docId = ID.unique();
+            await databases.createDocument(DATABASE_ID, COLLECTION.listings, docId, {
                 purpose: formData.purpose || 'rent',
                 title: formData.title,
-                description: formData.description,
+                description: formData.description || `${formData.title} in ${formData.location}`,
                 price: parseFloat(formData.price),
                 area: formData.area || '',
                 ownership: formData.ownership || 'Freehold',
                 possession: formData.possession || 'Ready to Move',
                 bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
                 location: formData.location,
-                latitude: formData.latitude,
-                longitude: formData.longitude,
+                latitude: formData.latitude || '28.6139',
+                longitude: formData.longitude || '77.4273',
                 type: formData.type,
                 phoneNumber: formData.phone_number,
                 whatsappNumber: formData.whatsapp_number,
-                amenities: JSON.stringify(formData.amenities),
-                images: JSON.stringify(imageUrls.length > 0 ? imageUrls : []),
+                amenities: formData.amenities,
+                images: imageUrls,
                 ownerId: user.$id,
                 listedBy: formData.listed_by || 'owner',
                 brokerageFee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent') : '₹0'),
                 brokerage_fee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent') : '₹0'),
-                status: 'pending',
+                status: 'approved',
                 genderPreference: formData.gender_preference || 'any',
-                occupancy: JSON.stringify(formData.occupancy),
+                occupancy: formData.occupancy,
                 deposit: formData.deposit || null,
                 availableFrom: formData.available_from || null,
                 association: formData.association || '',

@@ -20,6 +20,11 @@ const Login = () => {
     // If already logged in, redirect
     useEffect(() => {
         if (!authLoading && user && profile) {
+            const redirectParam = new URLSearchParams(location.search).get('redirect');
+            if (redirectParam && redirectParam.startsWith('/')) {
+                navigate(redirectParam, { replace: true });
+                return;
+            }
             const role = profile.role || 'student';
             if (role === 'admin') {
                 navigate('/admin', { replace: true });
@@ -29,7 +34,7 @@ const Login = () => {
                 navigate('/dashboard', { replace: true });
             }
         }
-    }, [user, profile, authLoading, navigate]);
+    }, [user, profile, authLoading, navigate, location.search]);
 
     if (authLoading || (user && profile)) {
         return (

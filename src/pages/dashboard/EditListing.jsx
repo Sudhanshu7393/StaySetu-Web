@@ -1,21 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { databases, DATABASE_ID, COLLECTION } from '../../lib/supabase';
+import { databases, DATABASE_ID, COLLECTION, parseJsonField } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import {
-    ArrowLeft, MapPin, IndianRupee, Save, X, Plus,
-    AlertCircle, CheckCircle2, Locate, Search
+    ArrowLeft, Upload, MapPin, IndianRupee, Home,
+    CheckCircle2, AlertCircle, Save, X, Plus, Locate, Search,
+    Building2, Users, Image as ImageIcon, Camera, Trash2, Star, Sparkles
 } from 'lucide-react';
 import PropertyMap from '../../components/common/PropertyMap';
 
+// High-quality verified sample photos
+const SAMPLE_PHOTOS = [
+    { name: 'Society Highrise', url: '/properties/crossings/crossings_republik_towers.jpg' },
+    { name: 'Balcony View', url: '/properties/crossings/indian_tower_balconies.jpg' },
+    { name: 'Drawing Room', url: '/properties/crossings/indian_drawing_room.jpg' },
+    { name: 'Bedroom', url: '/properties/crossings/indian_bedroom.jpg' },
+];
+
+// Client-side image compression
+const compressImageFile = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const maxWidth = 1280;
+                const maxHeight = 1280;
+                let { width, height } = img;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                resolve(compressedDataUrl);
+            };
+            img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+    });
+};
+
 const EditListing = () => {
     const { id } = useParams();
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const navigate = useNavigate();
+    const fileInputRef = useRef(null);
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [uploadingPhotos, setUploadingPhotos] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [showUrlInput, setShowUrlInput] = useState(false);
+    const [customUrl, setCustomUrl] = useState('');
 
     const [formData, setFormData] = useState({
         purpose: 'rent',
@@ -23,39 +76,42 @@ const EditListing = () => {
         description: '',
         price: '',
         area: '',
+        society: '',
         ownership: 'Freehold',
         possession: 'Ready to Move',
-        bedrooms: '',
+        bedrooms: '2',
+        type: 'Flat',
+        furnishing: 'Semi-Furnished',
         location: '',
-        latitude: '',
-        longitude: '',
-        type: 'PG',
+        latitude: '28.6139',
+        longitude: '77.4273',
+        gender_preference: 'any',
         phone_number: '',
         whatsapp_number: '',
         amenities: [],
-        images: [''],
+        images: [],
         listed_by: 'owner',
-        brokerage_fee: '15 Days Rent',
-        occupancy: [],
-        occupancy_pricing: {},
+        brokerage_fee: '₹0 (Direct Owner - Free)',
+        occupancy: ['single'],
+        occupancy_pricing: { single: '' },
         association: '',
         nearbyCollege: ''
     });
 
-    const amenityOptions = ['WiFi', 'AC', 'Food', 'Parking', 'Laundry', 'Security', 'Gym', 'Attached Bath'];
+    const amenityOptions = ['WiFi', 'AC', 'Food', 'Parking', 'Power Backup', 'Lift', 'Security', 'Gym', 'Attached Bath', 'Balcony'];
 
     useEffect(() => {
         const fetchListing = async () => {
             try {
                 const data = await databases.getDocument(DATABASE_ID, COLLECTION.listings, id);
                 if (data) {
-                    const amenities = typeof data.amenities === 'string' ? JSON.parse(data.amenities) : (data.amenities || []);
-                    const images = typeof data.images === 'string' ? JSON.parse(data.images) : (data.images || ['']);
-                    const rawOccupancy = data.occupancy ? JSON.parse(data.occupancy) : ['single'];
+                    const amenities = parseJsonField(data.amenities);
+                    const images = parseJsonField(data.images);
+                    const rawOccupancy = parseJsonField(data.occupancy);
                     const normalizedOccupancy = [];
                     const pricingMap = {};
 
-                    rawOccupancy.forEach(item => {
+                    (rawOccupancy.length ? rawOccupancy : ['single']).forEach(item => {
                         if (typeof item === 'object' && item !== null) {
                             normalizedOccupancy.push(item.type);
                             pricingMap[item.type] = item.price || '';
@@ -71,38 +127,59 @@ const EditListing = () => {
                         description: data.description || '',
                         price: data.price ? data.price.toString() : '',
                         area: data.area || '',
+                        society: data.society || data.association || '',
                         ownership: data.ownership || 'Freehold',
                         possession: data.possession || 'Ready to Move',
-                        bedrooms: data.bedrooms ? data.bedrooms.toString() : '',
+                        bedrooms: data.bedrooms ? data.bedrooms.toString() : '2',
                         location: data.location || '',
-                        latitude: data.latitude || '',
-                        longitude: data.longitude || '',
-                        type: data.type || 'PG',
-                        phone_number: data.phoneNumber || '',
-                        whatsapp_number: data.whatsappNumber || '',
+                        latitude: data.latitude ? data.latitude.toString() : '28.6139',
+                        longitude: data.longitude ? data.longitude.toString() : '77.4273',
+                        type: data.type || (data.purpose === 'sell' ? 'Flat' : 'Flat'),
+                        furnishing: data.furnishing || 'Semi-Furnished',
+                        phone_number: data.phoneNumber || data.ownerPhone || data.owner_phone || '',
+                        whatsapp_number: data.whatsappNumber || data.whatsapp_number || '',
                         amenities: amenities,
-                        images: images.length > 0 ? images : [''],
-                        listed_by: data.listedBy || 'owner',
-                        brokerage_fee: data.brokerageFee || data.brokerage_fee || (data.purpose === 'sell' ? '1% - 2%' : '15 Days Rent'),
+                        images: images.length > 0 ? images : [],
+                        listed_by: data.listedBy || data.listed_by || 'owner',
+                        brokerage_fee: data.brokerageFee || data.brokerage_fee || (data.listedBy === 'broker' ? '15 Days Rent' : '₹0 (Direct Owner)'),
                         occupancy: normalizedOccupancy,
                         occupancy_pricing: pricingMap,
-                        gender_preference: data.genderPreference || 'any',
-                        association: data.association || '',
+                        gender_preference: data.genderPreference || data.gender_preference || 'any',
+                        association: data.society || data.association || '',
                         nearbyCollege: data.nearbyCollege || ''
                     });
                 }
             } catch (err) {
                 console.error('Fetch error:', err);
+                setError('Failed to load listing for editing.');
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
         fetchListing();
     }, [id]);
 
+    const handlePurposeSwitch = (purpose) => {
+        setFormData(prev => ({
+            ...prev,
+            purpose,
+            type: purpose === 'sell' ? 'Flat' : 'Flat',
+            brokerage_fee: prev.listed_by === 'owner' ? '₹0 (Direct Owner - Free)' : (purpose === 'sell' ? '1% - 2%' : '15 Days Rent')
+        }));
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => {
+            const updated = { ...prev, [name]: value };
+            if (name === 'listed_by') {
+                updated.brokerage_fee = value === 'owner' 
+                    ? '₹0 (Direct Owner - Free)' 
+                    : (updated.purpose === 'sell' ? '1% - 2%' : '15 Days Rent');
+            }
+            return updated;
+        });
     };
 
     const handleLocationChange = (lat, lng) => {
@@ -113,14 +190,79 @@ const EditListing = () => {
         }));
     };
 
+    // Photo File Selection & Compression
+    const handleFileSelect = async (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+
+        setUploadingPhotos(true);
+        setError(null);
+
+        try {
+            const compressedUrls = [];
+            for (const file of files) {
+                if (file.type.startsWith('image/')) {
+                    const dataUrl = await compressImageFile(file);
+                    compressedUrls.push(dataUrl);
+                }
+            }
+
+            setFormData(prev => ({
+                ...prev,
+                images: [...prev.images, ...compressedUrls]
+            }));
+        } catch (err) {
+            console.error('Image compression error:', err);
+            setError('Failed to process one or more images.');
+        } finally {
+            setUploadingPhotos(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const handleAddPresetPhoto = (url) => {
+        if (!formData.images.includes(url)) {
+            setFormData(prev => ({
+                ...prev,
+                images: [...prev.images, url]
+            }));
+        }
+    };
+
+    const handleAddCustomUrl = () => {
+        if (!customUrl.trim()) return;
+        setFormData(prev => ({
+            ...prev,
+            images: [...prev.images, customUrl.trim()]
+        }));
+        setCustomUrl('');
+        setShowUrlInput(false);
+    };
+
+    const handleRemovePhoto = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleSetCoverPhoto = (index) => {
+        if (index === 0) return;
+        setFormData(prev => {
+            const imgs = [...prev.images];
+            const [selected] = imgs.splice(index, 1);
+            return {
+                ...prev,
+                images: [selected, ...imgs]
+            };
+        });
+    };
+
     const useCurrentLocation = () => {
         if (!navigator.geolocation) {
             setError('Geolocation is not supported by your browser');
             return;
         }
-
-        setSaving(true);
-        setError(null);
 
         navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -138,26 +280,20 @@ const EditListing = () => {
                     }
                 } catch (err) {
                     console.error('Reverse geocoding error:', err);
-                } finally {
-                    setSaving(false);
                 }
             },
             (err) => {
-                setError('Unable to retrieve your location. Please ensure location services are enabled.');
+                setError('Unable to retrieve location.');
                 console.error(err);
-                setSaving(false);
             }
         );
     };
 
     const searchAddressOnMap = async () => {
-        if (!formData.location || formData.location.trim().length < 5) {
-            setError('Please enter a more specific address to search on the map.');
+        if (!formData.location || formData.location.trim().length < 4) {
+            setError('Please enter a location to search on the map.');
             return;
         }
-
-        setSaving(true);
-        setError(null);
 
         try {
             const query = encodeURIComponent(formData.location);
@@ -168,13 +304,10 @@ const EditListing = () => {
                 const { lat, lon } = data[0];
                 handleLocationChange(parseFloat(lat), parseFloat(lon));
             } else {
-                setError('Could not find this address on the map. Please pin it manually.');
+                setError('Could not pin address automatically. Please tap map to pin.');
             }
         } catch (err) {
-            setError('Error searching address. Please try pinning manually.');
             console.error(err);
-        } finally {
-            setSaving(false);
         }
     };
 
@@ -187,51 +320,6 @@ const EditListing = () => {
         }));
     };
 
-    const toggleOccupancy = (type) => {
-        setFormData(prev => {
-            const newOccupancy = prev.occupancy.includes(type)
-                ? (prev.occupancy.length > 1 ? prev.occupancy.filter(o => o !== type) : prev.occupancy)
-                : [...prev.occupancy, type];
-            
-            // Sync pricing object
-            const newPricing = { ...prev.occupancy_pricing };
-            if (!newOccupancy.includes(type)) {
-                delete newPricing[type];
-            } else if (newPricing[type] === undefined) {
-                newPricing[type] = '';
-            }
-
-            return { ...prev, occupancy: newOccupancy, occupancy_pricing: newPricing };
-        });
-    };
-
-    const handlePriceForOccupancy = (type, value) => {
-        setFormData(prev => ({
-            ...prev,
-            occupancy_pricing: {
-                ...prev.occupancy_pricing,
-                [type]: value
-            }
-        }));
-    };
-
-    const handleImageUrlChange = (index, value) => {
-        const newImages = [...formData.images];
-        newImages[index] = value;
-        setFormData(prev => ({ ...prev, images: newImages }));
-    };
-
-    const addImageField = () => {
-        setFormData(prev => ({ ...prev, images: [...prev.images, ''] }));
-    };
-
-    const removeImageField = (index) => {
-        setFormData(prev => ({
-            ...prev,
-            images: prev.images.filter((_, i) => i !== index)
-        }));
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSaving(true);
@@ -240,47 +328,52 @@ const EditListing = () => {
         try {
             if (!user) throw new Error('You must be logged in to edit a listing');
 
-            const imageUrls = formData.images.filter(url => url && url.trim());
+            let finalImages = [...formData.images].filter(Boolean);
+            if (finalImages.length === 0) {
+                finalImages = [SAMPLE_PHOTOS[0].url];
+            }
 
             const occupancyData = formData.occupancy.map(type => ({
                 type,
                 price: parseFloat(formData.occupancy_pricing[type]) || parseFloat(formData.price) || 0
             }));
 
-            // Main price for search is the lowest available
-            const mainPrice = Math.min(...occupancyData.map(o => o.price).filter(p => p > 0)) || parseFloat(formData.price) || 0;
+            const mainPrice = parseFloat(formData.price) || 0;
 
             await databases.updateDocument(DATABASE_ID, COLLECTION.listings, id, {
                 purpose: formData.purpose || 'rent',
-                title: formData.title,
-                description: formData.description,
+                title: formData.title.trim(),
+                description: formData.description.trim(),
                 price: mainPrice,
                 area: formData.area || '',
+                society: formData.society || formData.association || '',
                 ownership: formData.ownership || 'Freehold',
                 possession: formData.possession || 'Ready to Move',
                 bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
-                location: formData.location,
+                location: formData.location.trim(),
                 latitude: formData.latitude,
                 longitude: formData.longitude,
                 type: formData.type,
+                furnishing: formData.furnishing || 'Semi-Furnished',
                 phoneNumber: formData.phone_number,
                 whatsappNumber: formData.whatsapp_number,
-                amenities: JSON.stringify(formData.amenities),
-                images: JSON.stringify(imageUrls),
+                owner_phone: formData.phone_number,
+                amenities: formData.amenities,
+                images: finalImages,
                 genderPreference: formData.gender_preference || 'any',
                 listedBy: formData.listed_by || 'owner',
-                brokerageFee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent') : '₹0'),
-                brokerage_fee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : (formData.listed_by === 'broker' ? (formData.purpose === 'sell' ? '1% - 2%' : '15 Days Rent') : '₹0'),
-                occupancy: JSON.stringify(occupancyData),
-                association: formData.association || '',
+                brokerageFee: (formData.brokerage_fee && formData.brokerage_fee.trim() !== '') ? formData.brokerage_fee : '₹0',
+                occupancy: occupancyData,
+                association: formData.society || formData.association || '',
                 nearbyCollege: formData.nearbyCollege || '',
+                status: 'approved',
                 updatedAt: new Date().toISOString(),
             });
 
             setSuccess(true);
-            setTimeout(() => navigate('/dashboard'), 2000);
+            setTimeout(() => navigate(`/property/${id}`), 1200);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || 'Failed to update listing.');
         } finally {
             setSaving(false);
         }
@@ -289,508 +382,455 @@ const EditListing = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="w-12 h-12 border-4 border-plum-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-10 h-10 border-3 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-24 pb-20">
+        <div className="min-h-screen bg-slate-50 pt-20 pb-24">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                {/* Back button */}
                 <button
-                    onClick={() => navigate('/dashboard')}
-                    className="flex items-center text-slate-600 hover:text-plum-500 font-bold mb-8 transition-colors"
+                    onClick={() => navigate(-1)}
+                    className="inline-flex items-center text-slate-600 hover:text-rose-600 font-bold mb-6 transition-colors text-sm"
                 >
-                    <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
+                    <ArrowLeft size={18} className="mr-2" /> Back
                 </button>
 
-                <div className="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-premium overflow-hidden border border-slate-100">
-                    <div className="p-5 sm:p-8 md:p-12 border-b border-slate-50">
-                        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Edit Property</h1>
-                        <p className="text-slate-500 font-medium tracking-tight text-xs sm:text-sm">Update your property details to keep information accurate.</p>
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200/80">
+                    
+                    {/* Header */}
+                    <div className="p-6 sm:p-8 md:p-10 border-b border-slate-100 bg-gradient-to-br from-white via-rose-50/20 to-zinc-50">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                                    Edit Property Listing
+                                </h1>
+                                <p className="text-slate-500 font-medium text-xs sm:text-sm mt-1">
+                                    Update details, photos, and pricing for this property.
+                                </p>
+                            </div>
+
+                            {/* Purpose Toggle */}
+                            <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200 shrink-0 self-start sm:self-center">
+                                <button
+                                    type="button"
+                                    onClick={() => handlePurposeSwitch('rent')}
+                                    className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                                        formData.purpose === 'rent'
+                                            ? 'bg-rose-500 text-white shadow-md shadow-rose-500/25'
+                                            : 'text-slate-600 hover:text-slate-900'
+                                    }`}
+                                >
+                                    🏠 For Rent
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handlePurposeSwitch('sell')}
+                                    className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                                        formData.purpose === 'sell'
+                                            ? 'bg-rose-500 text-white shadow-md shadow-rose-500/25'
+                                            : 'text-slate-600 hover:text-slate-900'
+                                    }`}
+                                >
+                                    🏷️ For Sale
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="p-5 sm:p-8 md:p-12 space-y-8 sm:space-y-10">
+                    <form onSubmit={handleSubmit} className="p-6 sm:p-8 md:p-10 space-y-8">
+                        
                         {error && (
-                            <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start space-x-3">
-                                <AlertCircle className="text-red-500 shrink-0" size={20} />
-                                <p className="text-sm text-red-600 font-medium">{error}</p>
+                            <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 text-rose-700 text-sm">
+                                <AlertCircle size={20} className="shrink-0" />
+                                <span className="font-semibold">{error}</span>
                             </div>
                         )}
 
                         {success && (
-                            <div className="p-4 bg-green-50 border border-green-100 rounded-2xl flex items-start space-x-3 font-bold text-green-600">
-                                <CheckCircle2 className="text-green-500 shrink-0" size={20} />
-                                <p>Listing updated successfully!</p>
+                            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-700 text-sm">
+                                <CheckCircle2 size={20} className="shrink-0" />
+                                <span className="font-bold">Property updated successfully! Redirecting...</span>
                             </div>
                         )}
 
-                        {/* Basic Info */}
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-6 font-black uppercase tracking-widest text-[10px] text-rose-500">Step 1 — Basic Information</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                
-                                {/* Purpose Switcher: Rent vs Sell */}
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Listing Purpose</label>
-                                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData(prev => ({ ...prev, purpose: 'rent', type: 'PG' }))}
-                                            className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm flex items-center justify-center gap-2 ${formData.purpose === 'rent'
-                                                ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-xs'
-                                                : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
-                                                }`}
-                                        >
-                                            <span>🏠 Rent Out (किराया)</span>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData(prev => ({ ...prev, purpose: 'sell', type: 'Flat' }))}
-                                            className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm flex items-center justify-center gap-2 ${formData.purpose === 'sell'
-                                                ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-xs'
-                                                : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
-                                                }`}
-                                        >
-                                            <span>🏷️ Sell Property (बेचना)</span>
-                                        </button>
-                                    </div>
-                                </div>
+                        {/* Basic Details */}
+                        <div className="space-y-4">
+                            <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <Home size={16} className="text-rose-500" /> Basic Details
+                            </h2>
 
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Are you an Owner or a Broker?</label>
-                                    <div className="flex gap-3 sm:gap-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData(prev => ({ ...prev, listed_by: 'owner' }))}
-                                            className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm ${formData.listed_by === 'owner'
-                                                ? 'border-rose-500 bg-rose-50 text-rose-700'
-                                                : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
-                                                }`}
-                                        >
-                                            Owner
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setFormData(prev => ({ ...prev, listed_by: 'broker' }))}
-                                            className={`flex-1 py-3 sm:py-3.5 rounded-2xl border-2 transition-all font-bold text-xs sm:text-sm ${formData.listed_by === 'broker'
-                                                ? 'border-rose-500 bg-rose-50 text-rose-700'
-                                                : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
-                                                }`}
-                                        >
-                                            Broker
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="md:col-span-2 p-4 bg-zinc-50 border border-zinc-200/80 rounded-2xl animate-fade-in">
-                                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                                        <label className="block text-xs font-black text-zinc-900 uppercase tracking-wider">
-                                            {formData.listed_by === 'broker' ? 'Disclosed Broker Fee / Commission' : 'Brokerage Fee (Optional - Defaults to ₹0)'}
-                                        </label>
-                                        <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${formData.listed_by === 'broker' ? 'text-amber-800 bg-amber-100' : 'text-emerald-800 bg-emerald-100'}`}>
-                                            {formData.listed_by === 'broker' ? 'Transparent Brokerage' : 'Direct Owner (₹0 Fee)'}
-                                        </span>
-                                    </div>
-                                    <p className="text-[11px] text-zinc-500 mb-3 font-medium">
-                                        Agar aap koi brokerage fee lete hain toh yahan bharein. Agar nahi lete toh khali chhod dein (clients ko ₹0 show hoga).
-                                    </p>
-                                    <div className="flex flex-wrap gap-2 mb-3">
-                                        {[
-                                            '₹0 (Direct Connect)',
-                                            ...(formData.purpose === 'sell' 
-                                                ? ['1% Deal Value', '2% Deal Value', '₹25,000 Flat']
-                                                : ['15 Days Rent', '1 Month Rent', '₹5,000 Flat'])
-                                        ].map((opt) => (
-                                            <button
-                                                key={opt}
-                                                type="button"
-                                                onClick={() => setFormData(prev => ({ ...prev, brokerage_fee: opt }))}
-                                                className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${
-                                                    formData.brokerage_fee === opt
-                                                        ? 'bg-rose-500 text-white border-rose-500 shadow-xs'
-                                                        : 'bg-white text-zinc-700 border-zinc-200 hover:border-zinc-400'
-                                                }`}
-                                            >
-                                                {opt}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    <input
-                                        type="text"
-                                        name="brokerage_fee"
-                                        value={formData.brokerage_fee}
-                                        onChange={handleChange}
-                                        placeholder="Brokerage fee e.g. ₹0 or 15 Days Rent"
-                                        className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-zinc-800 focus:outline-none focus:ring-2 focus:ring-rose-400"
-                                    />
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Property Title</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="sm:col-span-2">
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Title *
+                                    </label>
                                     <input
                                         type="text"
                                         name="title"
                                         required
-                                        placeholder={formData.purpose === 'sell' ? "e.g. 3 BHK Luxury Apartment in Crossings Republik" : "e.g. Modern Girls PG near ABES College"}
-                                        className="input-field"
                                         value={formData.title}
                                         onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-semibold text-slate-900"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Property Type</label>
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Property Type
+                                    </label>
                                     <select
                                         name="type"
-                                        className="input-field cursor-pointer"
                                         value={formData.type}
                                         onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-bold text-slate-900 bg-white"
                                     >
-                                        {formData.purpose === 'sell' ? (
-                                            <>
-                                                <option value="Flat">Flat / Apartment</option>
-                                                <option value="House/Villa">Independent Villa / Kothi</option>
-                                                <option value="Plot">Residential Plot</option>
-                                                <option value="Studio">Studio Suite</option>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <option value="PG">PG (Paying Guest)</option>
-                                                <option value="Flat">Flat / Apartment</option>
-                                                <option value="Hostel">Hostel</option>
-                                                <option value="Studio">Studio Flat</option>
-                                            </>
-                                        )}
+                                        <option value="Flat">Flat / High-Rise Apartment</option>
+                                        <option value="Villa">Independent House / Villa</option>
+                                        <option value="Plot">Residential Plot / Land</option>
+                                        <option value="PG">PG / Student Hostel</option>
+                                        <option value="Room">Single / Shared Room</option>
                                     </select>
                                 </div>
 
-                                {formData.purpose === 'sell' ? (
-                                    <>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Super Built-up Area</label>
-                                            <input
-                                                type="text"
-                                                name="area"
-                                                placeholder="e.g. 1,580 sq.ft"
-                                                className="input-field"
-                                                value={formData.area}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Bedrooms (BHK)
+                                    </label>
+                                    <select
+                                        name="bedrooms"
+                                        value={formData.bedrooms}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-bold text-slate-900 bg-white"
+                                    >
+                                        <option value="1">1 BHK / 1 RK</option>
+                                        <option value="2">2 BHK</option>
+                                        <option value="3">3 BHK</option>
+                                        <option value="4">4 BHK</option>
+                                        <option value="5">5+ BHK</option>
+                                    </select>
+                                </div>
 
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Bedrooms (BHK)</label>
-                                            <input
-                                                type="number"
-                                                name="bedrooms"
-                                                placeholder="e.g. 3"
-                                                className="input-field"
-                                                value={formData.bedrooms}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Society / Building Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="society"
+                                        value={formData.society}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-semibold text-slate-900"
+                                    />
+                                </div>
 
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Ownership Title</label>
-                                            <select
-                                                name="ownership"
-                                                className="input-field cursor-pointer"
-                                                value={formData.ownership}
-                                                onChange={handleChange}
-                                            >
-                                                <option value="Freehold">Freehold Title</option>
-                                                <option value="Leasehold">Leasehold</option>
-                                                <option value="Power of Attorney">Power of Attorney</option>
-                                                <option value="Co-operative Society">Co-operative Society</option>
-                                            </select>
-                                        </div>
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Super Built-up Area
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="area"
+                                        value={formData.area}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-semibold text-slate-900"
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Possession Status</label>
-                                            <select
-                                                name="possession"
-                                                className="input-field cursor-pointer"
-                                                value={formData.possession}
-                                                onChange={handleChange}
-                                            >
-                                                <option value="Ready to Move">Ready to Move</option>
-                                                <option value="Under Construction">Under Construction</option>
-                                                <option value="Immediate Registry">Immediate Registry</option>
-                                            </select>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Foundation / Association Name</label>
-                                            <input
-                                                type="text"
-                                                name="association"
-                                                placeholder="e.g. Crossings Republik / Delhi NCR PG Association"
-                                                className="input-field"
-                                                value={formData.association}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Nearby College / Landmark</label>
-                                            <input
-                                                type="text"
-                                                name="nearbyCollege"
-                                                placeholder="e.g. ABES EC, IMS Ghaziabad, AKGEC"
-                                                className="input-field"
-                                                value={formData.nearbyCollege}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
+                        {/* Pricing */}
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <IndianRupee size={16} className="text-rose-500" /> Pricing
+                            </h2>
 
-                                        <div className="md:col-span-2">
-                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Room Occupancy</label>
-                                            <div className="flex flex-wrap gap-4">
-                                                {[
-                                                    { id: 'single', label: 'Single' },
-                                                    { id: 'double', label: 'Double Sharing' },
-                                                    { id: 'triple', label: 'Triple Sharing' },
-                                                    { id: 'four', label: 'Four Sharing' }
-                                                ].map((opt) => (
-                                                    <button
-                                                        key={opt.id}
-                                                        type="button"
-                                                        onClick={() => toggleOccupancy(opt.id)}
-                                                        className={`flex-1 py-4 rounded-2xl border-2 transition-all font-bold text-sm ${formData.occupancy.includes(opt.id)
-                                                            ? 'border-rose-500 bg-rose-50 text-rose-700'
-                                                            : 'border-slate-100 text-slate-500 hover:border-slate-200 bg-white'
-                                                            }`}
-                                                    >
-                                                        {opt.label}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                                        {formData.purpose === 'sell'
-                                            ? 'Total Selling Price (₹)'
-                                            : (formData.type === 'Hostel' ? 'Starting Price (Monthly Rent ₹)' : 'Monthly Rent (₹)')}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        {formData.purpose === 'sell' ? 'Total Price (₹) *' : 'Monthly Rent (₹) *'}
                                     </label>
                                     <div className="relative">
-                                        <IndianRupee size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
                                         <input
                                             type="number"
                                             name="price"
-                                            required={formData.type !== 'Hostel'}
-                                            placeholder={formData.purpose === 'sell' ? "6500000" : "8500"}
-                                            className="input-field pl-10"
+                                            required
                                             value={formData.price}
                                             onChange={handleChange}
+                                            className="w-full pl-8 pr-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-bold text-slate-900"
                                         />
                                     </div>
-                                    <p className="text-[11px] text-slate-400 mt-1 font-medium">
-                                        {formData.purpose === 'sell'
-                                            ? '* Enter total expected sale price in Rupees (e.g. 5000000 for 50 Lac)'
-                                            : (formData.type === 'Hostel' ? '* Default price used if specific room prices aren\'t set.' : '')}
-                                    </p>
                                 </div>
 
-                                {formData.type === 'Hostel' && (
-                                    <div className="md:col-span-2">
-                                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Set Prices for Selected Room Types</label>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {formData.occupancy.map(type => (
-                                                <div key={type} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center justify-between gap-4">
-                                                    <span className="font-bold text-slate-700 text-xs uppercase">{type.replace('-', ' ')} Sharing</span>
-                                                    <div className="relative w-32 shrink-0">
-                                                        <IndianRupee size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                                        <input
-                                                            type="number"
-                                                            placeholder="Price"
-                                                            className="w-full bg-white border border-slate-200 rounded-xl py-2 pl-8 pr-3 text-sm font-bold focus:outline-none focus:border-plum-500"
-                                                            value={formData.occupancy_pricing[type] || ''}
-                                                            onChange={(e) => handlePriceForOccupancy(type, e.target.value)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="md:col-span-2">
-                                    <div className="flex gap-2 mb-6">
-                                        <div className="relative flex-1">
-                                            <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                            <input
-                                                type="text"
-                                                name="location"
-                                                required
-                                                placeholder="e.g. Arihant Ambience, Crossings Republik, Ghaziabad"
-                                                className="input-field pl-10"
-                                                value={formData.location}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={searchAddressOnMap}
-                                            className="px-6 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2 shrink-0"
-                                        >
-                                            <Search size={14} />
-                                            <span className="hidden sm:inline">Find on Map</span>
-                                        </button>
-                                    </div>
-
-                                    <div className="flex items-center justify-between mb-3">
-                                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">Pin Precise Location on Map</label>
-                                        <button
-                                            type="button"
-                                            onClick={useCurrentLocation}
-                                            className="flex items-center gap-1.5 text-xs font-black text-plum-600 hover:text-plum-700 transition-colors uppercase tracking-widest"
-                                        >
-                                            <Locate size={14} />
-                                            Use Live Location
-                                        </button>
-                                    </div>
-                                    <PropertyMap
-                                        isPicker={true}
-                                        position={formData.latitude && formData.longitude ? { lat: parseFloat(formData.latitude), lng: parseFloat(formData.longitude) } : null}
-                                        onLocationChange={handleLocationChange}
-                                    />
-                                    {(formData.latitude && formData.longitude) ? (
-                                        <p className="mt-2 text-[11px] text-emerald-600 font-bold flex items-center">
-                                            <Locate size={10} className="mr-1" /> Coordinates pinned: {parseFloat(formData.latitude).toFixed(4)}, {parseFloat(formData.longitude).toFixed(4)}
-                                        </p>
-                                    ) : (
-                                        <p className="mt-2 text-[11px] text-amber-600 font-bold flex items-center">
-                                            <AlertCircle size={10} className="mr-1" /> Please click on the map to pin the exact property location
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Description</label>
-                                    <textarea
-                                        name="description"
-                                        rows={4}
-                                        placeholder="Tell students about the rooms, food, environment etc..."
-                                        className="input-field resize-none"
-                                        value={formData.description}
+                                <div>
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Listed By
+                                    </label>
+                                    <select
+                                        name="listed_by"
+                                        value={formData.listed_by}
                                         onChange={handleChange}
-                                    ></textarea>
+                                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-bold text-slate-900 bg-white"
+                                    >
+                                        <option value="owner">Direct Owner (₹0 Free)</option>
+                                        <option value="broker">Verified Agent / Broker</option>
+                                    </select>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Photos */}
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                    <Camera size={16} className="text-rose-500" /> Photos ({formData.images.length})
+                                </h2>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowUrlInput(!showUrlInput)}
+                                    className="text-xs font-bold text-rose-600 hover:text-rose-700"
+                                >
+                                    {showUrlInput ? 'Cancel' : '+ Add Image URL'}
+                                </button>
+                            </div>
+
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleFileSelect}
+                                className="hidden"
+                            />
+
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="border-2 border-dashed border-rose-200 hover:border-rose-500 rounded-3xl p-6 text-center bg-rose-50/20 hover:bg-rose-50/40 transition-all cursor-pointer"
+                            >
+                                <Upload size={24} className="mx-auto mb-2 text-rose-500" />
+                                <p className="text-sm font-bold text-slate-800">
+                                    {uploadingPhotos ? 'Optimizing & adding photos...' : 'Tap to Upload More Photos from Gallery or Camera'}
+                                </p>
+                            </div>
+
+                            {showUrlInput && (
+                                <div className="flex gap-2 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                                    <input
+                                        type="url"
+                                        placeholder="Paste image URL (https://...)"
+                                        value={customUrl}
+                                        onChange={(e) => setCustomUrl(e.target.value)}
+                                        className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleAddCustomUrl}
+                                        className="px-4 py-2 bg-rose-500 text-white rounded-xl text-xs font-bold"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Preset Buttons */}
+                            <div className="flex flex-wrap gap-2">
+                                {SAMPLE_PHOTOS.map((sample) => (
+                                    <button
+                                        key={sample.name}
+                                        type="button"
+                                        onClick={() => handleAddPresetPhoto(sample.url)}
+                                        className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:border-rose-400 bg-white flex items-center gap-1.5"
+                                    >
+                                        <Plus size={13} className="text-rose-500" />
+                                        <span>{sample.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Grid of uploaded images */}
+                            {formData.images.length > 0 && (
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    {formData.images.map((imgUrl, index) => (
+                                        <div
+                                            key={index}
+                                            className="group relative aspect-[4/3] rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-100 shadow-xs"
+                                        >
+                                            <img
+                                                src={imgUrl}
+                                                alt={`Photo ${index + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            {index === 0 && (
+                                                <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-rose-600 text-white text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                                                    <Star size={10} className="fill-white" /> Cover
+                                                </span>
+                                            )}
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                {index !== 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSetCoverPhoto(index)}
+                                                        className="p-1.5 bg-white text-slate-900 rounded-lg text-xs font-bold"
+                                                    >
+                                                        Cover
+                                                    </button>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemovePhoto(index)}
+                                                    className="p-1.5 bg-rose-500 text-white rounded-lg text-xs"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Location */}
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                    <MapPin size={16} className="text-rose-500" /> Location
+                                </h2>
+                                <button
+                                    type="button"
+                                    onClick={useCurrentLocation}
+                                    className="text-xs font-bold text-rose-600 flex items-center gap-1"
+                                >
+                                    <Locate size={14} /> Auto-detect GPS
+                                </button>
+                            </div>
+
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    name="location"
+                                    required
+                                    value={formData.location}
+                                    onChange={handleChange}
+                                    className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-semibold text-slate-900"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={searchAddressOnMap}
+                                    className="px-4 py-3 rounded-2xl bg-slate-900 text-white text-xs font-bold flex items-center gap-1.5 hover:bg-black transition-all shrink-0"
+                                >
+                                    <Search size={14} /> Find
+                                </button>
+                            </div>
+
+                            <div className="rounded-2xl overflow-hidden border border-slate-200">
+                                <PropertyMap
+                                    position={{
+                                        lat: parseFloat(formData.latitude) || 28.6139,
+                                        lng: parseFloat(formData.longitude) || 77.4273
+                                    }}
+                                    onLocationChange={handleLocationChange}
+                                    editable={true}
+                                />
                             </div>
                         </div>
 
                         {/* Amenities */}
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-6 font-black uppercase tracking-widest text-[10px] text-plum-500">Step 2 — Amenities</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {amenityOptions.map(amenity => (
-                                    <button
-                                        key={amenity}
-                                        type="button"
-                                        onClick={() => toggleAmenity(amenity)}
-                                        className={`flex items-center justify-center p-3 rounded-xl border-2 transition-all font-bold text-sm ${formData.amenities.includes(amenity)
-                                            ? 'border-plum-500 bg-plum-50 text-plum-700'
-                                            : 'border-slate-50 text-slate-500 hover:border-slate-100'
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                                Amenities
+                            </h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                                {amenityOptions.map((amenity) => {
+                                    const selected = formData.amenities.includes(amenity);
+                                    return (
+                                        <button
+                                            key={amenity}
+                                            type="button"
+                                            onClick={() => toggleAmenity(amenity)}
+                                            className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                                                selected
+                                                    ? 'bg-rose-500 text-white border-rose-500 shadow-xs'
+                                                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                                             }`}
-                                    >
-                                        {amenity}
-                                    </button>
-                                ))}
+                                        >
+                                            {selected && <CheckCircle2 size={13} />}
+                                            <span>{amenity}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
-                        {/* Photos & Videos */}
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-6 font-black uppercase tracking-widest text-[10px] text-plum-500">Step 3 — Photos & Videos</h3>
-                            <div className="space-y-4">
-                                {formData.images.map((url, index) => (
-                                    <div key={index} className="flex gap-3">
-                                        <input
-                                            type="url"
-                                            placeholder="https://example.com/image.jpg"
-                                            className="input-field"
-                                            value={url}
-                                            onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                                        />
-                                        {formData.images.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImageField(index)}
-                                                className="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0"
-                                            >
-                                                <X size={20} />
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={addImageField}
-                                    className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 flex items-center justify-center space-x-2 hover:border-plum-300 hover:text-plum-500 transition-all font-bold"
-                                >
-                                    <Plus size={20} />
-                                    <span>Add Another Media URL</span>
-                                </button>
-                            </div>
+                        {/* Description */}
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                                Description
+                            </h2>
+                            <textarea
+                                name="description"
+                                rows="4"
+                                value={formData.description}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-medium text-slate-900"
+                            ></textarea>
                         </div>
 
-                        {/* Contact Info */}
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-6 font-black uppercase tracking-widest text-[10px] text-plum-500">Step 4 — Contact</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Contact */}
+                        <div className="space-y-4 pt-4 border-t border-slate-100">
+                            <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <Users size={16} className="text-rose-500" /> Contact Numbers
+                            </h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Phone Number</label>
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Calling Phone Number *
+                                    </label>
                                     <input
                                         type="tel"
                                         name="phone_number"
                                         required
-                                        placeholder="+91 XXXXX XXXXX"
-                                        className="input-field"
                                         value={formData.phone_number}
                                         onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-bold text-slate-900"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">WhatsApp Number</label>
+                                    <label className="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        WhatsApp Number
+                                    </label>
                                     <input
                                         type="tel"
                                         name="whatsapp_number"
-                                        required
-                                        placeholder="+91 XXXXX XXXXX"
-                                        className="input-field"
                                         value={formData.whatsapp_number}
                                         onChange={handleChange}
+                                        className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-rose-500 text-sm font-bold text-slate-900"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="pt-8 border-t border-slate-50 flex flex-col md:flex-row gap-4">
+                        {/* Submit Button */}
+                        <div className="pt-6">
                             <button
                                 type="submit"
-                                disabled={saving}
-                                className="flex-1 btn-primary py-5 rounded-2xl text-lg flex items-center justify-center space-x-3 shadow-premium"
+                                disabled={saving || uploadingPhotos}
+                                className="w-full py-4 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-rose-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
                             >
                                 {saving ? (
-                                    <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                 ) : (
                                     <>
-                                        <Save size={20} />
-                                        <span>Save Changes</span>
+                                        <Save size={18} />
+                                        <span>Save Changes & View Property</span>
                                     </>
                                 )}
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => navigate('/dashboard')}
-                                className="btn-secondary py-5 px-10 rounded-2xl"
-                            >
-                                Cancel
-                            </button>
                         </div>
+
                     </form>
                 </div>
             </div>

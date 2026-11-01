@@ -20,6 +20,8 @@ const StudentDashboard = () => {
     const [roleSuccess, setRoleSuccess] = useState(false);
     const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'visits');
     const [listings, setListings] = useState([]);
+    const [myListings, setMyListings] = useState([]);
+    const [myListingsLoading, setMyListingsLoading] = useState(false);
     const [savedListings, setSavedListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -103,14 +105,45 @@ const StudentDashboard = () => {
         }
     }, [user]);
 
+    const fetchMyListings = React.useCallback(async () => {
+        if (!user) return;
+        setMyListingsLoading(true);
+        try {
+            const res = await databases.listDocuments(
+                DATABASE_ID,
+                COLLECTION.listings,
+                [Query.equal('ownerId', user.$id || user.id), Query.orderDesc('$createdAt')]
+            );
+            setMyListings(res.documents || []);
+        } catch (err) {
+            console.error('Fetch my listings error:', err);
+        } finally {
+            setMyListingsLoading(false);
+        }
+    }, [user]);
+
+    const handleDeleteMyListing = async (listingId) => {
+        if (!window.confirm('Are you sure you want to delete this listing?')) return;
+        try {
+            await databases.deleteDocument(DATABASE_ID, COLLECTION.listings, listingId);
+            setMyListings(prev => prev.filter(item => (item.$id || item.id) !== listingId));
+        } catch (err) {
+            console.error('Delete listing error:', err);
+            alert('Failed to delete listing.');
+        }
+    };
+
     const fetchAllData = React.useCallback(async () => {
         setLoading(true);
         await Promise.all([
             fetchListings(),
             fetchSavedListings(),
+            fetchRoommateRequests(),
+            fetchIncomingRequests(),
+            fetchMyListings(),
         ]);
         setLoading(false);
-    }, [fetchListings, fetchSavedListings]);
+    }, [fetchListings, fetchSavedListings, fetchRoommateRequests, fetchIncomingRequests, fetchMyListings]);
 
     const fetchRoommateRequests = React.useCallback(async () => {
         if (!user) return;
@@ -240,6 +273,7 @@ const StudentDashboard = () => {
 
     const tabs = [
         { id: 'visits', label: 'Bookings & Visits', icon: Calendar, count: visits.length },
+        { id: 'my_listings', label: 'My Listings', icon: Home, count: myListings.length },
         { id: 'browse', label: 'Browse Stays', icon: Search, count: listings.length },
         { id: 'roommate', label: 'Find Roommate', icon: Users, count: roommateRequests.length },
         { id: 'saved', label: 'Saved', icon: Heart, count: stats.saved },
@@ -278,23 +312,33 @@ const StudentDashboard = () => {
                             </div>
                         </div>
 
-                        {/* Quick Stats */}
-                        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                            {[
-                                { label: 'Visits', value: visits.length, icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-50' },
-                                { label: 'Saved', value: stats.saved, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
-                                { label: 'Available', value: listings.length, icon: Home, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                            ].map((stat, i) => (
-                                <div key={i} className="bg-white px-2.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl border border-zinc-200/80 shadow-xs flex items-center gap-2 sm:gap-3">
-                                    <div className={`${stat.bg} ${stat.color} w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0`}>
-                                        <stat.icon size={16} />
+                        {/* Actions & Quick Stats */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <Link
+                                to="/dashboard/add-listing"
+                                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-rose-500/25 transition-all hover:scale-[1.02] shrink-0"
+                            >
+                                <Plus size={16} />
+                                <span>+ List Property</span>
+                            </Link>
+
+                            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                                {[
+                                    { label: 'Visits', value: visits.length, icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-50' },
+                                    { label: 'My Listed', value: myListings.length, icon: Home, color: 'text-purple-600', bg: 'bg-purple-50' },
+                                    { label: 'Saved', value: stats.saved, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
+                                ].map((stat, i) => (
+                                    <div key={i} className="bg-white px-2.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl border border-zinc-200/80 shadow-xs flex items-center gap-2 sm:gap-3">
+                                        <div className={`${stat.bg} ${stat.color} w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0`}>
+                                            <stat.icon size={16} />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-base sm:text-lg font-black text-zinc-900 leading-tight">{stat.value}</p>
+                                            <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-widest block truncate">{stat.label}</span>
+                                        </div>
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="text-base sm:text-lg font-black text-zinc-900 leading-tight">{stat.value}</p>
-                                        <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-widest block truncate">{stat.label}</span>
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -513,6 +557,142 @@ const StudentDashboard = () => {
                             )}
                         </div>
 
+                    </div>
+                )}
+
+                {/* My Listed Properties Tab */}
+                {activeTab === 'my_listings' && (
+                    <div className="animate-fade-in max-w-4xl mx-auto space-y-6">
+                        {/* Header Banner */}
+                        <div className="bg-gradient-to-r from-rose-50/90 via-white to-rose-100/40 rounded-3xl p-6 sm:p-8 border border-rose-100 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <span className="text-[11px] font-black uppercase tracking-widest text-rose-600 block">
+                                    PROPERTY OWNER / HOST
+                                </span>
+                                <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
+                                    My Listed Properties ({myListings.length})
+                                </h2>
+                                <p className="text-zinc-500 text-xs sm:text-sm font-normal mt-0.5">
+                                    Manage your active listings, edit details, or post new properties.
+                                </p>
+                            </div>
+
+                            <Link
+                                to="/dashboard/add-listing"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-rose-500/25 transition-all shrink-0"
+                            >
+                                <Plus size={16} />
+                                <span>+ List New Property</span>
+                            </Link>
+                        </div>
+
+                        {/* Listings List */}
+                        {myListingsLoading ? (
+                            <div className="text-center py-12 bg-white rounded-3xl border border-zinc-200">
+                                <div className="w-8 h-8 border-3 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                                <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">Loading your listings...</p>
+                            </div>
+                        ) : myListings.length > 0 ? (
+                            <div className="space-y-4">
+                                {myListings.map((prop) => {
+                                    const propImages = parseJsonField(prop.images) || [];
+                                    const coverImg = propImages[0] || '/properties/crossings/crossings_republik_towers.jpg';
+                                    const isSaleProp = prop.purpose === 'sell' || Number(prop.price) >= 500000;
+
+                                    return (
+                                        <div
+                                            key={prop.$id || prop.id}
+                                            className="bg-white rounded-3xl border border-zinc-200/80 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 sm:gap-5"
+                                        >
+                                            {/* Thumbnail */}
+                                            <div className="relative w-full sm:w-44 md:w-48 aspect-[16/10] sm:aspect-square shrink-0 rounded-2xl overflow-hidden bg-zinc-100">
+                                                <img
+                                                    src={coverImg}
+                                                    alt={prop.title}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <span className={`absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider text-white ${
+                                                    isSaleProp ? 'bg-rose-600' : 'bg-emerald-600'
+                                                }`}>
+                                                    {isSaleProp ? 'For Sale' : 'For Rent'}
+                                                </span>
+                                            </div>
+
+                                            {/* Details & Actions */}
+                                            <div className="flex-1 flex flex-col justify-between min-w-0">
+                                                <div>
+                                                    <div className="flex items-start justify-between gap-3 mb-1.5">
+                                                        <h3 className="font-extrabold text-zinc-900 text-sm sm:text-base line-clamp-1">
+                                                            {prop.title}
+                                                        </h3>
+                                                        <span className="shrink-0 text-[10px] font-extrabold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                                                            <CheckCircle size={10} /> Live & Active
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-1.5 text-xs text-zinc-500 mb-2">
+                                                        <MapPin size={13} className="text-rose-500 shrink-0" />
+                                                        <span className="line-clamp-1">{prop.location}</span>
+                                                    </div>
+
+                                                    <div className="text-sm font-black text-zinc-900 mb-3">
+                                                        {isSaleProp
+                                                            ? (Number(prop.price) >= 10000000 ? `₹${(Number(prop.price) / 10000000).toFixed(2)} Cr` : `₹${(Number(prop.price) / 100000).toFixed(2)} Lacs`)
+                                                            : `₹${Number(prop.price || 0).toLocaleString()} / month`}
+                                                    </div>
+                                                </div>
+
+                                                {/* Action Buttons */}
+                                                <div className="pt-3 border-t border-zinc-100 flex items-center justify-between gap-2">
+                                                    <div className="text-[11px] text-zinc-400 font-medium">
+                                                        ID: {(prop.$id || prop.id || '').substring(0, 10)}
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2">
+                                                        <Link
+                                                            to={`/property/${prop.$id || prop.id}`}
+                                                            className="px-3.5 py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 text-xs font-extrabold transition-all"
+                                                        >
+                                                            View Live
+                                                        </Link>
+                                                        <Link
+                                                            to={`/dashboard/edit-listing/${prop.$id || prop.id}`}
+                                                            className="px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-extrabold border border-rose-200 transition-all"
+                                                        >
+                                                            Edit
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => handleDeleteMyListing(prop.$id || prop.id)}
+                                                            className="p-1.5 rounded-full text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                                                            title="Delete Listing"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-3xl border border-zinc-200/80 p-8 sm:p-12 text-center shadow-xs">
+                                <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4">
+                                    <Home size={28} />
+                                </div>
+                                <h3 className="text-base font-extrabold text-zinc-900 mb-1">You haven't listed any properties yet</h3>
+                                <p className="text-zinc-500 text-xs sm:text-sm font-normal mb-6 max-w-sm mx-auto">
+                                    Have a flat, independent floor, room, or PG in Crossings Republik, Greater Noida, or Ghaziabad? List it now to connect directly with verified buyers and tenants.
+                                </p>
+                                <Link
+                                    to="/dashboard/add-listing"
+                                    className="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white font-extrabold py-3 px-6 rounded-full text-xs uppercase tracking-wider transition-all shadow-md shadow-rose-500/25"
+                                >
+                                    <Plus size={16} />
+                                    <span>List Your First Property</span>
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 )}
 

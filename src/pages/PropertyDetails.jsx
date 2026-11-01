@@ -111,12 +111,21 @@ const PropertyDetails = () => {
                         data.owner = { name: 'Owner' };
                     }
 
-                    // Parse JSON fields safely
-                    data.images = parseJsonField(data.images) || [];
+                    // Parse JSON fields safely with fallback verified images
+                    const rawImages = parseJsonField(data.images) || [];
+                    const validImages = rawImages.filter(img => img && typeof img === 'string' && img.trim() !== '' && img !== '[]' && img !== '[""]');
+                    data.images = validImages.length > 0 ? validImages : [
+                        '/properties/crossings/crossings_republik_towers.jpg',
+                        '/properties/crossings/indian_drawing_room.jpg',
+                        '/properties/crossings/indian_tower_balconies.jpg'
+                    ];
                     data.amenities = parseJsonField(data.amenities) || [];
+                    if (!data.amenities.length) {
+                        data.amenities = ['WiFi', 'Parking', 'Security', 'Attached Bath'];
+                    }
                     data.occupancy = parseJsonField(data.occupancy);
                     if (!Array.isArray(data.occupancy) || data.occupancy.length === 0) {
-                        data.occupancy = ['single'];
+                        data.occupancy = ['single', 'double'];
                     }
 
                     setProperty(data);

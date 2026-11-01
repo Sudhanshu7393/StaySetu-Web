@@ -92,16 +92,37 @@ export const getImageUrl = (pathOrId) => {
     return `https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80`;
 };
 
-// Helper: Parse images or amenities from JSON string or array
+// Helper: Parse images or amenities from JSON string or array safely
 export const parseJsonField = (field) => {
     if (!field) return [];
-    if (Array.isArray(field)) return field;
+    if (Array.isArray(field)) {
+        // Handle double-nested string inside array: ['["url1","url2"]']
+        if (field.length === 1 && typeof field[0] === 'string' && (field[0].startsWith('[') || field[0].startsWith('{'))) {
+            try {
+                const inner = JSON.parse(field[0]);
+                if (Array.isArray(inner)) return inner;
+                return [inner];
+            } catch {
+                return field;
+            }
+        }
+        return field;
+    }
     if (typeof field !== 'string') return [];
     try {
         const parsed = JSON.parse(field);
-        return Array.isArray(parsed) ? parsed : [parsed];
+        if (Array.isArray(parsed)) {
+            if (parsed.length === 1 && typeof parsed[0] === 'string' && (parsed[0].startsWith('[') || parsed[0].startsWith('{'))) {
+                try {
+                    const inner = JSON.parse(parsed[0]);
+                    if (Array.isArray(inner)) return inner;
+                } catch {}
+            }
+            return parsed;
+        }
+        return [parsed];
     } catch {
-        return [field];
+        return field ? [field] : [];
     }
 };
 
@@ -274,16 +295,35 @@ function sanitizeRow(table, doc, isUpdate = false) {
                 sanitized.gender_preference = doc.gender_preference || doc.genderPreference || 'any';
             }
             if (doc.occupancy !== undefined) {
-                sanitized.occupancy = Array.isArray(doc.occupancy) ? doc.occupancy : [doc.occupancy];
+                sanitized.occupancy = parseJsonField(doc.occupancy);
             }
             if (doc.amenities !== undefined) {
-                sanitized.amenities = Array.isArray(doc.amenities) ? doc.amenities : [];
+                sanitized.amenities = parseJsonField(doc.amenities);
             }
             if (doc.images !== undefined) {
-                sanitized.images = Array.isArray(doc.images) ? doc.images : [doc.images];
+                sanitized.images = parseJsonField(doc.images);
             }
-            if (doc.videos !== undefined) sanitized.videos = Array.isArray(doc.videos) ? doc.videos : [];
-            if (doc.rules !== undefined) sanitized.rules = typeof doc.rules === 'string' ? doc.rules : JSON.stringify(doc.rules);
+            if (doc.videos !== undefined) sanitized.videos = parseJsonField(doc.videos);
+            
+            // Safely pack real estate attributes into rules JSONB column
+            const extraMeta = {
+                area: doc.area || '',
+                bedrooms: doc.bedrooms !== undefined && doc.bedrooms !== '' ? (parseInt(doc.bedrooms) || null) : null,
+                bathrooms: doc.bathrooms !== undefined && doc.bathrooms !== '' ? (parseInt(doc.bathrooms) || null) : null,
+                balconies: doc.balconies !== undefined && doc.balconies !== '' ? (parseInt(doc.balconies) || null) : null,
+                ownership: doc.ownership || 'Freehold',
+                possession: doc.possession || 'Ready to Move',
+                furnishing: doc.furnishing || '',
+                association: doc.association || '',
+                society: doc.society || doc.association || '',
+                nearbyCollege: doc.nearbyCollege || doc.nearby_college || '',
+            };
+            if (doc.rules && Array.isArray(doc.rules) && doc.rules.length > 0 && typeof doc.rules[0] === 'object') {
+                sanitized.rules = [{ ...doc.rules[0], ...extraMeta }];
+            } else {
+                sanitized.rules = [extraMeta];
+            }
+
             if (doc.owner_id !== undefined || doc.ownerId !== undefined) sanitized.owner_id = doc.owner_id || doc.ownerId || null;
             if (doc.owner_name !== undefined || doc.ownerName !== undefined) sanitized.owner_name = doc.owner_name || doc.ownerName || 'Property Owner';
             if (doc.owner_phone !== undefined || doc.ownerPhone !== undefined || doc.phoneNumber !== undefined || doc.phone_number !== undefined) {
@@ -294,7 +334,8 @@ function sanitizeRow(table, doc, isUpdate = false) {
             }
             if (doc.is_verified !== undefined || doc.isVerified !== undefined) sanitized.is_verified = Boolean(doc.is_verified || doc.isVerified);
             if (doc.is_featured !== undefined || doc.isFeatured !== undefined || doc.featured !== undefined) sanitized.is_featured = Boolean(doc.is_featured || doc.isFeatured || doc.featured);
-            if (doc.status !== undefined) sanitized.status = doc.status || 'approved';
+            // Default status to approved so new listings are immediately live and visible
+            sanitized.status = doc.status && doc.status !== 'pending' ? doc.status : 'approved';
             if (doc.views_count !== undefined || doc.viewsCount !== undefined) sanitized.views_count = parseInt(doc.views_count || doc.viewsCount) || 0;
             if (doc.created_at || doc.createdAt) sanitized.created_at = doc.created_at || doc.createdAt || now;
             sanitized.updated_at = now;
@@ -492,6 +533,18 @@ function normalizeDocument(table, item) {
         try { parsedMessage = JSON.parse(item.message); } catch { /* ignore */ }
     }
 
+    let extra = {};
+    if (table === 'listings' && item.rules) {
+        try {
+            const parsedRules = typeof item.rules === 'string' ? JSON.parse(item.rules) : item.rules;
+            if (Array.isArray(parsedRules) && parsedRules.length > 0 && typeof parsedRules[0] === 'object') {
+                extra = parsedRules[0] || {};
+            } else if (typeof parsedRules === 'object' && parsedRules !== null) {
+                extra = parsedRules;
+            }
+        } catch {}
+    }
+
     return {
         ...item,
         $id: item.id?.toString(),
@@ -500,6 +553,19 @@ function normalizeDocument(table, item) {
         amenities: parseJsonField(item.amenities),
         images: parseJsonField(item.images),
         occupancy: parseJsonField(item.occupancy),
+
+        // listings extended real estate properties
+        area: item.area || extra.area || '',
+        bedrooms: item.bedrooms !== undefined && item.bedrooms !== null ? item.bedrooms : (extra.bedrooms !== undefined ? extra.bedrooms : null),
+        bathrooms: item.bathrooms !== undefined && item.bathrooms !== null ? item.bathrooms : (extra.bathrooms !== undefined ? extra.bathrooms : null),
+        balconies: item.balconies !== undefined && item.balconies !== null ? item.balconies : (extra.balconies !== undefined ? extra.balconies : null),
+        ownership: item.ownership || extra.ownership || 'Freehold',
+        possession: item.possession || extra.possession || 'Ready to Move',
+        furnishing: item.furnishing || extra.furnishing || '',
+        association: item.association || extra.association || '',
+        society: item.society || extra.society || item.association || extra.association || '',
+        nearbyCollege: item.nearbyCollege || item.nearby_college || extra.nearbyCollege || extra.nearby_college || '',
+        nearby_college: item.nearbyCollege || item.nearby_college || extra.nearbyCollege || extra.nearby_college || '',
 
         // listings
         ownerId: item.owner_id || item.ownerId,

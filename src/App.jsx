@@ -32,6 +32,7 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -43,7 +44,8 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    const redirectPath = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?redirect=${redirectPath}`} replace />;
   }
 
   return children;
