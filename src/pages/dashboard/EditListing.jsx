@@ -58,7 +58,7 @@ const compressImageFile = (file) => {
 
 const EditListing = () => {
     const { id } = useParams();
-    const { user, profile } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
 

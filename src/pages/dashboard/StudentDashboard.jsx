@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { databases, DATABASE_ID, COLLECTION, Query, ID } from '../../lib/supabase';
+import { databases, DATABASE_ID, COLLECTION, Query, ID, parseJsonField } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import PropertyCard from '../../components/common/PropertyCard';
@@ -397,9 +397,9 @@ const StudentDashboard = () => {
                         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
                             {[
                                 { key: 'all', label: 'All', count: visits.length },
-                                { key: 'upcoming', label: 'Upcoming', count: visits.filter(v => v.status === 'Upcoming' || v.status === 'Pending').length },
-                                { key: 'accepted', label: 'Accepted', count: visits.filter(v => v.status === 'Accepted').length },
-                                { key: 'canceled', label: 'Canceled', count: visits.filter(v => v.status === 'Canceled').length },
+                                { key: 'upcoming', label: 'Upcoming', count: visits.filter(v => v?.status === 'Upcoming' || v?.status === 'Pending').length },
+                                { key: 'accepted', label: 'Accepted', count: visits.filter(v => v?.status === 'Accepted').length },
+                                { key: 'canceled', label: 'Canceled', count: visits.filter(v => v?.status === 'Canceled').length },
                             ].map((pill) => (
                                 <button
                                     key={pill.key}
@@ -422,14 +422,14 @@ const StudentDashboard = () => {
                         <div className="space-y-4">
                             {visits.filter(v => {
                                 if (visitFilter === 'all') return true;
-                                if (visitFilter === 'upcoming') return v.status === 'Upcoming' || v.status === 'Pending';
-                                return v.status.toLowerCase() === visitFilter.toLowerCase();
+                                if (visitFilter === 'upcoming') return v?.status === 'Upcoming' || v?.status === 'Pending';
+                                return String(v?.status || '').toLowerCase() === visitFilter.toLowerCase();
                             }).length > 0 ? (
                                 visits
                                     .filter(v => {
                                         if (visitFilter === 'all') return true;
-                                        if (visitFilter === 'upcoming') return v.status === 'Upcoming' || v.status === 'Pending';
-                                        return v.status.toLowerCase() === visitFilter.toLowerCase();
+                                        if (visitFilter === 'upcoming') return v?.status === 'Upcoming' || v?.status === 'Pending';
+                                        return String(v?.status || '').toLowerCase() === visitFilter.toLowerCase();
                                     })
                                     .map((visit) => (
                                         <div
@@ -477,7 +477,7 @@ const StudentDashboard = () => {
 
                                                     {/* Tags */}
                                                     <div className="flex flex-wrap items-center gap-1.5 mb-3">
-                                                        {visit.tags.map((tag, i) => (
+                                                        {(visit.tags || []).map((tag, i) => (
                                                             <span key={i} className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600">
                                                                 {tag}
                                                             </span>
@@ -902,7 +902,7 @@ const StudentDashboard = () => {
                                                             <Phone size={14} /> Call: {request.requesterPhone}
                                                         </a>
                                                         <a
-                                                            href={`https://wa.me/${request.requesterPhone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${request.requesterName}, I saw your interest in my roommate requirement on StaySetu!`)}`}
+                                                            href={`https://wa.me/${String(request.requesterPhone || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${request.requesterName || ''}, I saw your interest in my roommate requirement on StaySetu!`)}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="w-full flex items-center justify-center gap-2 bg-[#25D366] text-white font-bold py-3 rounded-xl text-xs hover:bg-[#128C7E] transition-all shadow-md shadow-green-50"
@@ -1085,7 +1085,7 @@ const StudentDashboard = () => {
                                         {(req.whatsapp || req.contact_phone) && (req.userId || req.user_id) !== (user.$id || user.id) && (
                                             <div className="px-5 pb-5">
                                                 <a
-                                                    href={`https://wa.me/${(req.whatsapp || req.contact_phone).replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi! I saw your roommate requirement on StaySetu. I'm also looking in ${req.location || req.locality || 'the area'}. Let's connect!`)}`}
+                                                    href={`https://wa.me/${String(req.whatsapp || req.contact_phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi! I saw your roommate requirement on StaySetu. I'm also looking in ${req.location || req.locality || 'the area'}. Let's connect!`)}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3 rounded-2xl transition-all active:scale-95 text-sm shadow-md shadow-green-100"

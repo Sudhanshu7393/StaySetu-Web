@@ -16,10 +16,21 @@ class ErrorBoundary extends React.Component {
     }
 
     handleReload = () => {
+        try {
+            sessionStorage.clear();
+        } catch { /* ignore */ }
         window.location.reload();
     };
 
     handleGoHome = () => {
+        window.location.href = '/';
+    };
+
+    handleClearCacheAndReload = () => {
+        try {
+            localStorage.clear();
+            sessionStorage.clear();
+        } catch { /* ignore */ }
         window.location.href = '/';
     };
 
@@ -36,6 +47,12 @@ class ErrorBoundary extends React.Component {
                             <p className="text-zinc-500 text-xs sm:text-sm mt-1.5 leading-relaxed">
                                 We encountered an unexpected display issue. Please reload the page to continue.
                             </p>
+                            {this.state.error?.message && (
+                                <details className="text-left mt-3 bg-zinc-50 p-2.5 rounded-xl border border-zinc-200 text-[11px] text-zinc-600 font-mono">
+                                    <summary className="cursor-pointer font-bold text-zinc-500">Technical details</summary>
+                                    <p className="mt-1 break-words">{this.state.error.message}</p>
+                                </details>
+                            )}
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
                             <button

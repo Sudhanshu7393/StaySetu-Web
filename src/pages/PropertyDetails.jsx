@@ -367,7 +367,7 @@ const PropertyDetails = () => {
                                 </span>
                             </div>
 
-                            {property.images?.[activeImage]?.includes('is_video=true') ? (
+                            {typeof property.images?.[activeImage] === 'string' && property.images[activeImage].includes('is_video=true') ? (
                                 <video
                                     src={property.images[activeImage]}
                                     className="relative w-full h-full object-contain z-10"
@@ -636,7 +636,7 @@ const PropertyDetails = () => {
                                                             <UsersIcon size={16} />
                                                         </div>
                                                         <span className="font-bold text-emerald-700 text-xs uppercase tracking-tight">
-                                                            {type === 'single' ? 'Single' : type === 'double' ? 'Double Sharing' : type === 'triple' ? 'Triple Sharing' : (type.replace('-', ' ') + ' Sharing')}
+                                                            {type === 'single' ? 'Single' : type === 'double' ? 'Double Sharing' : type === 'triple' ? 'Triple Sharing' : (String(type || '').replace('-', ' ') + ' Sharing')}
                                                         </span>
                                                     </div>
                                                     {price && price > 0 && (
@@ -751,13 +751,20 @@ const PropertyDetails = () => {
                                     {!isSale && (
                                         <div className="flex justify-between items-center text-zinc-600">
                                             <span>Brokerage / Commission:</span>
-                                            <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
-                                                (property.brokerageFee && !property.brokerageFee.includes('Zero') && property.brokerageFee !== '0' && property.brokerageFee !== '₹0 (Direct Owner)' && property.brokerageFee !== '₹0 (No Brokerage)') || String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker'
-                                                    ? 'bg-amber-50 text-amber-900 border border-amber-200'
-                                                    : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                            }`}>
-                                                {property.brokerageFee || property.brokerage_fee || (String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker' ? '15 Days Rent' : '₹0 (Direct Connect)')}
-                                            </span>
+                                            {(() => {
+                                                const feeStr = String(property.brokerageFee || property.brokerage_fee || '');
+                                                const isBroker = String(property.listedBy || property.listed_by || 'owner').toLowerCase() === 'broker';
+                                                const hasFee = (feeStr && !feeStr.includes('Zero') && !feeStr.includes('Free') && feeStr !== '0' && feeStr !== '₹0 (Direct Owner)' && feeStr !== '₹0 (No Brokerage)') || isBroker;
+                                                return (
+                                                    <span className={`font-black px-2 py-0.5 rounded text-[11px] ${
+                                                        hasFee
+                                                            ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                                                            : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                                    }`}>
+                                                        {feeStr && feeStr !== '0' ? feeStr : (isBroker ? '15 Days Rent' : '₹0 (Direct Connect)')}
+                                                    </span>
+                                                );
+                                            })()}
                                         </div>
                                     )}
                                     {!isSale && (
